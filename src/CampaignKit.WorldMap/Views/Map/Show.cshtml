@@ -1,0 +1,130 @@
+﻿<!--
+Copyright 2017-2018 Jochen Linnemann
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+@model MapShowViewModel
+
+@{
+    Layout = "_MapLayout";
+    ViewBag.Title = "Showing " + Model.Name;
+}
+
+<div style="position: absolute; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000;">
+    <div style="position: absolute; right: 20px; bottom: 20px; pointer-events: all;">
+        <a href="#" id="deleteLink" style="padding: 10px;"><span class="glyphicon glyphicon-trash lead"></span></a>
+        <a href="#" id="editLink" style="padding: 10px;"><span class="glyphicon glyphicon-pencil lead"></span></a>
+    </div>
+</div>
+
+@if (Model.ShowProgress)
+{
+    <div id="progress-dialog" class="modal" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Creating map tiles for @Model.Name</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Secret))
+                    {
+                        <div class="form-group">
+                            <label class="control-label" asp-for="MapShowUrl">Use this URL to <b>share</b> your map</label>
+                            <input class="form-control" asp-for="MapShowUrl" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" asp-for="MapEditUrl">Use this URL to <b>edit</b> your map (don't share this URL!)</label>
+                            <input class="form-control" asp-for="MapEditUrl" readonly />
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button id="close-button" type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts {
+    <script>
+        function updateProgress() {
+            var $progressDialog = $('#progress-dialog');
+            var $progressBar = $('#progress-bar');
+            if ($progressDialog.length == 1 && $progressBar.length == 1) {
+                $.getJSON('@Model.ProgressUrl').then(function (data) {
+                    if (data.progress != null) {
+                        $progressBar.css('width', (data.progress * 100) + '%');
+                        if (data.progress < 1.0) {
+                            setTimeout(updateProgress, 500);
+                        } else {
+                            $progressBar.addClass('progress-bar-success');
+                            $('#close-button').addClass('btn-success').text('Done!');
+                        }
+                    } else {
+                        $progressDialog.modal('hide');
+                    }
+                }, function () {
+                    $progressBar.addClass('progress-bar-danger');
+                });
+            }
+        }
+
+        $(function () {
+            $('#progress-dialog').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            updateProgress();
+
+            function createBlock() {
+                var $message = $('<div>');
+                var $secrectKey = $('<input type="text" class="form-control">');
+                $message.append($('<label class="control-label">').text('Please enter the secret key for this map:'));
+                $message.append($secrectKey);
+
+                return { message: $message, secrectKey: $secrectKey };
+            }
+
+            $('#deleteLink').click(function () {
+                var block = createBlock();
+                BootstrapDialog.confirm({
+                    title: 'Delete map',
+                    message: block.message,
+                    callback: function (confirmed) {
+                        if (confirmed) location.href = '@Model.MapBaseDeleteUrl?Secret=' + block.secrectKey.val();
+                    }
+                });
+
+                return false;
+            });
+
+            $('#editLink').click(function () {
+                var block = createBlock();
+                BootstrapDialog.confirm({
+                    title: 'Edit map',
+                    message: block.message,
+                    callback: function (confirmed) {
+                        if (confirmed) location.href = '@Model.MapBaseEditUrl?Secret=' + block.secrectKey.val();
+                    }
+                });
+
+                return false;
+            });
+        });
+    </script>
+}
