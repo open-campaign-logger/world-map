@@ -1,0 +1,115 @@
+﻿<!--
+Copyright 2017-2018 Jochen Linnemann
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+@model MapCreateViewModel
+
+@{
+    ViewBag.Title = "Create your own!";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-1 col-md-2 col-lg-3">
+        </div>
+        <div class="col-sm-10 col-md-8 col-lg-6">
+            <h2>@ViewBag.Title</h2>
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+                    <form method="post" asp-antiforgery="true" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Name"></label>
+                            <input class="form-control" asp-for="Name" />
+                            <span class="text-danger" asp-validation-for="Name"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Secret"></label>
+                            <a tabindex="0" role="button" data-toggle="popover" data-placement="right" data-trigger="focus"
+                               title="@Html.DisplayNameFor(m=>m.Secret)" data-content="@Html.DescriptionFor(m => m.Secret)">
+                                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                            </a>
+                            <input class="form-control" asp-for="Secret" title="@Html.DescriptionFor(m => m.Secret)" readonly />
+                            <span class="text-danger" asp-validation-for="Secret"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" asp-for="MapImage"></label>
+                            <input class="form-control" asp-for="MapImage" />
+                            <span class="text-danger" asp-validation-for="MapImage"></span>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox col-xs-12">
+                                <label>
+                                    <input asp-for="RepeatMapInX" />
+                                    @Html.DisplayNameFor(m => m.RepeatMapInX)
+                                </label>
+                                <span class="text-danger" asp-validation-for="RepeatMapInX"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Copyright"></label>
+                            <a tabindex="0" role="button" data-toggle="popover" data-placement="right" data-trigger="focus"
+                               title="@Html.DisplayNameFor(m=>m.Copyright)" data-content="@Html.DescriptionFor(m => m.Copyright)">
+                                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                            </a>
+                            <input class="form-control" asp-for="Copyright" title="@Html.DescriptionFor(m => m.Copyright)" />
+                            <span class="text-danger" asp-validation-for="Copyright"></span>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox col-xs-12">
+                                <label>
+                                    <input asp-for="ThisIsMyOwnCreationPublishedRightfully" />
+                                    <strong>@Html.DisplayNameFor(m => m.ThisIsMyOwnCreationPublishedRightfully)</strong>
+                                </label>
+                                <span class="text-danger" asp-validation-for="ThisIsMyOwnCreationPublishedRightfully"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox col-xs-12">
+                                <label>
+                                    <input asp-for="ThisIsNotOffensiveNorObviouslyIllegalContent" />
+                                    <strong>@Html.DisplayNameFor(m => m.ThisIsNotOffensiveNorObviouslyIllegalContent)</strong>
+                                </label>
+                                <span class="text-danger" asp-validation-for="ThisIsNotOffensiveNorObviouslyIllegalContent"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox col-xs-12">
+                                <label>
+                                    <input asp-for="ProcessingSavingPublishingRightsGrantedForThisSite" />
+                                    <strong>@Html.DisplayNameFor(m => m.ProcessingSavingPublishingRightsGrantedForThisSite)</strong>
+                                </label>
+                                <span class="text-danger" asp-validation-for="ProcessingSavingPublishingRightsGrantedForThisSite"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input class="btn btn-primary pull-right" type="submit" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1 col-md-2 col-lg-3">
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
+}
