@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -22,7 +23,9 @@ using Microsoft.AspNetCore.Mvc.Routing;
 
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.Primitives;
+using SixLabors.ImageSharp.Formats;
 
 namespace CampaignKit.WorldMap.Services
 {
@@ -102,65 +105,99 @@ namespace CampaignKit.WorldMap.Services
         /// <returns>Task&lt;System.Boolean&gt;.</returns>
         public async Task<bool> CreateTilesAsync(Guid mapId, Stream stream)
         {
+            // ****************************************
+            //        Precondition Tests
+            // ****************************************
+            // Image data not provided?
             if (stream == null) return false;
 
+            // Map id doesn't exist?
             var map = _mapDataService.Find($"{mapId}");
-
             if (map == null) return false;
 
+            // Map directory already exists?
             var worldFolderPath = Path.Combine(_physicalWorldBasePath, $"{mapId}");
-
             if (Directory.Exists(worldFolderPath)) return false;
 
+            // ****************************************
+            //  Create Map Folder and Base Image File
+            // ****************************************
+            // Create world folder path
             Directory.CreateDirectory(worldFolderPath);
 
+            // Create image file from provided image data
             var originalFilePath = Path.Combine(worldFolderPath, $"original-file{map.FileExtension}");
-
             using (stream)
             using (var originalFileStream = new FileStream(originalFilePath, FileMode.CreateNew))
             {
                 stream.CopyTo(originalFileStream);
             }
 
+            // ****************************************
+            //        Create Tile Image Files
+            // ****************************************
+            // Setup progress indicator
             var progressIndicator = _progressService.CreateIndicator($"{mapId}");
             progressIndicator.SetProgress(0.0);
 
-            return await Task.Run(() =>
+            // Create master image file (sync)
+            var masterFilePath = Path.Combine(worldFolderPath, "master-file.png");
+            CreateMasterFileAndUpdateMapData(map, originalFilePath, masterFilePath);
+
+            // Calculate number of zoom levels and steps required
+            var stepCounter = 1;
+            var totalNumberOfSteps = 1; /* preparing the master file */
+            totalNumberOfSteps += map.MaxZoomLevel + 1; /* preparing one zoom-level file per zoom level */
+            totalNumberOfSteps += Sum(0, map.MaxZoomLevel, /* preparing the tiles of each zoom level */
+                zoomLevel => (int) Math.Pow((int) Math.Pow(2, zoomLevel), 2));
+
+            // Set the number of steps in the progress indicator
+            var progressUpdater = new Action(() =>
+                progressIndicator.SetProgress(++stepCounter / (double) totalNumberOfSteps));
+
+            // Create collection for tile creation tasks
+            List<Task<bool>> tasks = new List<Task<bool>>();
+
+            // Iterate through zoom levels to create required tiles
+            for (var zoomLevel = 0; zoomLevel <= map.MaxZoomLevel; zoomLevel++)
             {
-                var masterFilePath = Path.Combine(worldFolderPath, "master-file.png");
-                CreateMasterFileAndUpdateMapData(map, originalFilePath, masterFilePath);
+                // Calculate the number of tiles required for this zoom level
+                var numberOfTilesPerDimension = (int) Math.Pow(2, zoomLevel);
 
-                var stepCounter = 1;
-                var totalNumberOfSteps = 1; /* preparing the master file */
-                totalNumberOfSteps += map.MaxZoomLevel + 1; /* preparing one zoom-level file per zoom level */
-                totalNumberOfSteps += Sum(0, map.MaxZoomLevel, /* preparing the tiles of each zoom level */
-                    zoomLevel => (int) Math.Pow((int) Math.Pow(2, zoomLevel), 2));
+                // Create zoom level directory
+                var zoomLevelFolderPath = Path.Combine(worldFolderPath, $"{zoomLevel}");
+                Directory.CreateDirectory(zoomLevelFolderPath);
 
-                var progressUpdater = new Action(() =>
-                    progressIndicator.SetProgress(++stepCounter / (double) totalNumberOfSteps));
+                // Create zoom level base file (sync)
+                var zoomLevelBaseFilePath = Path.Combine(zoomLevelFolderPath, "zoom-level.png");
+                var zoomLevelBaseImage = CreateZoomLevelBaseFile(numberOfTilesPerDimension, masterFilePath, zoomLevelBaseFilePath);
+                progressUpdater.Invoke();
 
-                for (var zoomLevel = 0; zoomLevel <= map.MaxZoomLevel; zoomLevel++)
+                // Clear the task collection
+                tasks.Clear();
+
+                for (var x = 0; x < numberOfTilesPerDimension; x++)
                 {
-                    var numberOfTilesPerDimension = (int) Math.Pow(2, zoomLevel);
-
-                    var zoomLevelFolderPath = Path.Combine(worldFolderPath, $"{zoomLevel}");
-                    Directory.CreateDirectory(zoomLevelFolderPath);
-
-                    var zoomLevelBaseFilePath = Path.Combine(zoomLevelFolderPath, "zoom-level.png");
-                    CreateZoomLevelBaseFile(numberOfTilesPerDimension, masterFilePath, zoomLevelBaseFilePath);
-                    progressUpdater.Invoke();
-
-                    for (var x = 0; x < numberOfTilesPerDimension; x++)
                     for (var y = 0; y < numberOfTilesPerDimension; y++)
                     {
                         var zoomLevelTileFilePath = Path.Combine(zoomLevelFolderPath, $"{x}_{y}.png");
-                        CreateZoomLevelTileFile(zoomLevelBaseFilePath, x, y, zoomLevelTileFilePath);
+                        // Experienced issue where CreateZoomLevelTileFile was receiving:
+                        //  x=1, y=1, zoomLevelTileFilePath="...0_0.png"
+                        // A local copy of the x,y variables are required having to do with the way closures work in threaded scenarios.
+                        // Explanation can be found here: https://stackoverflow.com/questions/10179691/passing-arguments-with-changing-values-to-task-behaviour
+                        int localX = x;
+                        int localY = y;
+                        tasks.Add(Task.Run(() => CreateZoomLevelTileFile(zoomLevelBaseImage.Clone(), localX, localY, zoomLevelTileFilePath)));
                         progressUpdater.Invoke();
                     }
                 }
 
-                return true;
-            });
+                // Wait for all tile creation tasks to complete
+                var results = await Task.WhenAll(tasks);
+
+            }
+            
+            return true;
         }
 
         /// <inheritdoc />
@@ -184,22 +221,25 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="numberOfTilesPerDimension">The number of tiles per dimension.</param>
         /// <param name="masterFilePath">The master file path.</param>
         /// <param name="zoomLevelBaseFilePath">The zoom level base file path.</param>
-        private static void CreateZoomLevelBaseFile(
-            int numberOfTilesPerDimension, string masterFilePath, string zoomLevelBaseFilePath)
+        private Image<Rgba32> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, string masterFilePath, string zoomLevelBaseFilePath)
         {
-            using (var masterFileStream = new FileStream(masterFilePath, FileMode.Open))
-            using (var zoomLevelBaseFileStream = new FileStream(zoomLevelBaseFilePath, FileMode.CreateNew))
+
+            using (Image<Rgba32> masterBaseImage = Image.Load(masterFilePath)) 
             {
                 var size = numberOfTilesPerDimension * TilePixelSize;
 
-                var zoomLevelBaseImage = Image.Load(Configuration.Default, masterFileStream);
-                zoomLevelBaseImage.Clone(context => context.Resize(new ResizeOptions
+                masterBaseImage.Mutate(context => context.Resize(new ResizeOptions
                 {
                     Mode = ResizeMode.Pad,
                     Position = AnchorPositionMode.Center,
                     Size = new Size(size, size)
-                })).SaveAsPng(zoomLevelBaseFileStream);
+                }));
+
+                masterBaseImage.Save(zoomLevelBaseFilePath);
+
             }
+
+            return Image.Load(zoomLevelBaseFilePath);
         }
 
         /// <summary>
@@ -209,19 +249,17 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="x">The x.</param>
         /// <param name="y">The y.</param>
         /// <param name="zoomLevelTileFilePath">The zoom level tile file path.</param>
-        private static void CreateZoomLevelTileFile(
-            string zoomLevelBaseFilePath, int x, int y, string zoomLevelTileFilePath)
+        private bool CreateZoomLevelTileFile(Image<Rgba32> baseImage, int x, int y, string zoomLevelTileFilePath)
         {
-            using (var inStream = new FileStream(zoomLevelBaseFilePath, FileMode.Open))
-            using (var outStream = new FileStream(zoomLevelTileFilePath, FileMode.CreateNew))
-            {
-                var baseImage = Image.Load(Configuration.Default, inStream);
-                baseImage.Clone(context =>
-                        context.Crop(new Rectangle(x * TilePixelSize, y * TilePixelSize, TilePixelSize, TilePixelSize)))
-                    .SaveAsPng(outStream);
-            }
-        }
 
+            baseImage.Mutate(context => context.Crop(
+                new Rectangle(x * TilePixelSize, y * TilePixelSize, TilePixelSize, TilePixelSize)));
+
+            baseImage.Save(zoomLevelTileFilePath);
+
+            return true;
+        }
+            
         /// <summary>
         ///     Creates the master file and updates the map data.
         /// </summary>
