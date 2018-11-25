@@ -39,6 +39,44 @@ module.exports = function(grunt) {
                     }
                 ]
             },
+            leaflet_draw: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: "node_modules/leaflet-draw/dist",
+                        src: "leaflet.draw.js",
+                        dest: "wwwroot/js/"
+                    },
+                    {
+                        expand: true,
+                        cwd: "node_modules/leaflet-draw/dist",
+                        src: "leaflet.draw.css",
+                        dest: "wwwroot/css/"
+                    },
+                    {
+                        expand: true,
+                        cwd: "node_modules/leaflet-draw/dist/images",
+                        src: "**",
+                        dest: "wwwroot/css/images/"
+                    }
+                ]
+            },
+            quill: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: "node_modules/quill/dist",
+                        src: "quill.js",
+                        dest: "wwwroot/js/"
+                    },
+                    {
+                        expand: true,
+                        cwd: "node_modules/quill/dist",
+                        src: "*.css",
+                        dest: "wwwroot/css/"
+                    }
+                ]
+            },
             jQuery: {
                 files: [
                     {
@@ -109,7 +147,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-sass");
     grunt.loadNpmTasks("grunt-subgrunt");
 
-    grunt.registerTask("default", ["copy:leaflet", "copy:jQuery", "copy:bootstrap"]);
+    grunt.registerTask("default", ["copy:leaflet", "copy:jQuery", "copy:bootstrap", "copy:leaflet_draw", "copy:quill"]);
     grunt.registerTask("default-sass", ["default", "sass"]);
     grunt.registerTask("full", ["subgrunt:bootswatch", "default"]);
     grunt.registerTask("beforeBuild", ["default"]);

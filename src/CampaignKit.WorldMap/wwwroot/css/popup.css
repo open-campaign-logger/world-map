@@ -1,0 +1,43 @@
+﻿
+.popup {
+	width: 300px;
+}
+
+.popup_section {
+	padding: 5px;
+	padding-bottom: 10px;
+	background: #f3923b;
+	margin-bottom: 15px;
+}
+
+.popup_label {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+.popup_input {
+	font-size: 1.1em;
+	width: 285px;
+	height: 1.1em;
+}
+
+.popup_input_short {
+	font-size: 1.1em;
+	width: 195px;
+	height: 1.1em;
+	margin-left: 10px;
+	text-align: center;
+}
+
+.popup_title {
+	font-size: 1.1em;
+	width: 296px;
+	height: 1.5em;
+	margin-bottom: 10px;
+}
+
+
+.popup_editor {
+	height: 200px;
+	background: white;
+}
