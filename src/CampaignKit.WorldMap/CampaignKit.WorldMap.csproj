@@ -25,6 +25,16 @@
  </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="App_Data\.gitignore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App_Data\.gitignore">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="wwwroot\**\*;Views\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
