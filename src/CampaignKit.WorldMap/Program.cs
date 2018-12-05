@@ -14,6 +14,7 @@
 
 using System.IO;
 
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
 namespace CampaignKit.WorldMap
@@ -30,17 +31,15 @@ namespace CampaignKit.WorldMap
         /// </summary>
         /// <param name="args">The arguments.</param>
         public static void Main(string[] args)
-        {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .Build();
+		{
+			BuildWebHost(args).Run();
+		}
 
-            host.Run();
-        }
+		public static IWebHost BuildWebHost(string[] args) =>
+			WebHost.CreateDefaultBuilder(args)
+				.UseStartup<Startup>()
+				.Build();
 
-        #endregion Public Methods
-    }
+		#endregion Public Methods
+	}
 }

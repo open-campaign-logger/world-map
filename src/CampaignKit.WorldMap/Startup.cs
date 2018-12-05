@@ -15,9 +15,15 @@
 using System;
 
 using CampaignKit.WorldMap.Services;
+using CampaignKit.WorldMap.Entities;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Sqlite;
+using Microsoft.EntityFrameworkCore.Sqlite.Design;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -97,10 +103,14 @@ namespace CampaignKit.WorldMap
         /// <param name="services">The services.</param>
         public void ConfigureServices(IServiceCollection services)
         {
-            // This method gets called by the runtime. Use this method to add services to the container.
-            // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
+			// This method gets called by the runtime. Use this method to add services to the container.
+			// For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
 
-            services.AddMvc();
+			var connection = "Data Source=MapData.db";
+			services.AddDbContext<MappingContext>
+ 				(options => options.UseSqlite(connection));
+
+			services.AddMvc();
             services.AddSingleton(_configuration);
 
             services.AddSingleton<IAppDataPathService, DefaultAppDataPathService>();
