@@ -14,16 +14,13 @@
 
 using System;
 
-using CampaignKit.WorldMap.Services;
 using CampaignKit.WorldMap.Entities;
+using CampaignKit.WorldMap.Services;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Sqlite;
-using Microsoft.EntityFrameworkCore.Sqlite.Design;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,10 +29,10 @@ using Newtonsoft.Json;
 
 namespace CampaignKit.WorldMap
 {
-    /// <summary>
-    ///     Class Startup.
-    /// </summary>
-    public class Startup
+	/// <summary>
+	///     Class Startup.
+	/// </summary>
+	public class Startup
     {
         #region Private Fields
 
@@ -86,15 +83,20 @@ namespace CampaignKit.WorldMap
         {
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 
+			// Json conversion settings
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings { Formatting = Formatting.Indented };
 
-            loggerFactory.AddConsole();
-
-            if (env.IsDevelopment() || IsDevelopmentConfigured)
+			// Reads the IsDevelopment configuration variable to determine if this is a development environment or not
+			if (env.IsDevelopment() || IsDevelopmentConfigured)
+			{ 
                 app.UseDeveloperExceptionPage();
+			}
 
-            app.UseFileServer();
-            app.UseMvcWithDefaultRoute();
+			// Enable all static file middleware (except directory browsing) for the current request path in the current directory.
+			app.UseFileServer();
+
+			// Adds MVC to the IApplicationBuilder request execution pipeline.
+			app.UseMvcWithDefaultRoute();
         }
 
         /// <summary>
@@ -106,21 +108,27 @@ namespace CampaignKit.WorldMap
 			// This method gets called by the runtime. Use this method to add services to the container.
 			// For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
 
-			var connection = "Data Source=MapData.db";
+			// Add the configuration to the context
+			services.AddSingleton(_configuration);
+
+			// Instantiate the database and add to the context
 			services.AddDbContext<MappingContext>
- 				(options => options.UseSqlite(connection));
+ 				(options => options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
+			
+			// Add the MVC service
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-			services.AddMvc();
-            services.AddSingleton(_configuration);
-
-            services.AddSingleton<IAppDataPathService, DefaultAppDataPathService>();
+			// Add custom services to context
+			services.AddSingleton<IAppDataPathService, DefaultAppDataPathService>();
             services.AddSingleton<IWorldBasePathService, DefaultWorldBasePathService>();
             services.AddSingleton<IRandomDataService, DefaultRandomDataService>();
-            services.AddSingleton<IMapDataService, DefaultMapDataService>();
             services.AddSingleton<IProgressService, DefaultProgressService>();
 
-            services.AddTransient<ITileCreationService, DefaultTileCreationService>();
-        }
+			// Add background services
+			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
+
+
+		}
 
         #endregion Public Methods
     }
