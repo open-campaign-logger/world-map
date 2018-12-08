@@ -30,7 +30,7 @@ namespace CampaignKit.WorldMap.ViewModels
         /// </summary>
         /// <value>The hidden identifier.</value>
         [HiddenInput]
-        public Guid HiddenId { get; set; }
+        public int HiddenId { get; set; }
 
         /// <summary>
         ///     Gets or sets the hidden secret.

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace CampaignKit.WorldMap.Entities
@@ -19,10 +21,30 @@ namespace CampaignKit.WorldMap.Entities
 	public class MappingContext: DbContext
 	{
 
-		public MappingContext(DbContextOptions<MappingContext> options) : base(options)
+		public MappingContext(DbContextOptions<MappingContext> options)
+			: base(options)
 		{ }
 
 		public DbSet<Map> Maps { get; set; }
+		public DbSet<Tile> Tiles { get; set; }
+		public DbSet<Marker> Markers { get; set; }
 
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<Map>().HasData(new Map {
+				AdjustedSize = 4000,
+				ContentType = "image/jpeg",
+				Copyright = null,
+				CreationTimestamp = DateTime.UtcNow,
+				FileExtension = ".jpg",
+				MapId = 1,
+				MaxZoomLevel = 4,
+				Name = "Sample",
+				RepeatMapInX = false,
+				Secret = "lNtqjEVQ",
+				ThumbnailPath = $"~/world/1/0/zoom-level.png"
+			});
+		}
+		
 	}
 }

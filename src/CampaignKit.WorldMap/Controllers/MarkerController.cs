@@ -9,22 +9,22 @@ using CampaignKit.WorldMap.Entities;
 
 namespace CampaignKit.WorldMap.Controllers
 {
-    public class HomeController : Controller
+    public class MarkerController : Controller
     {
         private readonly MappingContext _context;
 
-        public HomeController(MappingContext context)
+        public MarkerController(MappingContext context)
         {
             _context = context;
         }
 
-        // GET: Map
+        // GET: Marker
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Maps.ToListAsync());
+            return View(await _context.Markers.ToListAsync());
         }
 
-        // GET: Map/Details/5
+        // GET: Marker/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,39 +32,39 @@ namespace CampaignKit.WorldMap.Controllers
                 return NotFound();
             }
 
-            var map = await _context.Maps
-                .FirstOrDefaultAsync(m => m.MapId == id);
-            if (map == null)
+            var marker = await _context.Markers
+                .FirstOrDefaultAsync(m => m.MarkerId == id);
+            if (marker == null)
             {
                 return NotFound();
             }
 
-            return View(map);
+            return View(marker);
         }
 
-        // GET: Map/Create
+        // GET: Marker/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Map/Create
+        // POST: Marker/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MapId,AdjustedSize,ContentType,Copyright,CreationTimestamp,FileExtension,MaxZoomLevel,Name,RepeatMapInX,Secret,ThumbnailPath")] Map map)
+        public async Task<IActionResult> Create([Bind("MarkerId,x,y,Title,MarkerData")] Marker marker)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(map);
+                _context.Add(marker);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(map);
+            return View(marker);
         }
 
-        // GET: Map/Edit/5
+        // GET: Marker/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -72,22 +72,22 @@ namespace CampaignKit.WorldMap.Controllers
                 return NotFound();
             }
 
-            var map = await _context.Maps.FindAsync(id);
-            if (map == null)
+            var marker = await _context.Markers.FindAsync(id);
+            if (marker == null)
             {
                 return NotFound();
             }
-            return View(map);
+            return View(marker);
         }
 
-        // POST: Map/Edit/5
+        // POST: Marker/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MapId,AdjustedSize,ContentType,Copyright,CreationTimestamp,FileExtension,MaxZoomLevel,Name,RepeatMapInX,Secret,ThumbnailPath")] Map map)
+        public async Task<IActionResult> Edit(int id, [Bind("MarkerId,x,y,Title,MarkerData")] Marker marker)
         {
-            if (id != map.MapId)
+            if (id != marker.MarkerId)
             {
                 return NotFound();
             }
@@ -96,12 +96,12 @@ namespace CampaignKit.WorldMap.Controllers
             {
                 try
                 {
-                    _context.Update(map);
+                    _context.Update(marker);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MapExists(map.MapId))
+                    if (!MarkerExists(marker.MarkerId))
                     {
                         return NotFound();
                     }
@@ -112,10 +112,10 @@ namespace CampaignKit.WorldMap.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(map);
+            return View(marker);
         }
 
-        // GET: Map/Delete/5
+        // GET: Marker/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -123,30 +123,30 @@ namespace CampaignKit.WorldMap.Controllers
                 return NotFound();
             }
 
-            var map = await _context.Maps
-                .FirstOrDefaultAsync(m => m.MapId == id);
-            if (map == null)
+            var marker = await _context.Markers
+                .FirstOrDefaultAsync(m => m.MarkerId == id);
+            if (marker == null)
             {
                 return NotFound();
             }
 
-            return View(map);
+            return View(marker);
         }
 
-        // POST: Map/Delete/5
+        // POST: Marker/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var map = await _context.Maps.FindAsync(id);
-            _context.Maps.Remove(map);
+            var marker = await _context.Markers.FindAsync(id);
+            _context.Markers.Remove(marker);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MapExists(int id)
+        private bool MarkerExists(int id)
         {
-            return _context.Maps.Any(e => e.MapId == id);
+            return _context.Markers.Any(e => e.MarkerId == id);
         }
     }
 }

@@ -21,3 +21,5 @@
 /// <reference path="wwwroot/js/jquery.validate.js" />
 /// <reference path="wwwroot/js/jquery.validate.unobtrusive.js" />
 /// <reference path="wwwroot/js/leaflet.js" />
+/// <reference path="wwwroot/js/leaflet.draw.js" />
+/// <reference path="wwwroot/js/quill.js" />
