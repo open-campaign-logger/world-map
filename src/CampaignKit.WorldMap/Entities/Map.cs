@@ -87,9 +87,15 @@ namespace CampaignKit.WorldMap.Entities
 		public string Secret { get; set; }
 
 		/// <summary>
-		///     Gets or sets the thumbnail path.
+		///     Gets or sets the world folder path.
 		/// </summary>
-		/// <value>The thumbnail path.</value>
+		/// <value>The world folder path.</value>
+		public string WorldFolderPath { get; set; }
+
+		/// <summary>
+		///     Gets or sets the map's thumbnail path.
+		/// </summary>
+		/// <value>The map's thumbnail path.</value>
 		public string ThumbnailPath { get; set; }
 
 		/// <summary>

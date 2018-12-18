@@ -19,6 +19,10 @@ using System.Linq;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using CampaignKit.WorldMap.Services;
+using Microsoft.Extensions.Logging;
+using CampaignKit.WorldMap.Entities;
 
 namespace CampaignKit.WorldMap
 {
@@ -35,7 +39,54 @@ namespace CampaignKit.WorldMap
         /// <param name="args">The arguments.</param>
         public static void Main(string[] args)
 		{
-			BuildWebHost(args).Run();
+			// Build the web host
+			var host = BuildWebHost(args);
+
+			// Seed the database if required
+
+			using (var scope = host.Services.CreateScope())
+			{
+				// Get the service provider
+				var services = scope.ServiceProvider;
+
+				// Get the data base provide and ensure that it is created and ready.
+				var dbContext = services.GetService<MappingContext>();
+				dbContext.Database.EnsureCreated();
+				dbContext.Database.GetDbConnection();
+
+				// Get the map data service provider and test to see if it already contains data			
+				var mapDataService = services.GetService<IMapDataService>();
+				var maps = mapDataService.FindAll();
+				maps.Wait();
+
+				if (maps.Result.Count() == 0)
+				{
+					// Create an object for the sample map
+					var sampleMap = new Map()
+					{
+						Name = "Sample",
+						Secret = "lNtqjEVQ",
+						Copyright = String.Empty,
+						ContentType = "image/png",
+						FileExtension = ".png",
+						CreationTimestamp = DateTime.UtcNow,
+						RepeatMapInX = false,
+					};
+					
+					// Retrieve the sample map image
+					var filePathService = services.GetService<IFilePathService>();
+					var imageStream = File.Open(Path.Combine(filePathService.SeedDataPath, "sample.png"), FileMode.Open);
+
+					// Use the data service to create the map
+					var mapTask = mapDataService.Create(sampleMap, imageStream);
+					mapTask.Wait();
+				}
+
+
+			}
+
+			// Run the web host
+			host.Run();
 		}
 
 		public static IWebHost BuildWebHost(string[] args) =>
@@ -44,5 +95,8 @@ namespace CampaignKit.WorldMap
 				.Build();
 
 		#endregion Public Methods
+
 	}
+
+
 }

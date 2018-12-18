@@ -29,21 +29,18 @@ namespace CampaignKit.WorldMap.Entities
 		public DbSet<Tile> Tiles { get; set; }
 		public DbSet<Marker> Markers { get; set; }
 
+		/// <summary>
+		/// Seeds the database with data for the sample map.
+		/// 
+		/// This method is called when the model for a derived context has been initialized, 
+		/// but before the model has been locked down and used to initialize the context. 
+		/// The default implementation of this method does nothing, but it can be overridden in a 
+		/// derived class such that the model can be further configured before it is locked down.
+		/// </summary>
+		/// <param name="modelBuilder">Edit Provides a simple API surface for configuring a IMutableModel that defines the shape of your entities, the relationships between them, and how they map to the database.</param>
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<Map>().HasData(new Map {
-				AdjustedSize = 4000,
-				ContentType = "image/jpeg",
-				Copyright = null,
-				CreationTimestamp = DateTime.UtcNow,
-				FileExtension = ".jpg",
-				MapId = 1,
-				MaxZoomLevel = 4,
-				Name = "Sample",
-				RepeatMapInX = false,
-				Secret = "lNtqjEVQ",
-				ThumbnailPath = $"~/world/1/0/zoom-level.png"
-			});
+
 		}
 		
 	}
