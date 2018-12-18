@@ -14,22 +14,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
-
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+
 using CampaignKit.WorldMap.Entities;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
-using SixLabors.ImageSharp.Formats;
-using System.IO;
 
 namespace CampaignKit.WorldMap.Services
 {
@@ -142,7 +142,7 @@ namespace CampaignKit.WorldMap.Services
 
 				// Query the tiles table to see if there are any unprocessed tiles.
 				var tiles = (from t in dbContext.Tiles select t)
-					.Where(t => t.CompletionTimestamp != null)
+					.Where(t => t.CompletionTimestamp == DateTime.MinValue)
 					.OrderBy(t => t.MapId).ThenBy(t => t.ZoomLevel)
 					.ToList();
 

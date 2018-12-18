@@ -79,33 +79,22 @@ namespace CampaignKit.WorldMap.Services
 		public double? GetMapProgress(string indicatorId)
 		{
 			// Create a default null return value
-			var progress = (double?)null;
+			var progress = (double?)1;
 
-			// Setup query datasource
-			// The following is equivalent to: foreach "t" in "_context.Tiles" select "t"
-			var tiles = (from t  // This defines the local variable
-			   in _context.Tiles // This defines the database
-						select t); // This defines what will be selected
-
-			// Establish query parameters
-			tiles.Where(t => t.MapId == Convert.ToInt32(indicatorId));
-
-			// Execute query
-			// Since we're using a database we need to call this step
-			// so that the query will actually execute.  (lazy loading)
-			var tileList = tiles.ToList();
+			// Find tiles related to this map
+			var tiles = (from t in _context.Tiles select t)
+				.Where(t => t.MapId == Convert.ToInt32(indicatorId))
+				.ToList();
+			var total = tiles.Count();
+			var completed = tiles.Where(t => t.CompletionTimestamp > DateTime.MinValue).Count();
 
 			// Are there tiles defined for this map?
-			if (tileList.Count > 0)
+			if (completed < total)
 			{
-
-				// Count the number of completed items in the set retrieved from the database
-				var completed = (from x in tileList where x.CompletionTimestamp != null select x).Count();
-
 				// Calculate the percentage complete ensuring to strongly type the 
 				// dividend and divisor so that the rounding does not occur during calculation
 				// and the resulting quotient is the correct data type.
-				progress = (double)completed / (double)tileList.Count();
+				progress = (double)completed / (double)total;
 
 			}
 			else
