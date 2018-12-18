@@ -62,8 +62,8 @@ namespace CampaignKit.WorldMap.Services
 		/// </summary>
 		/// <param name="map">The map.</param>
 		/// <param name="stream">Streamed image data.</param>
-		/// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
-		Task<bool> Create(Map map, Stream stream);
+		/// <returns>MapId.</returns>
+		Task<int> Create(Map map, Stream stream);
 
 		/// <summary>
 		///     Saves changes to the specified map.
@@ -172,15 +172,15 @@ namespace CampaignKit.WorldMap.Services
 		/// </summary>
 		/// <param name="map">The map.</param>
 		/// <param name="stream">Streamed image data.</param>
-		/// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
-		public async Task<bool> Create(Map map, Stream stream)
+		/// <returns>MapId for the created map.</returns>
+		public async Task<int> Create(Map map, Stream stream)
 		{
 
 			// **********************
 			//   Precondition Tests
 			// **********************
 			// Image data not provided?
-			if (stream == null) return false;
+			if (stream == null) return 0;
 
 			// ************************************
 			//  Create DB entity (Generate Map ID)
@@ -282,7 +282,7 @@ namespace CampaignKit.WorldMap.Services
 			_context.Update(map);
 			await _context.SaveChangesAsync();
 			
-			return true;
+			return map.MapId;
 			
 		}
 
