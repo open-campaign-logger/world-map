@@ -13,6 +13,8 @@
 // limitations under the License.
 
 
+using System.ComponentModel.DataAnnotations;
+
 namespace CampaignKit.WorldMap.Entities
 {
 	public class Marker
@@ -26,28 +28,34 @@ namespace CampaignKit.WorldMap.Entities
 		public int MarkerId { get; set; }
 
 		/// <summary>
-		///     Gets or sets the X coordinate of the marker
-		/// </summary>
-		/// <value>Marker x coordinate</value>
-		public int x { get; set; }
-
-		/// <summary>
-		///     Gets or sets the Y coordinate of the marker
-		/// </summary>
-		/// <value>Marker y coordinate</value>
-		public int y { get; set; }
-
-		/// <summary>
 		///     Gets or sets the marker title
 		/// </summary>
 		/// <value>Marker title.</value>
 		public string Title { get; set; }
 
 		/// <summary>
+		///     Gets or sets the marker layer type
+		/// </summary>
+		/// <value>Marker layer type.</value>
+		public string LayerType { get; set; }
+
+		/// <summary>
+		///     Gets or sets the marker lattitude and longitude
+		/// </summary>
+		/// <value>Marker lattitude and longitude.</value>
+		public string LatLng { get; set; }
+
+		/// <summary>
 		///     Gets or sets the marker data
 		/// </summary>
 		/// <value>Marker data in JSON format.</value>
 		public string MarkerData { get; set; }
+
+		/// <summary>
+		/// Parent entity
+		/// </summary>
+		[Required]
+		public Map Map { get; set; }
 
 		#endregion
 	}

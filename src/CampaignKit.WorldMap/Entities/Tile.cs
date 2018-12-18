@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CampaignKit.WorldMap.Entities
@@ -38,10 +39,16 @@ namespace CampaignKit.WorldMap.Entities
 		public int MapId { get; set; }
 
 		/// <summary>
-		///     Gets or sets the tile path.
+		///		Gets or sets the tile's zoom level.
 		/// </summary>
-		/// <value>The path.</value>
-		public string Path { get; set; }
+		/// <value>The tile's zoom level value.</value>
+		public int ZoomLevel { get; set; }
+
+		/// <summary>
+		///		Gets or sets the number of tiles per dimension in this zoom level.
+		/// </summary>
+		/// <value>The number of tiles per dimension in this zoome level.</value>
+		public int NumberOfTilesPerDimension { get; set; }
 
 		/// <summary>
 		///     Gets or sets the tile creation timestamp
@@ -62,6 +69,24 @@ namespace CampaignKit.WorldMap.Entities
 		/// </summary>
 		/// <value>The size of the tile.</value>
 		public int TileSize { get; set; }
+
+		/// <summary>
+		///		Gets or set the tile's x coordinate.
+		/// </summary>
+		/// <value>The tile's x coordinate</value>
+		public int X { get; set; }
+
+		/// <summary>
+		///		Gets or set the tile's u coordinate.
+		/// </summary>
+		/// <value>The tile's y coordinate</value>
+		public int Y { get; set; }
+
+		/// <summary>
+		/// Parent entity
+		/// </summary>
+		[Required]
+		public Map Map { get; set; }
 
 		#endregion
 

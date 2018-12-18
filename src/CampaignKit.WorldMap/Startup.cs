@@ -118,15 +118,19 @@ namespace CampaignKit.WorldMap
 			// Add the MVC service
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-			// Add custom services to context
-			services.AddSingleton<IAppDataPathService, DefaultAppDataPathService>();
-            services.AddSingleton<IWorldBasePathService, DefaultWorldBasePathService>();
-            services.AddSingleton<IRandomDataService, DefaultRandomDataService>();
-            services.AddSingleton<IProgressService, DefaultProgressService>();
+			// Add data services to context
+			// Note: these have been changed from singleton to scoped services in order
+			//       to work with the dbcontext which is scoped.
+			services.AddScoped<IFilePathService, DefaultFilePathService>();
+            services.AddScoped<IRandomDataService, DefaultRandomDataService>();
+            services.AddScoped<IProgressService, DefaultProgressService>();
+			services.AddScoped<IMapDataService, DefaultMapDataService>();
 
 			// Add background services
 			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
+			
 
+			// Ensure that the sample map has been setup
 
 		}
 
