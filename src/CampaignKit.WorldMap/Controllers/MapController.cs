@@ -107,15 +107,15 @@ namespace CampaignKit.WorldMap.Controllers
 				RepeatMapInX = model.RepeatMapInX
 			};
 
-			var saveResult = await _mapDataService.Create(map, model.MapImage.OpenReadStream());
-			if (!saveResult)
+			var id = await _mapDataService.Create(map, model.MapImage.OpenReadStream());
+			if (id == 0)
 			{
 				ModelState.AddModelError(string.Empty,
 					"Your map could not be saved. Please try again.");
 			}
 			else
 			{
-				return RedirectToAction(nameof(Show), new { map.MapId, map.Secret, ShowProgress = true });
+				return RedirectToAction(nameof(Show), new { id, map.Secret, ShowProgress = true });
 			}
 
 			return View();
@@ -215,7 +215,7 @@ namespace CampaignKit.WorldMap.Controllers
 			return Json(new { Progress = _progressService.GetMapProgress($"map_{id}") });
 		}
 
-		public async Task<IActionResult> Sample()
+		public IActionResult Sample()
 		{
 			if (!Request.Path.Value.EndsWith("/"))
 			{
@@ -226,7 +226,7 @@ namespace CampaignKit.WorldMap.Controllers
 			}
 
 			ViewBag.MaxZoomLevel = 4;
-			ViewBag.WorldPath = Url.Content($"{_filePathService.VirtualWorldBasePath}/sample");
+			ViewBag.WorldPath = Url.Content($"{_filePathService.VirtualWorldBasePath}/1");
 			ViewBag.NoWrap = false;
 
 			return View();
