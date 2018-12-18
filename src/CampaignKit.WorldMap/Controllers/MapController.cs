@@ -212,7 +212,7 @@ namespace CampaignKit.WorldMap.Controllers
 
 		public IActionResult Progress(int id)
 		{
-			return Json(new { Progress = _progressService.GetMapProgress($"map_{id}") });
+			return Json(new { Progress = _progressService.GetMapProgress($"{id}") });
 		}
 
 		public IActionResult Sample()

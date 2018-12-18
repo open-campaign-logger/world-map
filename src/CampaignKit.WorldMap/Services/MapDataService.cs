@@ -14,19 +14,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+
 using CampaignKit.WorldMap.Entities;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.Primitives;
-using SixLabors.ImageSharp.Formats;
+
 using Size = SixLabors.Primitives.Size;
 
 namespace CampaignKit.WorldMap.Services
