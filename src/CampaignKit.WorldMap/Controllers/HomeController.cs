@@ -13,53 +13,56 @@
 // limitations under the License.
 
 using System.Linq;
-
+using System.Threading.Tasks;
 using CampaignKit.WorldMap.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampaignKit.WorldMap.Controllers
 {
-    /// <inheritdoc />
-    /// <summary>
-    ///     Class HomeController.
-    /// </summary>
-    /// <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
-    public class HomeController : Controller
-    {
-        #region Private Fields
+	/// <inheritdoc />
+	/// <summary>
+	///     Class HomeController.
+	/// </summary>
+	/// <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
+	public class HomeController : Controller
+	{
+		#region Private Fields
 
-        private readonly IMapDataService _mapDataService;
+		private readonly IMapDataService _mapDataService;
 
-        #endregion Private Fields
+		#endregion Private Fields
 
-        #region Public Constructors
+		#region Public Constructors
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="HomeController" /> class.
-        /// </summary>
-        /// <param name="mapDataService">The map data service.</param>
-        public HomeController(IMapDataService mapDataService)
-        {
-            _mapDataService = mapDataService;
-        }
+		/// <summary>
+		///     Initializes a new instance of the <see cref="HomeController" /> class.
+		/// </summary>
+		/// <param name="mapDataService">The map data service.</param>
+		public HomeController(IMapDataService mapDataService)
+		{
+			_mapDataService = mapDataService;
+		}
 
-        #endregion Public Constructors
+		#endregion Public Constructors
 
-        #region Public Methods
+		#region Public Methods
 
-        public IActionResult Index()
-        {
-            var model = _mapDataService.FindAll().OrderByDescending(m => m.CreationTimestamp).Take(3);
+		public async Task<IActionResult> Index()
+		{
+			var model = (await _mapDataService.FindAll())
+				.Where(m => m.MapId != 1)
+				.OrderByDescending(m => m.CreationTimestamp)
+				.Take(3);
 
-            return View(model);
-        }
+			return View(model);
+		}
 
-        public ActionResult Legalities()
-        {
-            return View();
-        }
+		public ActionResult Legalities()
+		{
+			return View();
+		}
 
-        #endregion Public Methods
-    }
+		#endregion Public Methods
+	}
 }
