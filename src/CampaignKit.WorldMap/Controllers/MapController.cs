@@ -214,7 +214,7 @@ namespace CampaignKit.WorldMap.Controllers
 		public async Task<IActionResult> Index()
 		{
 			var model = await _mapDataService.FindAll();
-			model.OrderByDescending(m => m.CreationTimestamp);
+ 			model = model.OrderByDescending(m => m.CreationTimestamp);
 			return View(model);
 		}
 
