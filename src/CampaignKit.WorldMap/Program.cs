@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+
+using CampaignKit.WorldMap.Entities;
+using CampaignKit.WorldMap.Services;
 
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using CampaignKit.WorldMap.Services;
-using Microsoft.Extensions.Logging;
-using CampaignKit.WorldMap.Entities;
+
 using Newtonsoft.Json.Linq;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace CampaignKit.WorldMap
 {
-    /// <summary>
-    ///     Class Program.
-    /// </summary>
-    public class Program
+	/// <summary>
+	///     Class Program.
+	/// </summary>
+	public class Program
     {
         #region Public Methods
 
@@ -53,12 +53,12 @@ namespace CampaignKit.WorldMap
 				var services = scope.ServiceProvider;
 
 				// Get the data base provide and ensure that it is created and ready.
-				var dbContext = services.GetService<MappingContext>();
+				var dbContext = services.GetRequiredService<MappingContext>();
 				dbContext.Database.EnsureCreated();
 				dbContext.Database.GetDbConnection();
 
 				// Get the map data service provider and test to see if it already contains data			
-				var mapDataService = services.GetService<IMapDataService>();
+				var mapDataService = services.GetRequiredService<IMapDataService>();
 				var maps = mapDataService.FindAll();
 				maps.Wait();
 
@@ -110,6 +110,11 @@ namespace CampaignKit.WorldMap
 			host.Run();
 		}
 
+		/// <summary>
+		/// Builds the web host.
+		/// </summary>
+		/// <param name="args">The arguments.</param>
+		/// <returns></returns>
 		public static IWebHost BuildWebHost(string[] args) =>
 			WebHost.CreateDefaultBuilder(args)
 				.UseStartup<Startup>()
