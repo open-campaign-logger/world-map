@@ -14,27 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 @{
-    Layout = "_BaseLayout";
+	Layout = "_BaseLayout";
 }
 
 @section styles {
-    <link href="~/css/leaflet.css" rel="stylesheet" />
-    <style type="text/css">
-        html, body {
-            position: relative;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+	<link href="~/css/leaflet.css" rel="stylesheet" />
+	<link href="~/css/leaflet.draw.css" rel="stylesheet" />
+	<link href="~/css/quill.snow.css" rel="stylesheet" />
+	<link href="~/css/popup.css" rel="stylesheet" />
+	<style type="text/css">
+		html, body {
+			position: relative;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
 
-        div#map {
-            position: absolute;
-            top: 65px;
-            left: 0;
-            right: 0;
-            bottom: 0;
-        }
-    </style>
+		div#map {
+			position: absolute;
+			top: 65px;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+	</style>
 }
 
 <div id="map"></div>
@@ -42,16 +45,283 @@ limitations under the License.
 @RenderBody()
 
 @section scripts {
-    <script src="~/js/leaflet.js"></script>
-    <script>
-        var map = L.map('map').setView([0, 0], 2);
+	<script src="~/js/leaflet.js"></script>
+	<script src="~/js/leaflet.draw.js"></script>
+	<script src="~/js/quill.js"></script>
+	<script>
+
+		// **********************************************
+		//                 Globals
+		// **********************************************
+
+		var template = '<div id="popup_{id}" class="popup">\
+<div class="popup_section">\
+<label for="popup_title_{id}" class="popup_label">Title</label></br>\
+<input id="popup_title_{id}" class="popup_input" type="text" value="{title}"></input>\
+</div>\
+<div class="popup_section">\
+<label for="popup_coordinates_{id}" class="popup_label">Coordinates</label>\
+<input id="popup_coordinates_{id}" class="popup_input_short" type="text" value="{latlng}" disabled></input>\
+</div>\
+<div class="popup_section">\
+<label for="popup_editor_{id}" class="popup_label">Description</label></br>\
+<div id="popup_editor_{id}" class="popup_editor"></div>\
+</div>';
+
+
+		// **********************************************
+		//              Map Event Handlers
+		// **********************************************
+
+		// This is used for testing purposes only.
+		function exportData() {
+
+			var data = [];
+
+			for (var drawnItem of featureGroup.getLayers()) {
+				data.push(drawnItemToJSON(drawnItem));
+			}
+
+
+			// Stringify the GeoJson
+			var convertedData = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+
+			// Create export
+			document.getElementById('export').setAttribute('href', 'data:' + convertedData);
+			document.getElementById('export').setAttribute('download', 'data.geojson');
+
+		}
+
+
+		// This is used for testing purposes only.
+		function importData() {
+
+			// Importing the sample file and recreate drawnitems
+			jQuery.get('sample.json', function (data) {
+
+				for (var drawnitem of data) {
+
+					var layer;
+
+					if (drawnitem.properties.layerType == 'polygon') {
+						layer = L.polygon(drawnitem.latlngs);
+						layer.options.color = drawnitem.options.color;
+						layer.options.weight = drawnitem.options.weight;
+						layer.options.opacity = drawnitem.options.opacity;
+					} else if (drawnitem.properties.layerType == 'rectangle') {
+						layer = L.rectangle(drawnitem.latlngs);
+						layer.options.color = drawnitem.options.color;
+						layer.options.weight = drawnitem.options.weight;
+						layer.options.opacity = drawnitem.options.opacity;
+					} else if (drawnitem.properties.layerType == 'circle') {
+						layer = L.circle(drawnitem.latlngs);
+						layer.options.color = drawnitem.options.color;
+						layer.options.weight = drawnitem.options.weight;
+						layer.options.opacity = drawnitem.options.opacity;
+					} else if (drawnitem.properties.layerType == 'marker') {
+						layer = L.marker(drawnitem.latlngs);
+					}
+
+					// Create a popup
+					layer.bindPopup('')
+						.on('popupclose', popupClose)
+						.on('popupopen', popupOpen);
+
+					// Copy the properties from the saved object
+					layer.properties = drawnitem.properties;
+
+					// Add the layer and the popup to the drawn items group
+					featureGroup.addLayer(layer);
+
+
+				}
+
+			});
+
+		}
+
+		// Convert the drawnItem to JSON so that it can be persisted
+		function drawnItemToJSON(layer) {
+
+			// Calculate feature coordinates
+			var latlngs;
+			if (layer instanceof L.Polygon) {
+				latlngs = layer._defaultShape ? layer._defaultShape() : layer.getLatLngs();
+			} else {
+				latlngs = layer.getLatLng();
+			}
+
+			var feature = {
+				"options": layer.options,
+				"properties": layer.properties,
+				"latlngs": latlngs
+			};
+
+			return feature;
+
+		}
+
+		// **********************************************
+		//        Drawn Items Event Handlers
+		// **********************************************
+
+		// Set the drawnItem's properties and attach a popup
+		function drawnItemCreated(event) {
+
+			// Retrieve the drawing layer from the event.
+			var layer = event.layer;
+
+			// Calculate feature coordinates
+			var latlngs;
+			if (layer instanceof L.Polygon) {
+				latlngs = layer._defaultShape ? layer._defaultShape() : layer.getLatLngs();
+			} else {
+				latlngs = [layer.getLatLng()];
+			}
+
+			// Format the coordinates
+			var latlng = latlngs[0];
+
+			// Add a properties array to the layer object
+			layer.properties = {
+				title: "",
+				layerType: event.layerType,
+				latlng: strLatLng(latlng),
+				id: idLatLng(latlng),
+				content: ''
+			};
+
+			// Create a popup
+			layer.bindPopup('')
+				.on('popupclose', popupClose)
+				.on('popupopen', popupOpen);
+
+			// Add the layer and the popup to the drawn items group
+			featureGroup.addLayer(layer);
+
+		}
+
+		// Update the coordinates in the edited drawnItem's properties
+		function drawnItemEdited(event) {
+			var layers = event.layers;
+
+			layers.eachLayer(function (layer) {
+
+				// Calculate feature coordinates
+				var latlngs;
+				if (layer instanceof L.Polygon) {
+					latlngs = layer._defaultShape ? layer._defaultShape() : layer.getLatLngs();
+				} else {
+					latlngs = [layer.getLatLng()];
+				}
+
+				// Format the coordinates
+				var latlng = latlngs[0];
+
+				// Add a properties array to the layer object
+				layer.properties.latlng = strLatLng(latlng);
+				layer.properties.id = idLatLng(latlng);
+
+			});
+
+		}
+
+		// **********************************************
+		//             Popup Event Handlers
+		// **********************************************
+
+		// Function to call when a popup is opened
+		function popupOpen(e) {
+
+			// Close any other open popups
+
+			// Calculate the popup contents
+			var popupContent = L.Util.template(template, e.target.properties);
+			e.popup.setContent(popupContent);
+
+			// Instantiate the popup editor
+			quill = new Quill("#popup_editor_" + e.target.properties.id, {
+				theme: 'snow'
+			});
+
+			// Load the editor contents
+			quill.setContents(e.target.properties.content);
+
+		}
+
+		// Function to call when a popup is closed
+		function popupClose(e) {
+
+			// Grab form field data
+			e.target.properties.title = L.DomUtil.get('popup_title_' + e.target.properties.id).value;
+
+			// Save the editor contents into the
+			// the geoJSONMarker's properties
+			e.target.properties.content = quill.getContents();
+			quill = null;
+
+			// Clear the popup
+			e.popup.setContent('');
+
+		}
+
+
+		// **********************************************
+		//              Utility Functions
+		// **********************************************
+
+		// Truncate value based on number of decimals
+		var _round = function (num, len) {
+			return Math.round(num * (Math.pow(10, len))) / (Math.pow(10, len));
+		};
+
+		// Helper method to format LatLng object (x.xxxxxx, y.yyyyyy)
+		var strLatLng = function (latlng) {
+			return "(" + _round(latlng.lat, 4) + ", " + _round(latlng.lng, 4) + ")";
+		};
+
+		// Helper method to format LatLng object (x.xxxxxx, y.yyyyyy)
+		var idLatLng = function (latlng) {
+			return strLatLng(latlng).replace(/[\s\(\)\.]/g, "").replace(/[,]/g, "_");
+		};
+
+		// **********************************************
+		//                  Map Setup
+		// **********************************************
+
+		// Create the map box
+		var map = L.map('map').setView([0, 0], 2);
 
         L.tileLayer('@ViewBag.WorldPath/{z}/{x}_{y}.png', {
             attribution: "Campaign Logger",
             maxZoom: @ViewBag.MaxZoomLevel,
             noWrap: @(ViewBag.NoWrap ? "true": "false"),
             dummy: null
-        }).addTo(map);
-    </script>
-    @RenderSection("scripts", false)
+		}).addTo(map);
+
+		// Add a feature group to the map to hold drawn items
+		var featureGroup = L.featureGroup().addTo(map);
+
+		// Create a draw tool bar and bind it to the feature group
+		var drawControl = new L.Control.Draw({
+			draw: {
+				position: 'topleft',
+				polygon: true,
+				polyline: false,
+				rectangle: true,
+				circle: true
+			},
+			edit: {
+				featureGroup: featureGroup
+			}
+		}).addTo(map);
+
+		// Add a listener to the map for items that are  added by a user
+		map.on(L.Draw.Event.CREATED, drawnItemCreated);
+
+		// Update all layers with any changes made by a user
+		map.on(L.Draw.Event.EDITED, drawnItemEdited);
+
+	</script>
+	@RenderSection("scripts", false)
 }

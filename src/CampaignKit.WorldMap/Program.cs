@@ -13,8 +13,19 @@
 // limitations under the License.
 
 using System.IO;
+using System;
+using System.Linq;
 
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using CampaignKit.WorldMap.Services;
+using Microsoft.Extensions.Logging;
+using CampaignKit.WorldMap.Entities;
+using Newtonsoft.Json.Linq;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace CampaignKit.WorldMap
 {
@@ -30,17 +41,83 @@ namespace CampaignKit.WorldMap
         /// </summary>
         /// <param name="args">The arguments.</param>
         public static void Main(string[] args)
-        {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .Build();
+		{
+			// Build the web host
+			var host = BuildWebHost(args);
 
-            host.Run();
-        }
+			// Seed the database if required
 
-        #endregion Public Methods
-    }
+			using (var scope = host.Services.CreateScope())
+			{
+				// Get the service provider
+				var services = scope.ServiceProvider;
+
+				// Get the data base provide and ensure that it is created and ready.
+				var dbContext = services.GetService<MappingContext>();
+				dbContext.Database.EnsureCreated();
+				dbContext.Database.GetDbConnection();
+
+				// Get the map data service provider and test to see if it already contains data			
+				var mapDataService = services.GetService<IMapDataService>();
+				var maps = mapDataService.FindAll();
+				maps.Wait();
+
+				if (maps.Result.Count() == 0)
+				{
+					// Create an object for the sample map
+					var sampleMap = new Map()
+					{
+						Name = "Sample",
+						Secret = "lNtqjEVQ",
+						Copyright = String.Empty,
+						ContentType = "image/png",
+						FileExtension = ".png",
+						CreationTimestamp = DateTime.UtcNow,
+						RepeatMapInX = false,
+					};
+					
+					// Retrieve the sample map image
+					var filePathService = services.GetService<IFilePathService>();
+					var imageStream = File.Open(Path.Combine(filePathService.SeedDataPath, "sample.png"), FileMode.Open);
+
+					// Use the data service to create the map
+					var mapCreationTask = mapDataService.Create(sampleMap, imageStream);
+					mapCreationTask.Wait();
+
+					// Retrieve default marker data from test file
+					var markerData = File.ReadAllText(Path.Combine(filePathService.SeedDataPath, "sample.json"));
+					sampleMap.Markers = new List<Marker>();
+					var markers = JArray.Parse(markerData);
+					foreach (var m in markers)
+					{
+						var marker = new Marker()
+						{
+							JSON = m.ToString()
+						};
+						sampleMap.Markers.Add(marker);
+					}
+
+					// Use the data service to update the map
+					var markerCreationTask = mapDataService.Save(sampleMap);
+					markerCreationTask.Wait();
+
+				}
+
+
+			}
+
+			// Run the web host
+			host.Run();
+		}
+
+		public static IWebHost BuildWebHost(string[] args) =>
+			WebHost.CreateDefaultBuilder(args)
+				.UseStartup<Startup>()
+				.Build();
+
+		#endregion Public Methods
+
+	}
+
+
 }

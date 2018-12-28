@@ -17,10 +17,10 @@ using System.Text;
 
 namespace CampaignKit.WorldMap.Services
 {
-    /// <summary>
-    ///     Interface IRandomDataService
-    /// </summary>
-    public interface IRandomDataService
+	/// <summary>
+	///     Interface IRandomDataService
+	/// </summary>
+	public interface IRandomDataService
     {
         #region Public Methods
 

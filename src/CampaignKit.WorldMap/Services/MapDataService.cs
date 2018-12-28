@@ -12,159 +12,304 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Threading.Tasks;
 
 using CampaignKit.WorldMap.Entities;
 
-using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+
+using Size = SixLabors.Primitives.Size;
 
 namespace CampaignKit.WorldMap.Services
 {
-    /// <summary>
-    ///     Interface IMapDataService
-    /// </summary>
-    public interface IMapDataService
-    {
-        #region Public Methods
+	/// <summary>
+	///     Interface IMapDataService
+	/// </summary>
+	public interface IMapDataService
+	{
+		#region Public Methods
 
-        /// <summary>
-        ///     Deletes the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        void Delete(string id);
+		/// <summary>Deletes the specified map and all child entities.</summary>
+		/// <param name="id">The map identifier.</param>
+		/// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
+		Task<bool> Delete(int id);
 
-        /// <summary>
-        ///     Finds the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <returns>Map.</returns>
-        Map Find(string id);
+		/// <summary>Finds the map associated with the identifier.</summary>
+		/// <param name="id">The map identifier.</param>
+		/// <returns><c>Map</c> if successful, <c>null</c> otherwise</returns>
+		Task<Map> Find(int id);
 
-        /// <summary>
-        ///     Finds all maps.
-        /// </summary>
-        /// <returns>IEnumerable&lt;Map&gt;.</returns>
-        IEnumerable<Map> FindAll();
+		/// <summary>Finds all maps.</summary>
+		/// <returns>IEnumerable&lt;Map&gt;.</returns>
+		Task<IEnumerable<Map>> FindAll();
 
-        /// <summary>
-        ///     Saves the specified map.
-        /// </summary>
-        /// <param name="map">The map.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
-        bool Save(Map map);
+		/// <summary> Creates the specified map. </summary>
+		/// <param name="map">The map entity to create.</param>
+		/// <param name="stream">Map image data stream.</param>
+		/// <returns><c>id</c> if successful, <c>0</c> otherwise</returns>
+		Task<int> Create(Map map, Stream stream);
 
-        #endregion Public Methods
-    }
+		/// <summary> Saves changes to the specified map.</summary>
+		/// <param name="map">The map entity to save.</param>
+		/// <returns><c>id</c> if successful, <c>false</c> otherwise</returns>
+		Task<bool> Save(Map map);
 
-    /// <inheritdoc />
-    /// <summary>
-    ///     Class DefaultMapDataService.
-    /// </summary>
-    /// <seealso cref="T:CampaignKit.WorldMap.Services.IMapDataService" />
-    public class DefaultMapDataService : IMapDataService
-    {
-        #region Private Fields
+		#endregion Public Methods
+	}
 
-        private readonly string _appDataPath;
+	/// <summary>
+	///     Class DefaultMapDataService.
+	/// </summary>
+	/// <seealso cref="T:CampaignKit.WorldMap.Services.IMapDataService" />
+	public class DefaultMapDataService : IMapDataService
+	{
+		#region Private Fields
 
-        #endregion Private Fields
+		private readonly MappingContext _context;
+		private readonly IFilePathService _filePathService;
+		private readonly ILogger _logger;
+		
+		private const int TilePixelSize = 250;
 
-        #region Public Constructors
+		#endregion Private Fields
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DefaultMapDataService" /> class.
-        /// </summary>
-        /// <param name="appDataPathService">The application data path service.</param>
-        public DefaultMapDataService(IAppDataPathService appDataPathService)
-        {
-            _appDataPath = appDataPathService.AppDataPath;
-        }
+		#region Public Constructors
 
-        #endregion Public Constructors
+		/// <summary>Initializes a new instance of the <see cref="DefaultMapDataService"/> class.</summary>
+		/// <param name="context">The database context service.</param>
+		/// <param name="filePathService">The application data path service.</param>
+		/// <param name="logger">The application logger service.</param>
+		public DefaultMapDataService(MappingContext context, 
+			IFilePathService filePathService, 
+			ILogger<TileCreationService> logger)
+		{
+			_context = context;
+			_filePathService = filePathService;
+			_logger = logger;
+		}
 
-        #region Public Methods
+		#endregion Public Constructors
 
-        /// <inheritdoc />
-        /// <summary>
-        ///     Deletes the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        public void Delete(string id)
-        {
-            var mapFilePath = GetMapFilePath(id);
-            if (File.Exists(mapFilePath)) File.Delete(mapFilePath);
-        }
+		#region IMapDataService Members
 
-        /// <inheritdoc />
-        /// <summary>
-        ///     Finds the specified identifier.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <returns>Map.</returns>
-        public Map Find(string id)
-        {
-            var mapFilePath = GetMapFilePath(id);
+		#region Public Methods
 
-            if (!File.Exists(mapFilePath)) return null;
+		/// <summary>Deletes the specified map and all child entities.</summary>
+		/// <param name="id">The map identifier.</param>
+		/// <returns>
+		///   <c>true</c> if successful, <c>false</c> otherwise</returns>
+		public async Task<bool> Delete(int id)
+		{
+			// Determine if this map exists
+			var map = await _context.Maps.FindAsync(id);
+			if (map == null)
+			{
+				_logger.LogError($"Map with id:{id} not found");
+				return false;
+			}
 
-            var map = JsonConvert.DeserializeObject<Map>(File.ReadAllText(mapFilePath));
+			// Remove the map from the context.
+			_context.Maps.Remove(map);
+			await _context.SaveChangesAsync();
 
-            return map;
-        }
+			// Delete map directory and files
+			if (Directory.Exists(map.WorldFolderPath))
+			{
+				Directory.Delete(map.WorldFolderPath, true);
+			}
 
-        /// <inheritdoc />
-        /// <summary>
-        ///     Finds all maps.
-        /// </summary>
-        /// <returns>IEnumerable&lt;Map&gt;.</returns>
-        public IEnumerable<Map> FindAll()
-        {
-            var allMapFilePaths = GetAllMapFilePaths();
+			// Return result
+			return true;
+		}
 
-            return allMapFilePaths.Select(p => JsonConvert.DeserializeObject<Map>(File.ReadAllText(p)));
-        }
+		/// <summary>Finds the map associated with the identifier.</summary>
+		/// <param name="id">The map identifier.</param>
+		/// <returns>
+		///   <c>Map</c> if successful, <c>null</c> otherwise</returns>
+		public async Task<Map> Find(int id)
+		{
+			// Retrieve the map entry and any associated markers.
+			var map = await _context.Maps
+				.Include(m => m.Markers)
+				.FirstOrDefaultAsync(m => m.MapId == id);
 
-        /// <inheritdoc />
-        /// <summary>
-        ///     Saves the specified map.
-        /// </summary>
-        /// <param name="map">The map.</param>
-        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
-        public bool Save(Map map)
-        {
-            var mapFilePath = GetMapFilePath($"{map.Id}");
+			if (map == null)
+			{
+				_logger.LogError($"Map with id:{id} not found");
+				return null;
+			}
 
-            var json = JsonConvert.SerializeObject(map);
-            File.WriteAllText(mapFilePath, json);
+			return map;
+		}
 
-            return true;
-        }
+		/// <summary>Finds all maps.</summary>
+		/// <returns>IEnumerable&lt;Map&gt;.</returns>
+		public async Task<IEnumerable<Map>> FindAll()
+		{
+			return await _context.Maps.ToListAsync();
+		}
 
-        #endregion Public Methods
+		/// <summary>Creates the specified map.</summary>
+		/// <param name="map">The map entity to create.</param>
+		/// <param name="stream">Map image data stream.</param>
+		/// <returns>
+		///   <c>id</c> if successful, <c>0</c> otherwise</returns>
+		public async Task<int> Create(Map map, Stream stream)
+		{
 
-        #region Private Methods
+			// **********************
+			//   Precondition Tests
+			// **********************
+			// Image data not provided?
+			if (stream == null) return 0;
 
-        /// <summary>
-        ///     Gets all map file paths.
-        /// </summary>
-        /// <returns>IEnumerable&lt;System.String&gt;.</returns>
-        private IEnumerable<string> GetAllMapFilePaths()
-        {
-            return Directory.EnumerateFiles(_appDataPath, "world-*.json");
-        }
+			// ************************************
+			//  Create DB entity (Generate Map ID)
+			// ************************************
+			_context.Add(map);
+			await _context.SaveChangesAsync();
 
-        /// <summary>
-        ///     Gets the map file path.
-        /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <returns>System.String.</returns>
-        private string GetMapFilePath(string id)
-        {
-            return Path.Combine(_appDataPath, $"world-{id}.json");
-        }
+			// **********************
+			//   Create Map Folder 
+			// **********************
+			var worldFolderPath = Path.Combine(_filePathService.PhysicalWorldBasePath, $"{map.MapId}");
+			if (Directory.Exists(worldFolderPath))
+			{
+				Directory.Delete(worldFolderPath, true);
+			}
+			Directory.CreateDirectory(worldFolderPath);
 
-        #endregion Private Methods
-    }
+			// ****************************
+			//   Save Original Image File
+			// ****************************
+			var originalFilePath = Path.Combine(worldFolderPath, $"original-file{map.FileExtension}");
+			using (stream)
+			using (var originalFileStream = new FileStream(originalFilePath, FileMode.CreateNew))
+			{
+				stream.CopyTo(originalFileStream);
+			}
+
+			// ************************************
+			//      Create Master Image File 
+			// ************************************
+			// Create master image file
+			var masterFilePath = Path.Combine(worldFolderPath, "master-file.png");
+			using (var originalFileStream = new FileStream(originalFilePath, FileMode.Open))
+			using (var masterFileStream = new FileStream(masterFilePath, FileMode.CreateNew))
+			{
+				var masterImage = Image.Load(Configuration.Default, originalFileStream);
+				var width = masterImage.Width;
+				var height = masterImage.Height;
+
+				var largestSize = Math.Max(width, height);
+				var maxZoomLevel = Math.Log((double)largestSize / TilePixelSize, 2);
+
+				var adjustedMaxZoomLevel = (int)Math.Max(0, Math.Floor(maxZoomLevel));
+				var adjustedLargestSize = (int)Math.Round(Math.Pow(2, adjustedMaxZoomLevel) * TilePixelSize);
+
+				if (width != height || largestSize != adjustedLargestSize)
+					masterImage = masterImage.Clone(context => context.Resize(new ResizeOptions
+					{
+						Mode = ResizeMode.Pad,
+						Position = AnchorPositionMode.Center,
+						Size = new Size(width = adjustedLargestSize, height = adjustedLargestSize)
+					}));
+
+				masterImage.SaveAsPng(masterFileStream);
+
+				map.MaxZoomLevel = adjustedMaxZoomLevel;
+				map.AdjustedSize = adjustedLargestSize;
+
+				map.ThumbnailPath = $"{_filePathService.VirtualWorldBasePath}/{map.MapId}/0/zoom-level.png";
+
+			}
+
+			// ****************************************
+			//        Create Tile Image Files
+			// ****************************************
+
+			// Calculate number of zoom levels and steps required
+			map.Tiles = new List<Tile>();
+
+			// Iterate through zoom levels to create required tiles
+			for (var zoomLevel = 0; zoomLevel <= map.MaxZoomLevel; zoomLevel++)
+			{
+				// Calculate the number of tiles required for this zoom level
+				var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
+				
+				for (var x = 0; x < numberOfTilesPerDimension; x++)
+				{
+					for (var y = 0; y < numberOfTilesPerDimension; y++)
+					{
+						var tile = new Tile()
+						{
+							MapId = map.MapId,
+							ZoomLevel = zoomLevel,
+							CreationTimestamp = DateTime.UtcNow,
+							TileSize = TilePixelSize,
+							X = x,
+							Y = y
+						};
+						map.Tiles.Add(tile);
+
+					}
+				}
+			}
+
+			// ************************************
+			//   Update Map Entity
+			// ************************************
+			map.WorldFolderPath = worldFolderPath;
+			_context.Update(map);
+			await _context.SaveChangesAsync();
+			
+			return map.MapId;
+			
+		}
+
+		/// <summary>Saves changes to the specified map.</summary>
+		/// <param name="map">The map entity to save.</param>
+		/// <returns>
+		///   <c>id</c> if successful, <c>false</c> otherwise</returns>
+		public async Task<bool> Save(Map map)
+		{
+			_context.Update(map);
+			await _context.SaveChangesAsync();
+			return true;
+
+		}
+
+		#endregion Public Methods
+
+		#endregion
+
+		#region Private Methods
+
+
+		/// <summary>
+		///     Sums the specified values.
+		/// </summary>
+		/// <param name="from">From.</param>
+		/// <param name="to">To.</param>
+		/// <param name="valueGetter">The value getter.</param>
+		/// <returns>System.Int32.</returns>
+		private static int Sum(int from, int to, Func<int, int> valueGetter)
+		{
+			var result = 0;
+			for (var i = from; i <= to; i++) result += valueGetter.Invoke(i);
+
+			return result;
+		}
+
+
+		#endregion
+
+	}
 }
