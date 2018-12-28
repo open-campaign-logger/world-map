@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using CampaignKit.WorldMap.Entities;
-using Microsoft.Extensions.Logging;
-
-using System.Linq;
 using System;
+using System.Linq;
+
+using CampaignKit.WorldMap.Entities;
+
+using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Services
 {
@@ -35,7 +35,7 @@ namespace CampaignKit.WorldMap.Services
 		/// </summary>
 		/// <param name="mapId">The map identifier.</param>
 		/// <returns>System.Double.</returns>
-		double? GetMapProgress(string mapId);
+		double GetMapProgress(string mapId);
 
 		#endregion Public Methods
 	}
@@ -68,22 +68,22 @@ namespace CampaignKit.WorldMap.Services
 
 		#endregion
 
+		#region IProgressService Members
+
 		#region Public Methods
 
-		/// <inheritdoc />
-		/// <summary>
-		///     Gets the progress.
-		/// </summary>
+		/// <summary>Gets the map creation progress.
+		/// 0.0 = 0% .. 1.0 = 100%</summary>
 		/// <param name="mapId">The map identifier.</param>
 		/// <returns>System.Double.</returns>
-		public double? GetMapProgress(string indicatorId)
+		public double GetMapProgress(string mapId)
 		{
-			// Create a default null return value
-			var progress = (double?)1;
+			// Create a default return value
+			var progress = (double)0;
 
 			// Find tiles related to this map
 			var tiles = (from t in _context.Tiles select t)
-				.Where(t => t.MapId == Convert.ToInt32(indicatorId))
+				.Where(t => t.MapId == Convert.ToInt32(mapId))
 				.ToList();
 			var total = tiles.Count();
 			var completed = tiles.Where(t => t.CompletionTimestamp > DateTime.MinValue).Count();
@@ -99,7 +99,7 @@ namespace CampaignKit.WorldMap.Services
 			}
 			else
 			{
-				_logger.LogError($"No tiles found for map with id={indicatorId}");
+				_logger.LogError($"No tiles found for map with id={mapId}");
 			}
 
 			// Return the progress value
@@ -107,5 +107,8 @@ namespace CampaignKit.WorldMap.Services
 		}
 
 		#endregion Public Methods
+
+		#endregion
+
 	}
 }

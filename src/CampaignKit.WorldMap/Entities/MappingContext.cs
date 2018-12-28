@@ -12,36 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 
 using Microsoft.EntityFrameworkCore;
 
 namespace CampaignKit.WorldMap.Entities
 {
+
+	/// <summary>
+	///		Database context service.
+	/// </summary>
 	public class MappingContext: DbContext
 	{
 
+		/// <summary>Initializes a new instance of the <see cref="MappingContext"/> class.</summary>
+		/// <param name="options">The options.</param>
 		public MappingContext(DbContextOptions<MappingContext> options)
 			: base(options)
 		{ }
 
+		/// <summary>Gets or sets the maps.</summary>
+		/// <value>The maps.</value>
 		public DbSet<Map> Maps { get; set; }
+
+		/// <summary>Gets or sets the tiles.</summary>
+		/// <value>The tiles.</value>
 		public DbSet<Tile> Tiles { get; set; }
+
+		/// <summary>Gets or sets the markers.</summary>
+		/// <value>The markers.</value>
 		public DbSet<Marker> Markers { get; set; }
-
-		/// <summary>
-		/// Seeds the database with data for the sample map.
-		/// 
-		/// This method is called when the model for a derived context has been initialized, 
-		/// but before the model has been locked down and used to initialize the context. 
-		/// The default implementation of this method does nothing, but it can be overridden in a 
-		/// derived class such that the model can be further configured before it is locked down.
-		/// </summary>
-		/// <param name="modelBuilder">Edit Provides a simple API surface for configuring a IMutableModel that defines the shape of your entities, the relationships between them, and how they map to the database.</param>
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
-		{
-
-		}
-		
+				
 	}
 }

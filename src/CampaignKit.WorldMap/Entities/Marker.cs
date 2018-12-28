@@ -17,6 +17,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CampaignKit.WorldMap.Entities
 {
+	/// <summary>
+	/// Marker Entity
+	/// </summary>
 	public class Marker
 	{
 		#region Public Properties
@@ -25,38 +28,31 @@ namespace CampaignKit.WorldMap.Entities
 		///     Gets or sets the identifier.
 		/// </summary>
 		/// <value>The identifier.</value>
+		[Key]
 		public int MarkerId { get; set; }
-
+		
 		/// <summary>
-		///     Gets or sets the marker title
-		/// </summary>
-		/// <value>Marker title.</value>
-		public string Title { get; set; }
-
-		/// <summary>
-		///     Gets or sets the marker layer type
-		/// </summary>
-		/// <value>Marker layer type.</value>
-		public string LayerType { get; set; }
-
-		/// <summary>
-		///     Gets or sets the marker lattitude and longitude
-		/// </summary>
-		/// <value>Marker lattitude and longitude.</value>
-		public string LatLng { get; set; }
-
-		/// <summary>
-		///     Gets or sets the marker data
+		///     Gets or sets the marker JSON
 		/// </summary>
 		/// <value>Marker data in JSON format.</value>
-		public string MarkerData { get; set; }
+		[Required]
+		public string JSON { get; set; }
 
 		/// <summary>
-		/// Parent entity
+		///		Gets  or sets the parent entity.
 		/// </summary>
+		/// <value>The parent entity.</value>
 		[Required]
 		public Map Map { get; set; }
 
+		/// <summary>
+		///     Gets or sets the parent identifier.
+		/// </summary>
+		/// <value>The parent identifier.</value>
+		[Required]
+		public int MapId { get; set; }
+
 		#endregion
+
 	}
 }

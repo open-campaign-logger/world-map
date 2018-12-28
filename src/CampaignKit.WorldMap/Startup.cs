@@ -125,6 +125,7 @@ namespace CampaignKit.WorldMap
             services.AddScoped<IRandomDataService, DefaultRandomDataService>();
             services.AddScoped<IProgressService, DefaultProgressService>();
 			services.AddScoped<IMapDataService, DefaultMapDataService>();
+			services.AddScoped<IMarkerDataService, DefaultMarkerDataService>();
 
 			// Add background services
 			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();

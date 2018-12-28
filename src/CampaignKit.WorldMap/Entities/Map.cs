@@ -16,10 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
-using CampaignKit.WorldMap.Entities;
 
 namespace CampaignKit.WorldMap.Entities
 {
+	/// <summary>Map Entity</summary>
 	public class Map
 	{
 		#region Public Properties

@@ -1,0 +1,802 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CampaignKit.WorldMap</name>
+    </assembly>
+    <members>
+        <member name="T:CampaignKit.WorldMap.Controllers.HomeController">
+            <inheritdoc />
+            <summary>
+                Class HomeController.
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Controllers.HomeController.#ctor(CampaignKit.WorldMap.Services.IMapDataService)">
+            <summary>
+                Initializes a new instance of the <see cref="T:CampaignKit.WorldMap.Controllers.HomeController" /> class.
+            </summary>
+            <param name="mapDataService">The map data service.</param>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Controllers.MapController">
+            <inheritdoc />
+            <summary>
+                Class MapController.
+            </summary>
+            <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Controllers.MapController.#ctor(CampaignKit.WorldMap.Services.IRandomDataService,CampaignKit.WorldMap.Services.IMapDataService,CampaignKit.WorldMap.Services.IProgressService,CampaignKit.WorldMap.Services.IFilePathService,CampaignKit.WorldMap.Entities.MappingContext,Microsoft.Extensions.Logging.ILogger{CampaignKit.WorldMap.Controllers.MapController})">
+            <summary>
+                Initializes a new instance of the <see cref="T:CampaignKit.WorldMap.Controllers.MapController" /> class.
+            </summary>
+            <param name="randomDataService">The random data service.</param>
+            <param name="mapDataService">The map data service.</param>
+            <param name="progressService">The progress service.</param>
+            <param name="filePathService">The file path service.</param>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Controllers.MapController.UpdateMarker(System.Int32,System.Nullable{System.Int32},System.String)">
+            <summary>
+              POST: Map/UpdateMarker/{MarkerId} 
+            </summary>
+            <param name="id">Marker Id</param>
+            <param name="marker">Marker data</param>
+            <returns></returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Controllers.MapController.DeleteMarker(System.Int32)">
+            <summary>
+            	POST: Map/DeleteMarker/{MarkerId}
+            </summary>
+            <param name="id">Id of marker to delete</param>
+            <returns></returns>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.MapId">
+            <summary>
+                Gets or sets the identifier.
+            </summary>
+            <value>The identifier.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.AdjustedSize">
+            <summary>
+                Gets or sets the size of the adjusted.
+            </summary>
+            <value>The size of the adjusted.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.ContentType">
+            <summary>
+                Gets or sets the type of the content.
+            </summary>
+            <value>The type of the content.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.Copyright">
+            <summary>
+                Gets or sets the copyright.
+            </summary>
+            <value>The copyright.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.CreationTimestamp">
+            <summary>
+                Gets or sets the creation timestamp.
+            </summary>
+            <value>The creation timestamp.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.FileExtension">
+            <summary>
+                Gets or sets the file extension.
+            </summary>
+            <value>The file extension.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.MaxZoomLevel">
+            <summary>
+                Gets or sets the maximum zoom level.
+            </summary>
+            <value>The maximum zoom level.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+            <value>The name.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.RepeatMapInX">
+            <summary>
+                Gets or sets a value indicating whether [repeat map in x].
+            </summary>
+            <value><c>true</c> if [repeat map in x]; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.Secret">
+            <summary>
+                Gets or sets the secret.
+            </summary>
+            <value>The secret.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.WorldFolderPath">
+            <summary>
+                Gets or sets the world folder path.
+            </summary>
+            <value>The world folder path.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.ThumbnailPath">
+            <summary>
+                Gets or sets the map's thumbnail path.
+            </summary>
+            <value>The map's thumbnail path.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.Tiles">
+            <summary>
+                Gets or sets the tile collection for this map.
+            </summary>
+            <value>A collection of child tile entities.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Map.Markers">
+            <summary>
+                Gets or sets the marker collection for this map.
+            </summary>
+            <value>A collection of child marker entities.</value>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Entities.MappingContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            Seeds the database with data for the sample map.
+            
+            This method is called when the model for a derived context has been initialized, 
+            but before the model has been locked down and used to initialize the context. 
+            The default implementation of this method does nothing, but it can be overridden in a 
+            derived class such that the model can be further configured before it is locked down.
+            </summary>
+            <param name="modelBuilder">Edit Provides a simple API surface for configuring a IMutableModel that defines the shape of your entities, the relationships between them, and how they map to the database.</param>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Marker.MarkerId">
+            <summary>
+                Gets or sets the identifier.
+            </summary>
+            <value>The identifier.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Marker.JSON">
+            <summary>
+                Gets or sets the marker JSON
+            </summary>
+            <value>Marker data in JSON format.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Marker.Map">
+            <summary>
+            	Gets  or sets the parent entity.
+            </summary>
+            <value>The parent entity.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Marker.MapId">
+            <summary>
+                Gets or sets the parent identifier.
+            </summary>
+            <value>The parent identifier.</value>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Entities.Tile">
+            <summary>
+            	Class tile.
+            </summary>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.TileId">
+            <summary>
+                Gets or sets the identifier.
+            </summary>
+            <value>The identifier.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.ZoomLevel">
+            <summary>
+            	Gets or sets the tile's zoom level.
+            </summary>
+            <value>The tile's zoom level value.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.CreationTimestamp">
+            <summary>
+                Gets or sets the tile creation timestamp
+            </summary>
+            <value>Time that the tile creation process started.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.CompletionTimestamp">
+            <summary>
+                Gets or sets the tile completion timestamp
+            </summary>
+            <value>Time that the tile creation process completed.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.TileSize">
+            <summary>
+                Gets or sets the size of the tile in bytes.
+            </summary>
+            <value>The size of the tile.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.X">
+            <summary>
+            	Gets or set the tile's x coordinate.
+            </summary>
+            <value>The tile's x coordinate</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.Y">
+            <summary>
+            	Gets or set the tile's y coordinate.
+            </summary>
+            <value>The tile's y coordinate</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.Map">
+            <summary>
+            	Gets  or sets the parent entity.
+            </summary>
+            <value>The parent entity.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Entities.Tile.MapId">
+            <summary>
+                Gets or sets the parent identifier.
+            </summary>
+            <value>The parent identifier.</value>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Program">
+            <summary>
+                Class Program.
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Program.Main(System.String[])">
+            <summary>
+                Defines the entry point of the application.
+            </summary>
+            <param name="args">The arguments.</param>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.IFilePathService">
+            <summary>
+                Interface IFilePathService
+            </summary>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Services.IFilePathService.AppDataPath">
+            <summary>
+                Gets the application data path.
+            </summary>
+            <value>The application data path.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Services.IFilePathService.SeedDataPath">
+            <summary>
+                Gets the seed data path.
+            </summary>
+            <value>The seed data path.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Services.IFilePathService.PhysicalWorldBasePath">
+            <summary>
+                Gets the world base path.
+            </summary>
+            <value>The world base path.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Services.IFilePathService.VirtualWorldBasePath">
+            <summary>
+                Gets the virtual world base path.
+            </summary>
+            <value>The virtual world base path.</value>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.DefaultFilePathService">
+            <inheritdoc />
+            <summary>
+                Class DefaultAppDataPathService.
+            </summary>
+            <seealso cref="T:CampaignKit.WorldMap.Services.IAppDataPathService" />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultFilePathService.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+                Initializes a new instance of the <see cref="T:CampaignKit.WorldMap.Services.DefaultFilePathService" /> class.
+            </summary>
+            <param name="env">The env.</param>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Services.DefaultFilePathService.AppDataPath">
+            <inheritdoc />
+            <summary>
+                Gets the application data path.
+            </summary>
+            <value>The application data path.</value>
+            <exception cref="!:NotImplementedException"></exception>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Services.DefaultFilePathService.PhysicalWorldBasePath">
+            <inheritdoc />
+            <summary>
+                Gets the world base path.
+            </summary>
+            <value>The world base path.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Services.DefaultFilePathService.VirtualWorldBasePath">
+            <inheritdoc />
+            <summary>
+                Gets or sets the virtual world base path.
+            </summary>
+            <value>The virtual world base path.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Services.DefaultFilePathService.SeedDataPath">
+            <inheritdoc />		
+            <summary>
+                Gets the seed data path.
+            </summary>
+            <value>The seed data path.</value>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.IMapDataService">
+            <summary>
+                Interface IMapDataService
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMapDataService.Delete(System.Int32)">
+            <summary>
+                Deletes the specified identifier.
+            </summary>
+            <param name="id">The identifier.</param>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMapDataService.Find(System.Int32)">
+            <summary>
+                Finds the specified identifier.
+            </summary>
+            <param name="id">The identifier.</param>
+            <returns>Map.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMapDataService.FindAll">
+            <summary>
+                Finds all maps.
+            </summary>
+            <returns>IEnumerable&lt;Map&gt;.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMapDataService.Create(CampaignKit.WorldMap.Entities.Map,System.IO.Stream)">
+            <summary>
+                Creates the specified map.
+            </summary>
+            <param name="map">The map.</param>
+            <param name="stream">Streamed image data.</param>
+            <returns>MapId.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMapDataService.Save(CampaignKit.WorldMap.Entities.Map)">
+            <summary>
+                Saves changes to the specified map.
+            </summary>
+            <param name="map">The map.</param>
+            <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.DefaultMapDataService">
+            <inheritdoc />
+            <summary>
+                Class DefaultMapDataService.
+            </summary>
+            <seealso cref="T:CampaignKit.WorldMap.Services.IMapDataService" />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMapDataService.#ctor(CampaignKit.WorldMap.Entities.MappingContext,CampaignKit.WorldMap.Services.IFilePathService,Microsoft.Extensions.Logging.ILogger{CampaignKit.WorldMap.Services.TileCreationService})">
+            <summary>
+                Initializes a new instance of the <see cref="T:CampaignKit.WorldMap.Services.DefaultMapDataService" /> class.
+            </summary>
+            <param name="filePathService">The application data path service.</param>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMapDataService.Delete(System.Int32)">
+            <inheritdoc />
+            <summary>
+                Deletes the specified identifier.
+            </summary>
+            <param name="id">The identifier.</param>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMapDataService.Find(System.Int32)">
+            <inheritdoc />
+            <summary>
+                Finds the specified identifier.
+            </summary>
+            <param name="id">The identifier.</param>
+            <returns>Map.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMapDataService.FindAll">
+            <inheritdoc />
+            <summary>
+                Finds all maps.
+            </summary>
+            <returns>IEnumerable&lt;Map&gt;.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMapDataService.Create(CampaignKit.WorldMap.Entities.Map,System.IO.Stream)">
+            <inheritdoc />
+            <summary>
+                Saves the specified map.
+            </summary>
+            <param name="map">The map.</param>
+            <param name="stream">Streamed image data.</param>
+            <returns>MapId for the created map.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMapDataService.Save(CampaignKit.WorldMap.Entities.Map)">
+            <inheritdoc />
+            <summary>
+                Saves changes to the specified map.
+            </summary>
+            <param name="map">The map.</param>
+            <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMapDataService.Sum(System.Int32,System.Int32,System.Func{System.Int32,System.Int32})">
+            <summary>
+                Sums the specified values.
+            </summary>
+            <param name="from">From.</param>
+            <param name="to">To.</param>
+            <param name="valueGetter">The value getter.</param>
+            <returns>System.Int32.</returns>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.IMarkerDataService">
+            <summary>
+                Interface IMarkerDataService
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMarkerDataService.Delete(System.Int32)">
+            <summary>
+                Deletes the specified marker.
+            </summary>
+            <param name="id">The marker's identifier.</param>
+            <returns><c>true</c> if deletion successful, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMarkerDataService.Find(System.Int32)">
+            <summary>
+                Finds the specified marker.
+            </summary>
+            <param name="id">The marker's identifier.</param>
+            <returns><c>Map</c> if found, <c>null</c> otherwise.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMarkerDataService.Create(System.Int32,CampaignKit.WorldMap.Entities.Marker)">
+            <summary>
+                Creates the specified marker.
+            </summary>
+            <param name="mapId">The parent map's identifier.</param>
+            <param name="marker">The marker to create.</param>
+            <returns><c>marker identifier</c> if created, <c>null</c> otherwise.</returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IMarkerDataService.Save(System.Int32)">
+            <summary>
+                Saves changes to the specified marker.
+            </summary>
+            <param name="id">The marker's identifier.</param>
+            <returns><c>true</c> if save successful, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.DefaultMarkerDataService">
+            <inheritdoc />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMarkerDataService.#ctor(CampaignKit.WorldMap.Entities.MappingContext,Microsoft.Extensions.Logging.ILogger{CampaignKit.WorldMap.Services.TileCreationService})">
+            <summary>
+                Initializes a new instance of the <see cref="T:CampaignKit.WorldMap.Services.DefaultMarkerDataService" /> class.
+            </summary>
+            <param name="context">The database context.</param>
+            <param name="logger">The logging service.</param>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMarkerDataService.Create(System.Int32,CampaignKit.WorldMap.Entities.Marker)">
+            <inheritdoc />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMarkerDataService.Delete(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMarkerDataService.Find(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultMarkerDataService.Save(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.IProgressService">
+            <summary>
+                Interface IProgressService
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IProgressService.GetMapProgress(System.String)">
+            <summary>
+                Gets the map creation progress.
+                0.0 = 0% .. 1.0 = 100%
+            </summary>
+            <param name="mapId">The map identifier.</param>
+            <returns>System.Double.</returns>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.DefaultProgressService">
+            <inheritdoc />
+            <summary>
+                Class DefaultProgressService.
+            </summary>
+            <seealso cref="T:CampaignKit.WorldMap.Services.IProgressService" />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultProgressService.#ctor(CampaignKit.WorldMap.Entities.MappingContext,Microsoft.Extensions.Logging.ILogger{CampaignKit.WorldMap.Services.TileCreationService})">
+            <summary>
+                Initializes a new instance of the <see cref="T:CampaignKit.WorldMap.Services.DefaultProgressService" /> class.
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultProgressService.GetMapProgress(System.String)">
+            <inheritdoc />
+            <summary>
+                Gets the progress.
+            </summary>
+            <param name="mapId">The map identifier.</param>
+            <returns>System.Double.</returns>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.IRandomDataService">
+            <summary>
+                Interface IRandomDataService
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.IRandomDataService.GetRandomText(System.Int32)">
+            <summary>
+                Gets the random text.
+            </summary>
+            <param name="numberOfCharacters">The number of characters.</param>
+            <returns>System.String.</returns>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.DefaultRandomDataService">
+            <inheritdoc />
+            <summary>
+                Class DefaultRandomDataService.
+            </summary>
+            <seealso cref="T:CampaignKit.WorldMap.Services.IRandomDataService" />
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.DefaultRandomDataService.GetRandomText(System.Int32)">
+            <inheritdoc />
+            <summary>
+                Gets the random text.
+            </summary>
+            <param name="numberOfCharacters">The number of characters.</param>
+            <returns>System.String.</returns>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Services.TileCreationService">
+            <summary>
+            A timed background service that queries the Tiles table and processes 
+            tiles that haven't been created yet.
+            
+            This article was used to model this timed background service.
+            https://thinkrethink.net/2018/02/21/asp-net-core-background-processing/
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.TileCreationService.#ctor(System.IServiceProvider,Microsoft.Extensions.Logging.ILogger{CampaignKit.WorldMap.Services.TileCreationService})">
+            <summary>
+            Default Constructor
+            </summary>
+            <param name="serviceProvider">The context service provider</param>
+            <param name="logger">The context logger</param>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.TileCreationService.Process">
+            <summary>
+            Executes the timed background process for generating tiles.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.TileCreationService.CreateZoomLevelBaseFile(System.Int32,System.String,System.String,System.Int32)">
+            <summary>
+                Creates the zoom level base file.
+            </summary>
+            <param name="numberOfTilesPerDimension">The number of tiles per dimension.</param>
+            <param name="masterFilePath">The master file path.</param>
+            <param name="zoomLevelBaseFilePath">The zoom level base file path.</param>
+            <param name="tilePixelSize">Tile pixel size.</param>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Services.TileCreationService.CreateZoomLevelTileFile(SixLabors.ImageSharp.Image{SixLabors.ImageSharp.PixelFormats.Rgba32},CampaignKit.WorldMap.Entities.Tile,System.String)">
+            <summary>
+                Creates the zoom level tile file.
+            </summary>
+            <param name="zoomLevelBaseFilePath">The zoom level base file path.</param>
+            <param name="x">The tile to create.</param>
+            <param name="zoomLevelTileFilePath">The zoom level tile file path.</param>
+        </member>
+        <member name="T:CampaignKit.WorldMap.Startup">
+            <summary>
+                Class Startup.
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Startup.#ctor(Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+                Initializes a new instance of the <see cref="T:CampaignKit.WorldMap.Startup" /> class.
+            </summary>
+            <param name="env">The env.</param>
+        </member>
+        <member name="P:CampaignKit.WorldMap.Startup.IsDevelopmentConfigured">
+            <summary>
+                Gets a value indicating whether this instance is development configured.
+            </summary>
+            <value><c>true</c> if this instance is development configured; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment,Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+                Configures the specified application.
+            </summary>
+            <param name="app">The application.</param>
+            <param name="env">The env.</param>
+            <param name="loggerFactory">The logger factory.</param>
+        </member>
+        <member name="M:CampaignKit.WorldMap.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+                Configures the services.
+            </summary>
+            <param name="services">The services.</param>
+        </member>
+        <member name="T:CampaignKit.WorldMap.ViewHelpers.HtmlHelperExtensions">
+            <summary>
+                Class HtmlHelperExtensions.
+            </summary>
+        </member>
+        <member name="M:CampaignKit.WorldMap.ViewHelpers.HtmlHelperExtensions.DescriptionFor``2(Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+                Descriptions for.
+            </summary>
+            <typeparam name="TModel">The type of the t model.</typeparam>
+            <typeparam name="TValue">The type of the t value.</typeparam>
+            <param name="self">The self.</param>
+            <param name="expression">The expression.</param>
+            <returns>System.String.</returns>
+        </member>
+        <member name="T:CampaignKit.WorldMap.ViewModels.ErrorViewModel">
+            <summary>
+                Class ErrorViewModel.
+            </summary>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.ErrorViewModel.Message">
+            <summary>
+                Gets or sets the message.
+            </summary>
+            <value>The message.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.ErrorViewModel.Title">
+            <summary>
+                Gets or sets the title.
+            </summary>
+            <value>The title.</value>
+        </member>
+        <member name="T:CampaignKit.WorldMap.ViewModels.MapCreateViewModel">
+            <summary>
+                Class MapCreateViewModel.
+            </summary>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapCreateViewModel.Copyright">
+            <summary>
+                Gets or sets the copyright.
+            </summary>
+            <value>The copyright.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapCreateViewModel.MapImage">
+            <summary>
+                Gets or sets the map image.
+            </summary>
+            <value>The map image.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapCreateViewModel.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+            <value>The name.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapCreateViewModel.ProcessingSavingPublishingRightsGrantedForThisSite">
+            <summary>
+                Gets or sets a value indicating whether [processing saving publishing rights granted for this site].
+            </summary>
+            <value><c>true</c> if [processing saving publishing rights granted for this site]; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapCreateViewModel.RepeatMapInX">
+            <summary>
+                Gets or sets a value indicating whether [repeat map in x].
+            </summary>
+            <value><c>true</c> if [repeat map in x]; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapCreateViewModel.Secret">
+            <summary>
+                Gets or sets the secret.
+            </summary>
+            <value>The secret.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapCreateViewModel.ThisIsMyOwnCreationPublishedRightfully">
+            <summary>
+                Gets or sets a value indicating whether [this is my own creation published rightfully].
+            </summary>
+            <value><c>true</c> if [this is my own creation published rightfully]; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapCreateViewModel.ThisIsNotOffensiveNorObviouslyIllegalContent">
+            <summary>
+                Gets or sets a value indicating whether [this is not offensive or obviously illegal].
+            </summary>
+            <value><c>true</c> if [this is not offensive or obviously illegal]; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="T:CampaignKit.WorldMap.ViewModels.MapDeleteViewModel">
+            <summary>
+                Class MapDeleteViewModel.
+            </summary>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapDeleteViewModel.HiddenId">
+            <summary>
+                Gets or sets the hidden identifier.
+            </summary>
+            <value>The hidden identifier.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapDeleteViewModel.HiddenSecret">
+            <summary>
+                Gets or sets the hidden secret.
+            </summary>
+            <value>The hidden secret.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapDeleteViewModel.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+            <value>The name.</value>
+        </member>
+        <member name="T:CampaignKit.WorldMap.ViewModels.MapEditViewModel">
+            <summary>
+                Class MapEditViewModel.
+            </summary>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapEditViewModel.Copyright">
+            <summary>
+                Gets the copyright.
+            </summary>
+            <value>The copyright.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapEditViewModel.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+            <value>The name.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapEditViewModel.RepeatMapInX">
+            <summary>
+                Gets or sets a value indicating whether [repeat map in x].
+            </summary>
+            <value><c>true</c> if [repeat map in x]; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="T:CampaignKit.WorldMap.ViewModels.MapShowViewModel">
+            <summary>
+                Class MapShowViewModel.
+            </summary>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.Id">
+            <summary>
+                Gets or sets the identifier.
+            </summary>
+            <value>The identifier.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.MapBaseDeleteUrl">
+            <summary>
+                Gets the map base delete URL.
+            </summary>
+            <value>The map base delete URL.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.MapBaseEditUrl">
+            <summary>
+                Gets the map base edit URL.
+            </summary>
+            <value>The map base edit URL.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.MapEditUrl">
+            <summary>
+                Gets or sets the map edit URL.
+            </summary>
+            <value>The map edit URL.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.MapShowUrl">
+            <summary>
+                Gets or sets the map show URL.
+            </summary>
+            <value>The map show URL.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.MarkerUpdateUrl">
+            <summary>
+                Gets or sets the marker update URL.
+                HTTPPost: Marker data to update.
+            </summary>
+            <value>The marker update URL.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.MarkerDeleteUrl">
+            <summary>
+                Gets or sets the marker delete URL.
+                HTTPPost: Marker data to delete.
+            </summary>
+            <value>The marker delete URL.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.Name">
+            <summary>
+                Gets or sets the name.
+            </summary>
+            <value>The name.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.ProgressUrl">
+            <summary>
+                Gets or sets the progress URL.
+            </summary>
+            <value>The progress URL.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.Secret">
+            <summary>
+                Gets the secret.
+            </summary>
+            <value>The secret.</value>
+        </member>
+        <member name="P:CampaignKit.WorldMap.ViewModels.MapShowViewModel.ShowProgress">
+            <summary>
+                Gets a value indicating whether [show progress].
+            </summary>
+            <value><c>true</c> if [show progress]; otherwise, <c>false</c>.</value>
+        </member>
+    </members>
+</doc>

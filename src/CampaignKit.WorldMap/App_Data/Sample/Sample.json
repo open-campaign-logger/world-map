@@ -1,3 +1,224 @@
-{
-
-}
+[
+  {
+    "options": {
+      "stroke": true,
+      "color": "#f06eaa",
+      "weight": 4,
+      "opacity": 0.5,
+      "fill": true,
+      "fillColor": null,
+      "fillOpacity": 0.2,
+      "clickable": true
+    },
+    "properties": {
+      "title": "Rectangle Title",
+      "layerType": "rectangle",
+      "latlng": "(29.97, 31.12)",
+      "id": "2997_3112",
+      "content": {
+        "ops": [
+          {
+            "insert": "Rectangle Description"
+          },
+          {
+            "attributes": {
+              "header": 1
+            },
+            "insert": "\n"
+          },
+          {
+            "insert": "\n"
+          },
+          {
+            "attributes": {
+              "underline": true,
+              "italic": true,
+              "bold": true
+            },
+            "insert": "This is the description."
+          },
+          {
+            "insert": "\n"
+          }
+        ]
+      }
+    },
+    "latlngs": [
+      {
+        "lat": 29.974044591534422,
+        "lng": 31.122508049011234
+      },
+      {
+        "lat": 29.97731598122696,
+        "lng": 31.122508049011234
+      },
+      {
+        "lat": 29.97731598122696,
+        "lng": 31.127400398254398
+      },
+      {
+        "lat": 29.974044591534422,
+        "lng": 31.127400398254398
+      }
+    ]
+  },
+  {
+    "options": {
+      "stroke": true,
+      "color": "#f06eaa",
+      "weight": 4,
+      "opacity": 0.5,
+      "fill": true,
+      "fillColor": null,
+      "fillOpacity": 0.2,
+      "clickable": true
+    },
+    "properties": {
+      "title": "Polygon Title",
+      "layerType": "polygon",
+      "latlng": "(29.98, 31.13)",
+      "id": "2998_3113",
+      "content": {
+        "ops": [
+          {
+            "insert": "Polygon Description"
+          },
+          {
+            "attributes": {
+              "header": 1
+            },
+            "insert": "\n"
+          },
+          {
+            "insert": "\nThis is the description.\n"
+          }
+        ]
+      }
+    },
+    "latlngs": [
+      {
+        "lat": 29.98497358578796,
+        "lng": 31.129674911499027
+      },
+      {
+        "lat": 29.98497358578796,
+        "lng": 31.129674911499027
+      },
+      {
+        "lat": 29.981033338736204,
+        "lng": 31.13113403320313
+      },
+      {
+        "lat": 29.981033338736204,
+        "lng": 31.13113403320313
+      },
+      {
+        "lat": 29.98244589810904,
+        "lng": 31.141390800476078
+      },
+      {
+        "lat": 29.98244589810904,
+        "lng": 31.141390800476078
+      },
+      {
+        "lat": 29.989619902644307,
+        "lng": 31.14036083221436
+      },
+      {
+        "lat": 29.989619902644307,
+        "lng": 31.14036083221436
+      }
+    ]
+  },
+  {
+    "options": {
+      "stroke": true,
+      "color": "#f06eaa",
+      "weight": 4,
+      "opacity": 0.5,
+      "fill": true,
+      "fillColor": null,
+      "fillOpacity": 0.2,
+      "clickable": true,
+      "radius": 373.866398252301
+    },
+    "properties": {
+      "title": "Circle Title",
+      "layerType": "circle",
+      "latlng": "(29.98, 31.14)",
+      "id": "2998_3114",
+      "content": {
+        "ops": [
+          {
+            "attributes": {
+              "link": "https://www.cbc.ca"
+            },
+            "insert": "Circle Description"
+          },
+          {
+            "attributes": {
+              "header": 1
+            },
+            "insert": "\n"
+          },
+          {
+            "insert": "\nThis is the description.\n"
+          }
+        ]
+      }
+    },
+    "latlngs": {
+      "lat": 29.97545725029985,
+      "lng": 31.13555431365967
+    }
+  },
+  {
+    "options": {
+      "icon": {
+        "options": {},
+        "_initHooksCalled": true
+      }
+    },
+    "properties": {
+      "title": "Marker Title",
+      "layerType": "marker",
+      "latlng": "(29.98, 31.14)",
+      "id": "2998_3114",
+      "content": {
+        "ops": [
+          {
+            "insert": "Marker Description"
+          },
+          {
+            "attributes": {
+              "header": 1
+            },
+            "insert": "\n"
+          },
+          {
+            "insert": "\nThis is the description."
+          },
+          {
+            "attributes": {
+              "list": "bullet"
+            },
+            "insert": "\n"
+          },
+          {
+            "insert": "Another line"
+          },
+          {
+            "attributes": {
+              "list": "bullet"
+            },
+            "insert": "\n"
+          }
+        ]
+      }
+    },
+    "latlngs": {
+      "lat": 29.97631227084605,
+      "lng": 31.143836975097656
+    }
+  }
+]

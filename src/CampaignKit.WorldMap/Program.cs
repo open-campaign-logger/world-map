@@ -23,6 +23,9 @@ using Microsoft.Extensions.DependencyInjection;
 using CampaignKit.WorldMap.Services;
 using Microsoft.Extensions.Logging;
 using CampaignKit.WorldMap.Entities;
+using Newtonsoft.Json.Linq;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace CampaignKit.WorldMap
 {
@@ -78,8 +81,26 @@ namespace CampaignKit.WorldMap
 					var imageStream = File.Open(Path.Combine(filePathService.SeedDataPath, "sample.png"), FileMode.Open);
 
 					// Use the data service to create the map
-					var mapTask = mapDataService.Create(sampleMap, imageStream);
-					mapTask.Wait();
+					var mapCreationTask = mapDataService.Create(sampleMap, imageStream);
+					mapCreationTask.Wait();
+
+					// Retrieve default marker data from test file
+					var markerData = File.ReadAllText(Path.Combine(filePathService.SeedDataPath, "sample.json"));
+					sampleMap.Markers = new List<Marker>();
+					var markers = JArray.Parse(markerData);
+					foreach (var m in markers)
+					{
+						var marker = new Marker()
+						{
+							JSON = m.ToString()
+						};
+						sampleMap.Markers.Add(marker);
+					}
+
+					// Use the data service to update the map
+					var markerCreationTask = mapDataService.Save(sampleMap);
+					markerCreationTask.Wait();
+
 				}
 
 

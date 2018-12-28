@@ -21,6 +21,8 @@ using CampaignKit.WorldMap.Services;
 using CampaignKit.WorldMap.ViewModels;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 
 namespace CampaignKit.WorldMap.Controllers
 {
@@ -37,6 +39,8 @@ namespace CampaignKit.WorldMap.Controllers
 		private readonly IProgressService _progressService;
 		private readonly IRandomDataService _randomDataService;
 		private readonly IFilePathService _filePathService;
+		private readonly MappingContext _context;
+		private readonly ILogger _logger;
 
 		#endregion Private Fields
 
@@ -52,12 +56,16 @@ namespace CampaignKit.WorldMap.Controllers
 		public MapController(IRandomDataService randomDataService, 
 			IMapDataService mapDataService, 
 			IProgressService progressService, 
-			IFilePathService filePathService)
+			IFilePathService filePathService,
+			MappingContext context,
+			ILogger<MapController> logger)
 		{
 			_randomDataService = randomDataService;
 			_mapDataService = mapDataService;
 			_progressService = progressService;
 			_filePathService = filePathService;
+			_context = context;
+			_logger = logger;
 		}
 
 		#endregion Public Constructors
@@ -232,6 +240,70 @@ namespace CampaignKit.WorldMap.Controllers
 			return View();
 		}
 
+		// ****************************
+		//   Marker Related Actions    
+		// ****************************
+		/// <summary>
+		///   POST: Map/UpdateMarker/{MarkerId} 
+		/// </summary>
+		/// <param name="id">Marker Id</param>
+		/// <param name="marker">Marker data</param>
+		/// <returns></returns>
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UpdateMarker(int id, int? markerId, string markerData)
+		{
+			var map = _mapDataService.Find(id);
+
+			if (map == null)
+			{
+				_logger.LogError($"Map with id:{id} not found");
+				return Json("Failed to update marker");
+			}
+
+
+			var marker = new Marker()
+			{
+				JSON = JArray.Parse(markerData).ToString()
+			};
+
+			var m = await _context.Markers.FindAsync(id);
+
+			if (m == null)
+			{
+				_context.Add(marker);
+			}
+			else
+			{
+				_context.Update(marker);
+			}
+
+			await _context.SaveChangesAsync();
+
+			return Json(marker.MarkerId);
+		}
+
+		/// <summary>
+		///		POST: Map/DeleteMarker/{MarkerId}
+		/// </summary>
+		/// <param name="id">Id of marker to delete</param>
+		/// <returns></returns>
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteMarker(int id)
+		{
+			var marker = await _context.Markers.FindAsync(id);
+			_context.Markers.Remove(marker);
+
+			await _context.SaveChangesAsync();
+
+			return Json("success");
+		}
+
+
+		// *******************************
+		//     Display Related Actions   
+		// *******************************
 		public async Task<IActionResult> Show(int id, string secret = null, bool showProgress = false)
 		{
 			var map = await _mapDataService.Find(id);
@@ -247,10 +319,8 @@ namespace CampaignKit.WorldMap.Controllers
 				Secret = secret,
 				ShowProgress = showProgress,
 				ProgressUrl = Url.Action(nameof(Progress), new { Id = id }),
-				MapEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id, Secret = secret }, protocol,
-					Request.Host.Value),
+				MapEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id, Secret = secret }, protocol, Request.Host.Value),
 				MapShowUrl = Url.Action(nameof(Show), "Map", new { Id = id }, protocol, Request.Host.Value),
-
 				MapBaseDeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
 				MapBaseEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value)
 			};
