@@ -52,12 +52,26 @@ namespace CampaignKit.WorldMap.ViewModels
         /// </summary>
         /// <value>The map show URL.</value>
         public string MapShowUrl { get; set; }
+				
+		/// <summary>
+		///     Gets or sets the marker update URL.
+		///     HTTPPost: Marker data to update.
+		/// </summary>
+		/// <value>The marker update URL.</value>
+		public string MarkerUpdateUrl { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        public string Name { get; set; }
+		/// <summary>
+		///     Gets or sets the marker delete URL.
+		///     HTTPPost: Marker data to delete.
+		/// </summary>
+		/// <value>The marker delete URL.</value>
+		public string MarkerDeleteUrl { get; set; }
+
+		/// <summary>
+		///     Gets or sets the name.
+		/// </summary>
+		/// <value>The name.</value>
+		public string Name { get; set; }
 
         /// <summary>
         ///     Gets or sets the progress URL.
