@@ -12,22 +12,22 @@ namespace CampaignKit.WorldMap.Tests.UnitTests
 	public class BasicTests : IClassFixture<CustomWebApplicationFactory<Startup>>
 	{
 
-		private readonly CustomWebApplicationFactory<Startup> webApplicationFactory;
-		private HttpClient httpClient;
-		private TestFixture<Startup> fixture;
+		private readonly CustomWebApplicationFactory<Startup> _factory;
+		private HttpClient _client;
 
 		public BasicTests(CustomWebApplicationFactory<Startup> webApplicationFactory)
 		{
-			this.webApplicationFactory = webApplicationFactory;
-			// this.httpClient = this.webApplicationFactory.CreateDefaultClient(new Uri("https://localhost"));
-			fixture = new TestFixture<Startup>();
+			this._factory = webApplicationFactory;
+			this._client = webApplicationFactory.CreateClient();
 		}
 
 		[Fact]
 		public async Task TestDataExists()
 		{
-			var results = await webApplicationFactory.MapDataService.FindAll();
-			Assert.True(results.ToList().Count > 0);
+			// Arrange & Act
+			var response = await _client.GetAsync("/");
+			response.EnsureSuccessStatusCode();
+			var stringResponse = await response.Content.ReadAsStringAsync();
 		}
 
 

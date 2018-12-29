@@ -141,26 +141,23 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 					var scopedServices = scope.ServiceProvider;
 
 					// Get a handle to the file path service
-					FilePathService = scopedServices.GetRequiredService<IFilePathService>();
+					// FilePathService = scopedServices.GetRequiredService<IFilePathService>();
 
 					// Get a handle to the map data service
-					MapDataService = scopedServices.GetRequiredService<IMapDataService>();
+					// MapDataService = scopedServices.GetRequiredService<IMapDataService>();
 
 					// Get a handle to the marker data service
-					MarkerDataService = scopedServices.GetRequiredService<IMarkerDataService>();
+					// MarkerDataService = scopedServices.GetRequiredService<IMarkerDataService>();
 
 					// Get a handle to the random data service
-					RandomDataService = scopedServices.GetRequiredService<IRandomDataService>();
+					// RandomDataService = scopedServices.GetRequiredService<IRandomDataService>();
 
 					// Get a handle to the database service
 					DatabaseService = scopedServices.GetRequiredService<MappingContext>();
+					DatabaseService.Database.EnsureCreated();
 
 					// Get a handle to the logging service
-					LoggerService = scopedServices
-						.GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
-									   
-					// Ensure the database is created.
-					DatabaseService.Database.EnsureCreated();
+					LoggerService = scopedServices.GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
 
 				}
 			});

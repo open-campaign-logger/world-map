@@ -144,6 +144,10 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 			var contentRoot = GetProjectPath(solutionRelativeTargetProjectParentDir, startupAssembly);
 
 			// Create a web host builder
+			// This is an older 1.x approach
+			// Preferred method for 2.x is to use 
+			// Create default builder: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
+			
 			var builder = new WebHostBuilder()
 				.UseContentRoot(contentRoot)
 				.UseEnvironment("Testing")
