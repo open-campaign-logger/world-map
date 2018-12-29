@@ -29,6 +29,7 @@ using Newtonsoft.Json.Linq;
 
 namespace CampaignKit.WorldMap
 {
+
 	/// <summary>
 	///     Class Program.
 	/// </summary>
