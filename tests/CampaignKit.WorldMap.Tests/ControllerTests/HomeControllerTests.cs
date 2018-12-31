@@ -56,8 +56,22 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 				var modelList = model.ToList();
 				Assert.Equal(3, modelList.Count);
 
+				// Ensure maps are ordered correctly.
+				Assert.Equal("Map4", modelList[0].Name);
+				Assert.Equal("Map3", modelList[1].Name);
+				Assert.Equal("Map2", modelList[2].Name); // Map 1 is excluded from results
 			}
 		}
 
+		[Theory]
+		[InlineData("/", "<h3>Welcome, Adventurer!</h3>")]
+		[InlineData("/Home/Legalities", "<h2>Legalities</h2>")]
+		public async Task TestPageGet(string page, string titleTestString)
+		{
+			var response = await _client.GetAsync(page);
+			response.EnsureSuccessStatusCode();
+			var stringResponse = await response.Content.ReadAsStringAsync();
+			Assert.Contains(titleTestString, stringResponse);
+		}
 	}
 }

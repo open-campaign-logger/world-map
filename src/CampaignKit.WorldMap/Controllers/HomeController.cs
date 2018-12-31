@@ -62,7 +62,7 @@ namespace CampaignKit.WorldMap.Controllers
 		#region Public Methods
 
 		/// <summary>
-		///		Get: /
+		///		GET: /
 		/// </summary>
 		/// <returns>Home view showing last three created maps.</returns>
 		[HttpGet]
@@ -77,7 +77,7 @@ namespace CampaignKit.WorldMap.Controllers
 		}
 
 		/// <summary>
-		///		Get: /Legalities
+		///		GET: /Home/Legalities
 		/// </summary>
 		/// <returns>Application legalities view.</returns>
 		[HttpGet]
