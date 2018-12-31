@@ -17,7 +17,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
+using CampaignKit.WorldMap.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -70,7 +70,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// <value>
 		/// The map data service.
 		/// </value>
-		public IMapDataService MapDataService { get; set; }
+		public IMapRepository MapDataService { get; set; }
 
 		/// <summary>
 		/// Gets or sets the marker data service.
@@ -78,7 +78,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// <value>
 		/// The marker data service.
 		/// </value>
-		public IMarkerDataService MarkerDataService { get; set; }
+		public IMarkerRepository MarkerDataService { get; set; }
 
 		/// <summary>
 		/// Gets or sets the progress service.
@@ -110,7 +110,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// <value>
 		/// The database service.
 		/// </value>
-		public MappingContext DatabaseService { get; set; }
+		public WorldMapDBContext DatabaseService { get; set; }
 
 		/// <summary>
 		/// Gets or sets the logger service.

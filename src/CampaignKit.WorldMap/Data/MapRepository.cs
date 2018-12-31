@@ -27,12 +27,12 @@ using SixLabors.ImageSharp.Processing;
 
 using Size = SixLabors.Primitives.Size;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Entities
 {
 	/// <summary>
-	///     Interface IMapDataService
+	///		EntityFramework interface for <c>Map</c> data elements.
 	/// </summary>
-	public interface IMapDataService
+	public interface IMapRepository
 	{
 		#region Public Methods
 
@@ -44,55 +44,68 @@ namespace CampaignKit.WorldMap.Services
 		/// <summary>Finds the map associated with the identifier.</summary>
 		/// <param name="id">The map identifier.</param>
 		/// <returns><c>Map</c> if successful, <c>null</c> otherwise</returns>
-		Task<Map> Find(int id);
+		Task<Entities.Map> Find(int id);
 
 		/// <summary>Finds all maps.</summary>
 		/// <returns>IEnumerable&lt;Map&gt;.</returns>
-		Task<IEnumerable<Map>> FindAll();
+		Task<IEnumerable<Entities.Map>> FindAll();
 
 		/// <summary> Creates the specified map. </summary>
 		/// <param name="map">The map entity to create.</param>
 		/// <param name="stream">Map image data stream.</param>
 		/// <returns><c>id</c> if successful, <c>0</c> otherwise</returns>
-		Task<int> Create(Map map, Stream stream);
+		Task<int> Create(Entities.Map map, Stream stream);
 
 		/// <summary> Saves changes to the specified map.</summary>
 		/// <param name="map">The map entity to save.</param>
 		/// <returns><c>id</c> if successful, <c>false</c> otherwise</returns>
-		Task<bool> Save(Map map);
+		Task<bool> Save(Entities.Map map);
 
 		#endregion Public Methods
 	}
 
 	/// <summary>
-	///     Class DefaultMapDataService.
+	///		Default implementation of the EntityFramework respository for Map data elements.
 	/// </summary>
-	/// <seealso cref="T:CampaignKit.WorldMap.Services.IMapDataService" />
-	public class DefaultMapDataService : IMapDataService
+	/// <seealso cref="CampaignKit.WorldMap.Entities.IMapRepository" />
+	public class DefaultMapRepository : IMapRepository
 	{
 		#region Private Fields
 
-		private readonly MappingContext _context;
+		/// <summary>
+		/// The database context
+		/// </summary>
+		private readonly WorldMapDBContext _dbContext;
+
+		/// <summary>
+		/// The file path service
+		/// </summary>
 		private readonly IFilePathService _filePathService;
-		private readonly ILogger _logger;
-		
+
+		/// <summary>
+		///		The application logging service.
+		/// </summary>
+		private readonly ILogger _loggerService;
+
 		private const int TilePixelSize = 250;
 
 		#endregion Private Fields
 
 		#region Public Constructors
 
-		/// <summary>Initializes a new instance of the <see cref="DefaultMapDataService"/> class.</summary>
-		/// <param name="context">The database context service.</param>
-		/// <param name="filePathService">The application data path service.</param>
-		/// <param name="logger">The application logger service.</param>
-		public DefaultMapDataService(MappingContext context, 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DefaultMapRepository"/> class.
+		/// </summary>
+		/// <param name="dbContext">The database context.</param>
+		/// <param name="filePathService">The file path service.</param>
+		/// <param name="loggerService">The logger service.</param>
+		public DefaultMapRepository(WorldMapDBContext dbContext, 
 			IFilePathService filePathService, 
-			ILogger<TileCreationService> logger)
+			ILogger<DefaultMapRepository> loggerService)
 		{
-			_context = context;
+			_dbContext = dbContext;
 			_filePathService = filePathService;
-			_logger = logger;
+			_loggerService = loggerService;
 		}
 
 		#endregion Public Constructors
@@ -108,16 +121,16 @@ namespace CampaignKit.WorldMap.Services
 		public async Task<bool> Delete(int id)
 		{
 			// Determine if this map exists
-			var map = await _context.Maps.FindAsync(id);
+			var map = await _dbContext.Maps.FindAsync(id);
 			if (map == null)
 			{
-				_logger.LogError($"Map with id:{id} not found");
+				_loggerService.LogError($"Map with id:{id} not found");
 				return false;
 			}
 
 			// Remove the map from the context.
-			_context.Maps.Remove(map);
-			await _context.SaveChangesAsync();
+			_dbContext.Maps.Remove(map);
+			await _dbContext.SaveChangesAsync();
 
 			// Delete map directory and files
 			if (Directory.Exists(map.WorldFolderPath))
@@ -133,16 +146,16 @@ namespace CampaignKit.WorldMap.Services
 		/// <param name="id">The map identifier.</param>
 		/// <returns>
 		///   <c>Map</c> if successful, <c>null</c> otherwise</returns>
-		public async Task<Map> Find(int id)
+		public async Task<Entities.Map> Find(int id)
 		{
 			// Retrieve the map entry and any associated markers.
-			var map = await _context.Maps
+			var map = await _dbContext.Maps
 				.Include(m => m.Markers)
 				.FirstOrDefaultAsync(m => m.MapId == id);
 
 			if (map == null)
 			{
-				_logger.LogError($"Map with id:{id} not found");
+				_loggerService.LogError($"Map with id:{id} not found");
 				return null;
 			}
 
@@ -151,9 +164,9 @@ namespace CampaignKit.WorldMap.Services
 
 		/// <summary>Finds all maps.</summary>
 		/// <returns>IEnumerable&lt;Map&gt;.</returns>
-		public async Task<IEnumerable<Map>> FindAll()
+		public async Task<IEnumerable<Entities.Map>> FindAll()
 		{
-			return await _context.Maps.ToListAsync();
+			return await _dbContext.Maps.ToListAsync();
 		}
 
 		/// <summary>Creates the specified map.</summary>
@@ -161,7 +174,7 @@ namespace CampaignKit.WorldMap.Services
 		/// <param name="stream">Map image data stream.</param>
 		/// <returns>
 		///   <c>id</c> if successful, <c>0</c> otherwise</returns>
-		public async Task<int> Create(Map map, Stream stream)
+		public async Task<int> Create(Entities.Map map, Stream stream)
 		{
 
 			// **********************
@@ -173,8 +186,8 @@ namespace CampaignKit.WorldMap.Services
 			// ************************************
 			//  Create DB entity (Generate Map ID)
 			// ************************************
-			_context.Add(map);
-			await _context.SaveChangesAsync();
+			_dbContext.Add(map);
+			await _dbContext.SaveChangesAsync();
 
 			// **********************
 			//   Create Map Folder 
@@ -267,8 +280,8 @@ namespace CampaignKit.WorldMap.Services
 			//   Update Map Entity
 			// ************************************
 			map.WorldFolderPath = worldFolderPath;
-			_context.Update(map);
-			await _context.SaveChangesAsync();
+			_dbContext.Update(map);
+			await _dbContext.SaveChangesAsync();
 			
 			return map.MapId;
 			
@@ -278,10 +291,10 @@ namespace CampaignKit.WorldMap.Services
 		/// <param name="map">The map entity to save.</param>
 		/// <returns>
 		///   <c>id</c> if successful, <c>false</c> otherwise</returns>
-		public async Task<bool> Save(Map map)
+		public async Task<bool> Save(Entities.Map map)
 		{
-			_context.Update(map);
-			await _context.SaveChangesAsync();
+			_dbContext.Update(map);
+			await _dbContext.SaveChangesAsync();
 			return true;
 
 		}

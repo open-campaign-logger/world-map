@@ -19,12 +19,12 @@ using CampaignKit.WorldMap.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Entities
 {
 	/// <summary>
-	///     Interface IMarkerDataService
+	///		EntityFramework interface for <c>Marker</c> data elements.
 	/// </summary>
-	public interface IMarkerDataService
+	public interface IMarkerRepository
 	{
 		#region Public Methods
 
@@ -59,34 +59,40 @@ namespace CampaignKit.WorldMap.Services
 
 		#endregion Public Methods
 	}
-	   
-	/// <inheritdoc />
+
 	/// <summary>
-	///     Class DefaultMarkerDataService.
+	///		Default implementation of the EntityFramework respository for Marker data elements.
 	/// </summary>
-	/// <seealso cref="T:CampaignKit.WorldMap.Services.IMarkerDataService" />
-	public class DefaultMarkerDataService : IMarkerDataService
+	/// <seealso cref="CampaignKit.WorldMap.Entities.IMarkerRepository" />
+	public class DefaultMarkerRepository : IMarkerRepository
 	{
 
 		#region Private Fields
 
-		private readonly MappingContext _context;
-		private readonly ILogger _logger;
+		/// <summary>
+		/// The database context
+		/// </summary>
+		private readonly WorldMapDBContext _dbContext;
+
+		/// <summary>
+		///		The application logging service.
+		/// </summary>
+		private readonly ILogger _loggerService;
 
 		#endregion Private Fields
 
 		#region Public Constructors
 
 		/// <summary>
-		///     Initializes a new instance of the <see cref="DefaultMarkerDataService" /> class.
+		/// Initializes a new instance of the <see cref="DefaultMarkerRepository"/> class.
 		/// </summary>
-		/// <param name="context">The database context.</param>
-		/// <param name="logger">The logging service.</param>
-		public DefaultMarkerDataService(MappingContext context,
-			ILogger<TileCreationService> logger)
+		/// <param name="dbContext">The database context.</param>
+		/// <param name="loggerService">The logger service.</param>
+		public DefaultMarkerRepository(WorldMapDBContext dbContext,
+			ILogger<DefaultMarkerRepository> loggerService)
 		{
-			_context = context;
-			_logger = logger;
+			_dbContext = dbContext;
+			_loggerService = loggerService;
 		}
 
 		#endregion Public Constructors
@@ -103,16 +109,16 @@ namespace CampaignKit.WorldMap.Services
 		{
 
 			// Determine if this map exists
-			var marker = await _context.Markers.FindAsync(id);
+			var marker = await _dbContext.Markers.FindAsync(id);
 			if (marker == null)
 			{
-				_logger.LogError($"Marker with id:{id} not found");
+				_loggerService.LogError($"Marker with id:{id} not found");
 				return false;
 			}
 
 			// Remove the marker from the context.
-			_context.Markers.Remove(marker);
-			await _context.SaveChangesAsync();
+			_dbContext.Markers.Remove(marker);
+			await _dbContext.SaveChangesAsync();
 
 			// Return result
 			return true;
@@ -126,12 +132,12 @@ namespace CampaignKit.WorldMap.Services
 		public async Task<Marker> Find(int id)
 		{
 			// Retrieve the marker entry
-			var marker = await _context.Markers
+			var marker = await _dbContext.Markers
 				.FirstOrDefaultAsync(m => m.MarkerId == id);
 
 			if (marker == null)
 			{
-				_logger.LogError($"Marker with id:{id} not found");
+				_loggerService.LogError($"Marker with id:{id} not found");
 				return null;
 			}
 
@@ -151,21 +157,21 @@ namespace CampaignKit.WorldMap.Services
 			// Map id provided?
 			if (mapId == 0)
 			{
-				_logger.LogError($"Map id not provided");
+				_loggerService.LogError($"Map id not provided");
 				return 0;
 			}
 			// Marker data provided?
 			if (marker == null)
 			{
-				_logger.LogError($"Marker data not provided");
+				_loggerService.LogError($"Marker data not provided");
 				return 0;
 			}			
 
 			// ************************************
 			//  Create DB entity (Generate Marker ID)
 			// ************************************
-			_context.Add(marker);
-			await _context.SaveChangesAsync();
+			_dbContext.Add(marker);
+			await _dbContext.SaveChangesAsync();
 			
 			return marker.MarkerId;
 		}
@@ -176,8 +182,8 @@ namespace CampaignKit.WorldMap.Services
 		///   <c>true</c> if save successful, <c>false</c> otherwise.</returns>
 		public async Task<bool> Save(Marker marker)
 		{
-			_context.Update(marker);
-			await _context.SaveChangesAsync();
+			_dbContext.Update(marker);
+			await _dbContext.SaveChangesAsync();
 			return true;
 		}
 

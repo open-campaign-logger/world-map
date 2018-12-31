@@ -31,7 +31,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Entities
 {
 	/// <summary>
 	/// A timed background service that queries the Tiles table and processes 
@@ -134,7 +134,7 @@ namespace CampaignKit.WorldMap.Services
 			using (IServiceScope scope = _serviceProvider.CreateScope())
 			{
 				// Retrieve the db context from the container
-				var dbContext = scope.ServiceProvider.GetRequiredService<MappingContext>();
+				var dbContext = scope.ServiceProvider.GetRequiredService<WorldMapDBContext>();
 				var filePathService = scope.ServiceProvider.GetRequiredService<IFilePathService>();
 
 				// Open the db connection

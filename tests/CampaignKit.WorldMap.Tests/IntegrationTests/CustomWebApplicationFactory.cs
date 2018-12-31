@@ -14,7 +14,7 @@
 
 
 using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
+using CampaignKit.WorldMap.Entities;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -47,7 +47,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// <value>
 		/// The map data service.
 		/// </value>
-		public IMapDataService MapDataService { get; set; }
+		public IMapRepository MapDataService { get; set; }
 
 		/// <summary>
 		/// Gets or sets the marker data service.
@@ -55,7 +55,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// <value>
 		/// The marker data service.
 		/// </value>
-		public IMarkerDataService MarkerDataService { get; set; }
+		public IMarkerRepository MarkerDataService { get; set; }
 
 		/// <summary>
 		/// Gets or sets the progress service.
@@ -87,7 +87,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// <value>
 		/// The database service.
 		/// </value>
-		public MappingContext DatabaseService { get; set; }
+		public WorldMapDBContext DatabaseService { get; set; }
 
 		/// <summary>
 		/// Gets or sets the logger service.
@@ -124,7 +124,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 
 				// Add a database context (MappingContext) using an in-memory 
 				// database for testing.
-				services.AddDbContext<MappingContext>(options =>
+				services.AddDbContext<WorldMapDBContext>(options =>
 				{
 					options.UseInMemoryDatabase("InMemoryDbForTesting");
 					options.UseInternalServiceProvider(serviceProvider);
@@ -144,16 +144,16 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 					FilePathService = scopedServices.GetRequiredService<IFilePathService>();
 
 					// Get a handle to the map data service
-					MapDataService = scopedServices.GetRequiredService<IMapDataService>();
+					MapDataService = scopedServices.GetRequiredService<IMapRepository>();
 
 					// Get a handle to the marker data service
-					MarkerDataService = scopedServices.GetRequiredService<IMarkerDataService>();
+					MarkerDataService = scopedServices.GetRequiredService<IMarkerRepository>();
 
 					// Get a handle to the random data service
 					RandomDataService = scopedServices.GetRequiredService<IRandomDataService>();
 
 					// Get a handle to the database service
-					DatabaseService = scopedServices.GetRequiredService<MappingContext>();
+					DatabaseService = scopedServices.GetRequiredService<WorldMapDBContext>();
 
 					// Get a handle to the logging service
 					LoggerService = scopedServices

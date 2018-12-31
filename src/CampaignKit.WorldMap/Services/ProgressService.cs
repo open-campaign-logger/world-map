@@ -19,7 +19,7 @@ using CampaignKit.WorldMap.Entities;
 
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Entities
 {
 
 	/// <summary>
@@ -49,7 +49,7 @@ namespace CampaignKit.WorldMap.Services
 	{
 		#region Private Fields
 
-		private readonly MappingContext _context;
+		private readonly WorldMapDBContext _context;
 		private readonly ILogger _logger;
 
 		#endregion
@@ -59,7 +59,7 @@ namespace CampaignKit.WorldMap.Services
 		/// <summary>
 		///     Initializes a new instance of the <see cref="DefaultProgressService" /> class.
 		/// </summary>
-		public DefaultProgressService(MappingContext context,
+		public DefaultProgressService(WorldMapDBContext context,
 				ILogger<TileCreationService> logger)
 		{
 			_context = context;

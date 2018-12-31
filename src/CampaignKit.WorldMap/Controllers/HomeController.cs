@@ -14,43 +14,60 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using CampaignKit.WorldMap.Services;
+
+using CampaignKit.WorldMap.Entities;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Controllers
 {
-	/// <inheritdoc />
+
 	/// <summary>
-	///     Class HomeController.
+	///		Main MVC controller for application.
 	/// </summary>
-	/// <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
+	/// <seealso cref="Microsoft.AspNetCore.Mvc.Controller" />
 	public class HomeController : Controller
 	{
 		#region Private Fields
 
-		private readonly IMapDataService _mapDataService;
+		/// <summary>
+		///		The EntityFramework repository for Map data elements.
+		/// </summary>
+		private readonly IMapRepository _mapRepository;
+
+		/// <summary>
+		///		The application logging service.
+		/// </summary>
+		private readonly ILogger _loggerService;
 
 		#endregion Private Fields
 
 		#region Public Constructors
 
 		/// <summary>
-		///     Initializes a new instance of the <see cref="HomeController" /> class.
+		/// Initializes a new instance of the <see cref="HomeController"/> class.
 		/// </summary>
 		/// <param name="mapDataService">The map data service.</param>
-		public HomeController(IMapDataService mapDataService)
+		/// <param name="logger">The logger.</param>
+		public HomeController(IMapRepository mapDataService,
+			ILogger<HomeController> logger)
 		{
-			_mapDataService = mapDataService;
+			_mapRepository = mapDataService;
 		}
 
 		#endregion Public Constructors
 
 		#region Public Methods
 
+		/// <summary>
+		///		Get: /
+		/// </summary>
+		/// <returns>Home view showing last three created maps.</returns>
+		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
-			var model = (await _mapDataService.FindAll())
+			var model = (await _mapRepository.FindAll())
 				.Where(m => m.MapId != 1)
 				.OrderByDescending(m => m.CreationTimestamp)
 				.Take(3);
@@ -58,6 +75,11 @@ namespace CampaignKit.WorldMap.Controllers
 			return View(model);
 		}
 
+		/// <summary>
+		///		Get: /Legalities
+		/// </summary>
+		/// <returns>Application legalities view.</returns>
+		[HttpGet]
 		public ActionResult Legalities()
 		{
 			return View();
