@@ -13,14 +13,13 @@
 // limitations under the License.
 
 
-using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
 
+using System;
+using CampaignKit.WorldMap.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Tests.IntegrationTests
 {
@@ -57,7 +56,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 
 				// Add a database context (MappingContext) using an in-memory 
 				// database for testing.
-				services.AddDbContext<MappingContext>(options =>
+				services.AddDbContext<WorldMapDBContext>(options =>
 				{
 					options.UseInMemoryDatabase("InMemoryDbForTesting");
 					options.UseInternalServiceProvider(serviceProvider);
@@ -74,8 +73,84 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 					var scopedServices = scope.ServiceProvider;
 
 					// Get a handle to the database service
-					var databaseService = scopedServices.GetRequiredService<MappingContext>();
+					var databaseService = scopedServices.GetRequiredService<WorldMapDBContext>();
 					databaseService.Database.EnsureCreated();
+
+					// Create a sample map
+					var map_1 = new Map()
+					{
+						AdjustedSize = 0,
+						ContentType = "",
+						Copyright = "",
+						CreationTimestamp = DateTime.Today.AddDays(-2),
+						FileExtension = "",
+						MaxZoomLevel = 0,
+						Name = "Map1",
+						RepeatMapInX = false,
+						Secret = "",
+						ThumbnailPath = "",
+						WorldFolderPath = "",
+					};
+
+					databaseService.Maps.Add(map_1);
+					databaseService.SaveChanges();
+
+					// Create a sample map
+					var map_2 = new Map()
+					{
+						AdjustedSize = 0,
+						ContentType = "",
+						Copyright = "",
+						CreationTimestamp = DateTime.Today.AddDays(-5),
+						FileExtension = "",
+						MaxZoomLevel = 0,
+						Name = "Map2",
+						RepeatMapInX = false,
+						Secret = "",
+						ThumbnailPath = "",
+						WorldFolderPath = "",
+					};
+
+					databaseService.Maps.Add(map_2);
+					databaseService.SaveChanges();
+
+					// Create a sample map
+					var map_3 = new Map()
+					{
+						AdjustedSize = 0,
+						ContentType = "",
+						Copyright = "",
+						CreationTimestamp = DateTime.Today.AddDays(-1),
+						FileExtension = "",
+						MaxZoomLevel = 0,
+						Name = "Map3",
+						RepeatMapInX = false,
+						Secret = "",
+						ThumbnailPath = "",
+						WorldFolderPath = "",
+					};
+
+					databaseService.Maps.Add(map_3);
+					databaseService.SaveChanges();
+
+					// Create a sample map
+					var map_4 = new Map()
+					{
+						AdjustedSize = 0,
+						ContentType = "",
+						Copyright = "",
+						CreationTimestamp = DateTime.Today,
+						FileExtension = "",
+						MaxZoomLevel = 0,
+						Name = "Map4",
+						RepeatMapInX = false,
+						Secret = "",
+						ThumbnailPath = "",
+						WorldFolderPath = "",
+					};
+
+					databaseService.Maps.Add(map_4);
+					databaseService.SaveChanges();
 
 				}
 			});

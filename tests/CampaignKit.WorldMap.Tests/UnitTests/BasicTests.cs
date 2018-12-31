@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+
 using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
 using CampaignKit.WorldMap.Tests.IntegrationTests;
-using Microsoft.AspNetCore.Mvc.Testing;
+
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+
 using Xunit;
 
 namespace CampaignKit.WorldMap.Tests.UnitTests
@@ -47,7 +45,7 @@ namespace CampaignKit.WorldMap.Tests.UnitTests
 				var scopedServices = scope.ServiceProvider;
 
 				// Retrieve services from the scoped context
-				var service = scopedServices.GetService<MappingContext>();
+				var service = scopedServices.GetService<WorldMapDBContext>();
 				Assert.True(service.Maps.Count() > 0);
 			}
 		}
@@ -65,8 +63,27 @@ namespace CampaignKit.WorldMap.Tests.UnitTests
 				var scopedServices = scope.ServiceProvider;
 
 				// Retrieve services from the scoped context
-				var db = scopedServices.GetService<MappingContext>();
+				var db = scopedServices.GetService<WorldMapDBContext>();
 				Assert.True(db.Database.CanConnect());
+			}
+
+		}
+
+		[Fact]
+		public async Task TestMapsExist()
+		{
+			// Build the service provider.
+			var hostServices = _factory.Server.Host.Services;
+
+			using (var scope = hostServices.CreateScope())
+			{
+				// Get the service provider
+				var scopedServices = scope.ServiceProvider;
+
+				// Retrieve services from the scoped context
+				var services = scopedServices.GetService<IMapRepository>();
+				var results = await services.FindAll();
+				Assert.True(results.ToList().Count > 0);
 			}
 
 		}
