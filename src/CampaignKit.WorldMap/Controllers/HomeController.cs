@@ -54,6 +54,7 @@ namespace CampaignKit.WorldMap.Controllers
 			ILogger<HomeController> logger)
 		{
 			_mapRepository = mapDataService;
+			_loggerService = logger;
 		}
 
 		#endregion Public Constructors
@@ -71,7 +72,7 @@ namespace CampaignKit.WorldMap.Controllers
 				.Where(m => m.MapId != 1)
 				.OrderByDescending(m => m.CreationTimestamp)
 				.Take(3);
-
+			
 			return View(model);
 		}
 

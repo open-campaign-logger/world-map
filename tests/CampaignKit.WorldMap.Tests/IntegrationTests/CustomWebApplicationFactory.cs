@@ -14,7 +14,6 @@
 
 
 using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -32,62 +31,14 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 	public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<Startup>
 	{
 		#region Public Properties
-
-		/// <summary>
-		/// Gets or sets the file path service.
-		/// </summary>
-		/// <value>
-		/// The file path service.
-		/// </value>
-		public IFilePathService FilePathService { get; set;  }
-
-		/// <summary>
-		/// Gets or sets the map data service.
-		/// </summary>
-		/// <value>
-		/// The map data service.
-		/// </value>
-		public IMapDataService MapDataService { get; set; }
-
-		/// <summary>
-		/// Gets or sets the marker data service.
-		/// </summary>
-		/// <value>
-		/// The marker data service.
-		/// </value>
-		public IMarkerDataService MarkerDataService { get; set; }
-
-		/// <summary>
-		/// Gets or sets the progress service.
-		/// </summary>
-		/// <value>
-		/// The progress service.
-		/// </value>
-		public IProgressService ProgressService { get; set; }
-
-		/// <summary>
-		/// Gets or sets the random data service.
-		/// </summary>
-		/// <value>
-		/// The random data service.
-		/// </value>
-		public IRandomDataService RandomDataService { get; set; }
-
-		/// <summary>
-		/// Gets or sets the tile creation service.
-		/// </summary>
-		/// <value>
-		/// The tile creation service.
-		/// </value>
-		public TileCreationService TileCreationService { get; set; }
-
+		
 		/// <summary>
 		/// Gets or sets the database service.
 		/// </summary>
 		/// <value>
 		/// The database service.
 		/// </value>
-		public MappingContext DatabaseService { get; set; }
+		public WorldMapDBContext DatabaseService { get; set; }
 
 		/// <summary>
 		/// Gets or sets the logger service.
@@ -124,7 +75,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 
 				// Add a database context (MappingContext) using an in-memory 
 				// database for testing.
-				services.AddDbContext<MappingContext>(options =>
+				services.AddDbContext<WorldMapDBContext>(options =>
 				{
 					options.UseInMemoryDatabase("InMemoryDbForTesting");
 					options.UseInternalServiceProvider(serviceProvider);
@@ -140,20 +91,8 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 					// Get a handle to the service provider
 					var scopedServices = scope.ServiceProvider;
 
-					// Get a handle to the file path service
-					// FilePathService = scopedServices.GetRequiredService<IFilePathService>();
-
-					// Get a handle to the map data service
-					// MapDataService = scopedServices.GetRequiredService<IMapDataService>();
-
-					// Get a handle to the marker data service
-					// MarkerDataService = scopedServices.GetRequiredService<IMarkerDataService>();
-
-					// Get a handle to the random data service
-					// RandomDataService = scopedServices.GetRequiredService<IRandomDataService>();
-
 					// Get a handle to the database service
-					DatabaseService = scopedServices.GetRequiredService<MappingContext>();
+					DatabaseService = scopedServices.GetRequiredService<WorldMapDBContext>();
 					DatabaseService.Database.EnsureCreated();
 
 					// Get a handle to the logging service

@@ -16,14 +16,11 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+
 using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Entities;
+
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Tests.IntegrationTests
