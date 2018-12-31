@@ -42,7 +42,7 @@ namespace CampaignKit.WorldMap
         public static void Main(string[] args)
 		{
 			// Build the web host
-			var host = BuildWebHost(args);
+			var host = CreateWebHostBuilder(args).Build();
 
 			// Seed the database if required
 
@@ -110,14 +110,16 @@ namespace CampaignKit.WorldMap
 		}
 
 		/// <summary>
-		/// Builds the web host.
+		/// Creates the core web host.
+		/// 
+		/// see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
+		/// see: https://github.com/aspnet/Docs/blob/master/aspnetcore/test/integration-tests/samples/2.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs
 		/// </summary>
-		/// <param name="args">The arguments.</param>
+		/// <param name="args"></param>
 		/// <returns></returns>
-		public static IWebHost BuildWebHost(string[] args) =>
+		public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
 			WebHost.CreateDefaultBuilder(args)
-				.UseStartup<Startup>()
-				.Build();
+				.UseStartup<Startup>();
 
 		#endregion Public Methods
 
