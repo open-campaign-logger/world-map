@@ -18,7 +18,6 @@ using System.IO;
 using System.Linq;
 
 using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
 
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -54,23 +53,23 @@ namespace CampaignKit.WorldMap
 				var services = scope.ServiceProvider;
 
 				// Get the data base provide and ensure that it is created and ready.
-				var dbContext = services.GetRequiredService<MappingContext>();
+				var dbContext = services.GetRequiredService<WorldMapDBContext>();
 				dbContext.Database.EnsureCreated();
 				dbContext.Database.GetDbConnection();
 
 				// Get the map data service provider and test to see if it already contains data			
-				var mapDataService = services.GetRequiredService<IMapDataService>();
+				var mapDataService = services.GetRequiredService<IMapRepository>();
 				var maps = mapDataService.FindAll();
 				maps.Wait();
 
 				if (maps.Result.Count() == 0)
 				{
 					// Create an object for the sample map
-					var sampleMap = new Map()
+					var sampleMap = new Entities.Map()
 					{
 						Name = "Sample",
 						Secret = "lNtqjEVQ",
-						Copyright = String.Empty,
+						Copyright = string.Empty,
 						ContentType = "image/png",
 						FileExtension = ".png",
 						CreationTimestamp = DateTime.UtcNow,

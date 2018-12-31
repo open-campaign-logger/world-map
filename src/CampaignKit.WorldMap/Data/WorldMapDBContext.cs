@@ -21,12 +21,12 @@ namespace CampaignKit.WorldMap.Entities
 	/// <summary>
 	///		Database context service.
 	/// </summary>
-	public class MappingContext: DbContext
+	public class WorldMapDBContext: DbContext
 	{
 
-		/// <summary>Initializes a new instance of the <see cref="MappingContext"/> class.</summary>
+		/// <summary>Initializes a new instance of the <see cref="WorldMapDBContext"/> class.</summary>
 		/// <param name="options">The options.</param>
-		public MappingContext(DbContextOptions<MappingContext> options)
+		public WorldMapDBContext(DbContextOptions<WorldMapDBContext> options)
 			: base(options)
 		{ }
 

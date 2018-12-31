@@ -16,7 +16,7 @@ using System.IO;
 
 using Microsoft.AspNetCore.Hosting;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Entities
 {
 	/// <summary>
 	///     Interface IFilePathService
