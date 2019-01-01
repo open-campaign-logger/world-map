@@ -301,21 +301,25 @@ namespace CampaignKit.WorldMap.Controllers
 		/// </summary>
 		/// <returns>Map sample view.</returns>
 		[HttpGet]
-		public IActionResult Sample()
+		public async Task<IActionResult> Sample()
 		{
-			if (!Request.Path.Value.EndsWith("/"))
+			var map = await _mapRepository.Find(1);
+
+			if (map == null)
+				return ShowErrorView();
+
+			var model = new MapShowViewModel
 			{
-				var actionUrl = Url.Action("Sample");
-				if (!actionUrl.EndsWith("/")) actionUrl += "/";
+				Name = map.Name,
+				Id = map.MapId,
+				MarkerData = map.MarkerData
+			};
 
-				return Redirect(actionUrl);
-			}
-
-			ViewBag.MaxZoomLevel = 4;
+			ViewBag.MaxZoomLevel = map.MaxZoomLevel;
 			ViewBag.WorldPath = Url.Content($"{_filePathService.VirtualWorldBasePath}/1");
-			ViewBag.NoWrap = false;
+			ViewBag.NoWrap = !map.RepeatMapInX;
 
-			return View();
+			return View(model);
 		}
 
 		/// <summary>
@@ -344,7 +348,9 @@ namespace CampaignKit.WorldMap.Controllers
 				MapEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id, Secret = secret }, protocol, Request.Host.Value),
 				MapShowUrl = Url.Action(nameof(Show), "Map", new { Id = id }, protocol, Request.Host.Value),
 				MapBaseDeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
-				MapBaseEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value)
+				MapBaseEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
+				Id = id,
+				MarkerData = map.MarkerData
 			};
 
 			ViewBag.MaxZoomLevel = map.MaxZoomLevel;
@@ -354,20 +360,35 @@ namespace CampaignKit.WorldMap.Controllers
 			return View(model);
 		}
 
+		/// <summary>
+		///		GET: /Map/MarkerData/{id?}
+		/// </summary>
+		/// <param name="id">The map identifier.</param>
+		/// <returns>The selected map.</returns>
+		[HttpGet]
+		public async Task<IActionResult> GetMarkerData(int id)
+		{
+			var map = await _mapRepository.Find(id);
+
+			if (map == null)
+				return ShowErrorView();
+
+			return Json(map.MarkerData);
+		}
+
 		#endregion
 
 		#region  Marker Related Actions    
 
 		/// <summary>
-		///		POST: Map/UpdateMarker/{MarkerId} 
+		///		POST: Map/Update/{MapId}
 		/// </summary>
 		/// <param name="id">The identifier.</param>
-		/// <param name="markerId">The marker identifier.</param>
-		/// <param name="markerData">The marker data.</param>
+		/// <param name="markerData">Map marker data in JSON format.</param>
 		/// <returns></returns>
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> UpdateMarker(int id, int? markerId, string markerData)
+		public async Task<IActionResult> Update(int id, string markerData)
 		{
 			var map = _mapRepository.Find(id);
 
@@ -377,45 +398,11 @@ namespace CampaignKit.WorldMap.Controllers
 				return Json("Failed to update marker");
 			}
 
-
-			var marker = new Marker()
-			{
-				JSON = JArray.Parse(markerData).ToString()
-			};
-
-			var m = await _dbContext.Markers.FindAsync(id);
-
-			if (m == null)
-			{
-				_dbContext.Add(marker);
-			}
-			else
-			{
-				_dbContext.Update(marker);
-			}
-
 			await _dbContext.SaveChangesAsync();
 
-			return Json(marker.MarkerId);
+			return View();
 		}
-
-		/// <summary>
-		///		POST: Map/DeleteMarker/{MarkerId}
-		/// </summary>
-		/// <param name="id">Id of marker to delete</param>
-		/// <returns></returns>
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> DeleteMarker(int id)
-		{
-			var marker = await _dbContext.Markers.FindAsync(id);
-			_dbContext.Markers.Remove(marker);
-
-			await _dbContext.SaveChangesAsync();
-
-			return Json("success");
-		}
-
+		
 		#endregion
 
 		#endregion Public Methods

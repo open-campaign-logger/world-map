@@ -86,16 +86,7 @@ namespace CampaignKit.WorldMap
 
 					// Retrieve default marker data from test file
 					var markerData = File.ReadAllText(Path.Combine(filePathService.SeedDataPath, "sample.json"));
-					sampleMap.Markers = new List<Marker>();
-					var markers = JArray.Parse(markerData);
-					foreach (var m in markers)
-					{
-						var marker = new Marker()
-						{
-							JSON = m.ToString()
-						};
-						sampleMap.Markers.Add(marker);
-					}
+					sampleMap.MarkerData = markerData;
 
 					// Use the data service to update the map
 					var markerCreationTask = mapDataService.Save(sampleMap);

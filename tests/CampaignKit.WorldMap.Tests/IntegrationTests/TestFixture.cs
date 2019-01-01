@@ -68,15 +68,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// The map data service.
 		/// </value>
 		public IMapRepository MapDataService { get; set; }
-
-		/// <summary>
-		/// Gets or sets the marker data service.
-		/// </summary>
-		/// <value>
-		/// The marker data service.
-		/// </value>
-		public IMarkerRepository MarkerDataService { get; set; }
-
+		
 		/// <summary>
 		/// Gets or sets the progress service.
 		/// </summary>

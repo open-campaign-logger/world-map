@@ -59,20 +59,27 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 				var progressService = scopedServices.GetService<IProgressService>();
 				var filePathService = scopedServices.GetService<IFilePathService>();
 				var dbContext = scopedServices.GetService<WorldMapDBContext>();
-				
+
 				// Instantiate the controller
 				var controller = new MapController(randomDataService, mapRepository, progressService, filePathService, dbContext, loggerService);
 
 				// call the controller method
-				IActionResult result = await controller.Edit(2, "Map2");
+				var viewModel = new MapEditViewModel()
+				{
+					Copyright = "Copy",
+					Name = "Map2_Altered",
+					RepeatMapInX = true
+				};
+				IActionResult result = await controller.Edit(3, "Map3", viewModel);
 
-				// Assert result is a view
-				ViewResult viewResult = Assert.IsType<ViewResult>(result);
-
-				// Assert result contains three maps 
-				var viewModel = Assert.IsType<MapEditViewModel>(viewResult.Model);
+				// Assert that map has been deleted
+				var editedMap = await mapRepository.Find(3);
+				Assert.Equal(viewModel.Copyright, editedMap.Copyright);
+				Assert.Equal(viewModel.Name, editedMap.Name);
+				Assert.Equal(viewModel.RepeatMapInX, editedMap.RepeatMapInX);
 
 			}
+
 		}
 
 		[Fact]
@@ -98,13 +105,17 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 				var controller = new MapController(randomDataService, mapRepository, progressService, filePathService, dbContext, loggerService);
 
 				// call the controller method
-				IActionResult result = await controller.Delete(2, "Map2");
-
-				// Assert result is a view
-				ViewResult viewResult = Assert.IsType<ViewResult>(result);
-
-				// Assert result contains three maps 
-				var viewModel = Assert.IsType<MapDeleteViewModel>(viewResult.Model);
+				var viewModel = new MapDeleteViewModel()
+				{
+					HiddenId = 2,
+					HiddenSecret = "Map2",
+					Name = "Map2"
+				};
+				IActionResult result = await controller.Delete(viewModel.HiddenId, viewModel.HiddenSecret, viewModel);
+				
+				// Assert that map has been deleted
+				var deletedMap = await mapRepository.Find(viewModel.HiddenId);
+				Assert.Null(deletedMap);
 
 			}
 		}

@@ -37,10 +37,6 @@ namespace CampaignKit.WorldMap.Entities
 		/// <summary>Gets or sets the tiles.</summary>
 		/// <value>The tiles.</value>
 		public DbSet<Tile> Tiles { get; set; }
-
-		/// <summary>Gets or sets the markers.</summary>
-		/// <value>The markers.</value>
-		public DbSet<Marker> Markers { get; set; }
-				
+						
 	}
 }

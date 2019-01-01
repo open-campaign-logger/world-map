@@ -150,7 +150,6 @@ namespace CampaignKit.WorldMap.Entities
 		{
 			// Retrieve the map entry and any associated markers.
 			var map = await _dbContext.Maps
-				.Include(m => m.Markers)
 				.FirstOrDefaultAsync(m => m.MapId == id);
 
 			if (map == null)
