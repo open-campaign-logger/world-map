@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
 
-namespace CampaignKit.WorldMap.Tests.UnitTests
+namespace CampaignKit.WorldMap.Tests.IntegrationTests
 {
 	public class BasicTests : IClassFixture<CustomWebApplicationFactory<Startup>>
 	{
@@ -68,26 +68,6 @@ namespace CampaignKit.WorldMap.Tests.UnitTests
 			}
 
 		}
-
-		[Fact]
-		public async Task TestMapsExist()
-		{
-			// Build the service provider.
-			var hostServices = _factory.Server.Host.Services;
-
-			using (var scope = hostServices.CreateScope())
-			{
-				// Get the service provider
-				var scopedServices = scope.ServiceProvider;
-
-				// Retrieve services from the scoped context
-				var services = scopedServices.GetService<IMapRepository>();
-				var results = await services.FindAll();
-				Assert.True(results.ToList().Count > 0);
-			}
-
-		}
-
-
+			   
 	}
 }

@@ -21,4 +21,8 @@
     <ProjectReference Include="..\..\src\CampaignKit.WorldMap\CampaignKit.WorldMap.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UnitTests\" />
+  </ItemGroup>
+
 </Project>

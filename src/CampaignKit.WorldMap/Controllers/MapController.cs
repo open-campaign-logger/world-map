@@ -418,8 +418,6 @@ namespace CampaignKit.WorldMap.Controllers
 
 		#endregion
 
-
-
 		#endregion Public Methods
 
 		#region Private Methods
