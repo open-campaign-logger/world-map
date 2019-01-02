@@ -222,6 +222,9 @@ limitations under the License.
 			// Add the layer and the popup to the drawn items group
 			featureGroup.addLayer(layer);
 
+			// Save marker data
+			saveMarkers();
+
 		}
 
 		// Update the coordinates in the edited drawnItem's properties
@@ -246,6 +249,9 @@ limitations under the License.
 				layer.properties.id = idLatLng(latlng);
 
 			});
+
+			// Save marker data
+			saveMarkers();
 
 		}
 
@@ -282,6 +288,8 @@ limitations under the License.
 			// the geoJSONMarker's properties
 			e.target.properties.content = quill.getContents();
 			quill = null;
+
+			// Save marker data
 			saveMarkers();
 
 			// Clear the popup
@@ -345,6 +353,9 @@ limitations under the License.
 
 		// Update all layers with any changes made by a user
 		map.on(L.Draw.Event.EDITED, drawnItemEdited);
+
+		// Update all layers with any changes made by a user
+		map.on(L.Draw.Event.DELETED, drawnItemEdited);
 
 		// Import marker data
 		loadMarkers();
