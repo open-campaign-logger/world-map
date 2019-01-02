@@ -12,27 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+
+using CampaignKit.WorldMap.Entities;
 
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using CampaignKit.WorldMap.Services;
-using Microsoft.Extensions.Logging;
-using CampaignKit.WorldMap.Entities;
+
 using Newtonsoft.Json.Linq;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace CampaignKit.WorldMap
 {
-    /// <summary>
-    ///     Class Program.
-    /// </summary>
-    public class Program
+
+	/// <summary>
+	///     Class Program.
+	/// </summary>
+	public class Program
     {
         #region Public Methods
 
@@ -43,7 +43,7 @@ namespace CampaignKit.WorldMap
         public static void Main(string[] args)
 		{
 			// Build the web host
-			var host = BuildWebHost(args);
+			var host = CreateWebHostBuilder(args).Build();
 
 			// Seed the database if required
 
@@ -53,23 +53,23 @@ namespace CampaignKit.WorldMap
 				var services = scope.ServiceProvider;
 
 				// Get the data base provide and ensure that it is created and ready.
-				var dbContext = services.GetService<MappingContext>();
+				var dbContext = services.GetRequiredService<WorldMapDBContext>();
 				dbContext.Database.EnsureCreated();
 				dbContext.Database.GetDbConnection();
 
 				// Get the map data service provider and test to see if it already contains data			
-				var mapDataService = services.GetService<IMapDataService>();
+				var mapDataService = services.GetRequiredService<IMapRepository>();
 				var maps = mapDataService.FindAll();
 				maps.Wait();
 
 				if (maps.Result.Count() == 0)
 				{
 					// Create an object for the sample map
-					var sampleMap = new Map()
+					var sampleMap = new Entities.Map()
 					{
 						Name = "Sample",
 						Secret = "lNtqjEVQ",
-						Copyright = String.Empty,
+						Copyright = string.Empty,
 						ContentType = "image/png",
 						FileExtension = ".png",
 						CreationTimestamp = DateTime.UtcNow,
@@ -86,16 +86,7 @@ namespace CampaignKit.WorldMap
 
 					// Retrieve default marker data from test file
 					var markerData = File.ReadAllText(Path.Combine(filePathService.SeedDataPath, "sample.json"));
-					sampleMap.Markers = new List<Marker>();
-					var markers = JArray.Parse(markerData);
-					foreach (var m in markers)
-					{
-						var marker = new Marker()
-						{
-							JSON = m.ToString()
-						};
-						sampleMap.Markers.Add(marker);
-					}
+					sampleMap.MarkerData = markerData;
 
 					// Use the data service to update the map
 					var markerCreationTask = mapDataService.Save(sampleMap);
@@ -103,17 +94,23 @@ namespace CampaignKit.WorldMap
 
 				}
 
-
 			}
 
 			// Run the web host
 			host.Run();
 		}
 
-		public static IWebHost BuildWebHost(string[] args) =>
+		/// <summary>
+		/// Creates the core web host.
+		/// 
+		/// see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
+		/// see: https://github.com/aspnet/Docs/blob/master/aspnetcore/test/integration-tests/samples/2.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs
+		/// </summary>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
 			WebHost.CreateDefaultBuilder(args)
-				.UseStartup<Startup>()
-				.Build();
+				.UseStartup<Startup>();
 
 		#endregion Public Methods
 

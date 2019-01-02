@@ -35,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="grunt" Version="0.1.13" />
     <PackageReference Include="Microsoft.AspNetCore.All" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
