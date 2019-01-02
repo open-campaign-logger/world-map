@@ -92,11 +92,6 @@ namespace CampaignKit.WorldMap.ViewModels
 		/// <value><c>true</c> if [show progress]; otherwise, <c>false</c>.</value>
 		public bool ShowProgress { get; set; }
 
-		/// <summary>
-		///		Map marker data in JSON format.
-		/// </summary>
-		public string MarkerData { get; set; }
-
         #endregion Public Properties
     }
 }

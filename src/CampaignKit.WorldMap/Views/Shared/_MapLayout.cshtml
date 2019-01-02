@@ -139,22 +139,22 @@ limitations under the License.
 			for (var drawnItem of featureGroup.getLayers()) {
 				data.push(drawnItemToJSON(drawnItem));
 			}
+									
+			// Prepare submission data
+			// Note: model properties and values must be surrounded by quotes.
+			var submissionData = {
+				"MapId": "1",
+				"MarkerData": JSON.stringify(data)
+			}
 
-			// Get the antiforgery token
-			var form = $('#__AjaxAntiForgeryForm');
-			var token = $('input[name="__RequestVerificationToken"]', form).val();
-			
 			// Post the data back to the controller
-			// TODO: Figure out how to post to MVC controller method
-			//       with multiple parameters from ajax.
+			console.log('Submitting form...');
 			$.ajax({
+				url: '/Map/MarkerData',
 				type: 'POST',
-				url: '/Map/MarkerData/@Model.Id',
 				contentType: 'application/json',
-				data: {
-					id: @Model.Id,
-					markerData: JSON.stringify(data)
-				},
+				dataType: 'json',
+				data: JSON.stringify(submissionData),
 				success: function (result) {
 					console.log('Data received: ');
 					console.log(result);

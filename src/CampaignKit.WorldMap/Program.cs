@@ -94,7 +94,6 @@ namespace CampaignKit.WorldMap
 
 				}
 
-
 			}
 
 			// Run the web host

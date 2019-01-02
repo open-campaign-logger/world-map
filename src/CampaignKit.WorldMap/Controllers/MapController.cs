@@ -311,8 +311,7 @@ namespace CampaignKit.WorldMap.Controllers
 			var model = new MapShowViewModel
 			{
 				Name = map.Name,
-				Id = map.MapId,
-				MarkerData = map.MarkerData
+				Id = map.MapId
 			};
 
 			ViewBag.MaxZoomLevel = map.MaxZoomLevel;
@@ -349,8 +348,7 @@ namespace CampaignKit.WorldMap.Controllers
 				MapShowUrl = Url.Action(nameof(Show), "Map", new { Id = id }, protocol, Request.Host.Value),
 				MapBaseDeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
 				MapBaseEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
-				Id = id,
-				MarkerData = map.MarkerData
+				Id = id
 			};
 
 			ViewBag.MaxZoomLevel = map.MaxZoomLevel;
@@ -379,26 +377,24 @@ namespace CampaignKit.WorldMap.Controllers
 
 			return Json(map.MarkerData);
 		}
-			   		
 
 		/// <summary>
 		///		POST: Map/MarkerData/{MapId}
 		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <param name="markerData">Map marker data in JSON format.</param>
+		/// <param name="model">Map marker data.</param>
 		/// <returns></returns>
 		[HttpPost]
-		public async Task<IActionResult> MarkerData(int id, string markerData)
+		public async Task<IActionResult> MarkerData([FromBody] MarkerEditViewModel model)
 		{
-			var map = await _mapRepository.Find(id);
+			var map = await _mapRepository.Find(model.MapId);
 
 			if (map == null)
 			{
-				_loggerService.LogError($"Map with id:{id} not found");
+				_loggerService.LogError($"Map with id:{model.MapId} not found");
 				return Json("Failed to update marker");
 			}
 
-			map.MarkerData = markerData;
+			map.MarkerData = model.MarkerData;
 
 			await _dbContext.SaveChangesAsync();
 
