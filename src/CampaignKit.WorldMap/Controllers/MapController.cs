@@ -360,13 +360,17 @@ namespace CampaignKit.WorldMap.Controllers
 			return View(model);
 		}
 
+		#endregion
+
+		#region  Marker Related Actions    
+
 		/// <summary>
 		///		GET: /Map/MarkerData/{id?}
 		/// </summary>
 		/// <param name="id">The map identifier.</param>
-		/// <returns>The selected map.</returns>
+		/// <returns>The map's marker data in JSON format.</returns>
 		[HttpGet]
-		public async Task<IActionResult> GetMarkerData(int id)
+		public async Task<IActionResult> MarkerData(int id)
 		{
 			var map = await _mapRepository.Find(id);
 
@@ -375,22 +379,18 @@ namespace CampaignKit.WorldMap.Controllers
 
 			return Json(map.MarkerData);
 		}
-
-		#endregion
-
-		#region  Marker Related Actions    
+			   		
 
 		/// <summary>
-		///		POST: Map/Update/{MapId}
+		///		POST: Map/MarkerData/{MapId}
 		/// </summary>
 		/// <param name="id">The identifier.</param>
 		/// <param name="markerData">Map marker data in JSON format.</param>
 		/// <returns></returns>
 		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Update(int id, string markerData)
+		public async Task<IActionResult> MarkerData(int id, string markerData)
 		{
-			var map = _mapRepository.Find(id);
+			var map = await _mapRepository.Find(id);
 
 			if (map == null)
 			{
@@ -398,9 +398,11 @@ namespace CampaignKit.WorldMap.Controllers
 				return Json("Failed to update marker");
 			}
 
+			map.MarkerData = markerData;
+
 			await _dbContext.SaveChangesAsync();
 
-			return View();
+			return Json("Success");
 		}
 		
 		#endregion

@@ -76,11 +76,11 @@ limitations under the License.
 		// **********************************************
 		
 		// This is used for testing purposes only.
-		function importData() {
+		function loadMarkers() {
 
 			$.ajax({
 				type: "GET",
-				url: "/Map/GetMarkerData/@Model.Id",
+				url: "/Map/MarkerData/@Model.Id",
 				contentType: "application/json",
 				dataType: "json",
 				success: function (response) {
@@ -131,26 +131,30 @@ limitations under the License.
 		}
 
 		// This is used for testing purposes only.
-		function exportData() {
+		function saveMarkers() {
 
 			var data = [];
 
+			// Create an array of layer items
 			for (var drawnItem of featureGroup.getLayers()) {
 				data.push(drawnItemToJSON(drawnItem));
 			}
 
-			// Stringify the GeoJson
-			var convertedData = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
-
-			// Create export
-			// document.getElementById('export').setAttribute('href', 'data:' + convertedData);
-			// document.getElementById('export').setAttribute('download', 'data.geojson');
+			// Get the antiforgery token
+			var form = $('#__AjaxAntiForgeryForm');
+			var token = $('input[name="__RequestVerificationToken"]', form).val();
+			
+			// Post the data back to the controller
+			// TODO: Figure out how to post to MVC controller method
+			//       with multiple parameters from ajax.
 			$.ajax({
 				type: 'POST',
-				url: '/Map/Update',
-				dataType: 'json',
-				contentType: dataType,
-				data: data,
+				url: '/Map/MarkerData/@Model.Id',
+				contentType: 'application/json',
+				data: {
+					id: @Model.Id,
+					markerData: JSON.stringify(data)
+				},
 				success: function (result) {
 					console.log('Data received: ');
 					console.log(result);
@@ -278,6 +282,7 @@ limitations under the License.
 			// the geoJSONMarker's properties
 			e.target.properties.content = quill.getContents();
 			quill = null;
+			saveMarkers();
 
 			// Clear the popup
 			e.popup.setContent('');
@@ -342,7 +347,7 @@ limitations under the License.
 		map.on(L.Draw.Event.EDITED, drawnItemEdited);
 
 		// Import marker data
-		importData();
+		loadMarkers();
 
 	</script>
 	@RenderSection("scripts", false)
