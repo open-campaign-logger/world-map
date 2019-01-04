@@ -96,7 +96,15 @@ namespace CampaignKit.WorldMap
 			app.UseFileServer();
 
 			// Adds MVC to the IApplicationBuilder request execution pipeline.
-			app.UseMvcWithDefaultRoute();
+			// Using multiple routes to support callback from oidc-connect authority
+			// see: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-2.2#multiple-routes
+			app.UseMvc(routes =>
+			{
+				routes.MapRoute("oidc", "oidc-callback", defaults: new { controller = "Home", action = "Index" });
+				routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
+			});
+			
+
         }
 
         /// <summary>
@@ -129,8 +137,6 @@ namespace CampaignKit.WorldMap
 			// Add background services
 			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
 			
-
-			// Ensure that the sample map has been setup
 
 		}
 
