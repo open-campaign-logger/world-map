@@ -52,47 +52,20 @@ namespace CampaignKit.WorldMap
 				// Get the service provider
 				var services = scope.ServiceProvider;
 
+				// Determine if database has been created
+				// WorldMap.db
+				var filePathService = services.GetService<IFilePathService>();
+				var sampleDB = Path.Combine(filePathService.AppDataPath, "Sample", "Sample.db");
+				var appDB = Path.Combine(filePathService.AppDataPath, "WorldMap.db");
+				if (!File.Exists(appDB))
+				{
+					File.Copy(sampleDB, appDB);
+				}
+				
 				// Get the data base provide and ensure that it is created and ready.
 				var dbContext = services.GetRequiredService<WorldMapDBContext>();
 				dbContext.Database.EnsureCreated();
 				dbContext.Database.GetDbConnection();
-
-				// Get the map data service provider and test to see if it already contains data			
-				var mapDataService = services.GetRequiredService<IMapRepository>();
-				var maps = mapDataService.FindAll();
-				maps.Wait();
-
-				if (maps.Result.Count() == 0)
-				{
-					// Create an object for the sample map
-					var sampleMap = new Entities.Map()
-					{
-						Name = "Sample",
-						Secret = "lNtqjEVQ",
-						Copyright = string.Empty,
-						ContentType = "image/png",
-						FileExtension = ".png",
-						CreationTimestamp = DateTime.UtcNow,
-						RepeatMapInX = false,
-					};
-					
-					// Retrieve the sample map image
-					var filePathService = services.GetService<IFilePathService>();
-					var imageStream = File.Open(Path.Combine(filePathService.SeedDataPath, "sample.png"), FileMode.Open);
-
-					// Use the data service to create the map
-					var mapCreationTask = mapDataService.Create(sampleMap, imageStream);
-					mapCreationTask.Wait();
-
-					// Retrieve default marker data from test file
-					var markerData = File.ReadAllText(Path.Combine(filePathService.SeedDataPath, "sample.json"));
-					sampleMap.MarkerData = markerData;
-
-					// Use the data service to update the map
-					var markerCreationTask = mapDataService.Save(sampleMap);
-					markerCreationTask.Wait();
-
-				}
 
 			}
 
