@@ -16,10 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
-using CampaignKit.WorldMap.Entities;
 
 namespace CampaignKit.WorldMap.Entities
 {
+	/// <summary>Map Entity</summary>
 	public class Map
 	{
 		#region Public Properties
@@ -105,10 +105,10 @@ namespace CampaignKit.WorldMap.Entities
 		public ICollection<Tile> Tiles { get; set; }
 
 		/// <summary>
-		///     Gets or sets the marker collection for this map.
+		///     Gets or sets the marker data for this map.
 		/// </summary>
-		/// <value>A collection of child marker entities.</value>
-		public ICollection<Marker> Markers { get; set; }
+		/// <value>A JSON representation of child marker entities for this map.</value>
+		public string MarkerData { get; set; }
 
 		#endregion Public Properties
 	}

@@ -15,12 +15,12 @@
 using System;
 using System.Text;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Entities
 {
-    /// <summary>
-    ///     Interface IRandomDataService
-    /// </summary>
-    public interface IRandomDataService
+	/// <summary>
+	///     Interface IRandomDataService
+	/// </summary>
+	public interface IRandomDataService
     {
         #region Public Methods
 

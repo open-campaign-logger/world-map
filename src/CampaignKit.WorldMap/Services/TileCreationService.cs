@@ -19,8 +19,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,7 +29,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.Primitives;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Entities
 {
 	/// <summary>
 	/// A timed background service that queries the Tiles table and processes 
@@ -43,10 +41,28 @@ namespace CampaignKit.WorldMap.Services
 	public class TileCreationService : BackgroundService
 	{
 		#region Private Members
-		
-		private ILogger _logger;
+
+		/// <summary>
+		///		The application logging service.
+		/// </summary>
+		private readonly ILogger _loggerService;
+
+		/// <summary>
+		/// Gets the service provider.
+		/// </summary>
+		/// <value>
+		/// The service provider.
+		/// </value>
 		private IServiceProvider _serviceProvider { get; }
+
+		/// <summary>
+		/// The executing task
+		/// </summary>
 		private Task _executingTask;
+
+		/// <summary>
+		/// The stopping cancellation token.
+		/// </summary>
 		private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
 
 		#endregion
@@ -54,13 +70,13 @@ namespace CampaignKit.WorldMap.Services
 		#region Constructors
 
 		/// <summary>
-		/// Default Constructor
+		/// Initializes a new instance of the <see cref="TileCreationService"/> class.
 		/// </summary>
-		/// <param name="serviceProvider">The context service provider</param>
-		/// <param name="logger">The context logger</param>
-		public TileCreationService(IServiceProvider serviceProvider, ILogger<TileCreationService> logger)
+		/// <param name="serviceProvider">The service provider.</param>
+		/// <param name="loggerService">The logger service.</param>
+		public TileCreationService(IServiceProvider serviceProvider, ILogger<TileCreationService> loggerService)
 		{
-			_logger = logger;
+			_loggerService = loggerService;
 			_serviceProvider = serviceProvider;
 		}
 
@@ -68,6 +84,11 @@ namespace CampaignKit.WorldMap.Services
 
 		#region Public Members
 
+		/// <summary>
+		/// Triggered when the application host is ready to start the service.
+		/// </summary>
+		/// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+		/// <returns></returns>
 		public override Task StartAsync(CancellationToken cancellationToken)
 		{
 			// Store the task we're executing
@@ -84,6 +105,11 @@ namespace CampaignKit.WorldMap.Services
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Triggered when the application host is performing a graceful shutdown.
+		/// </summary>
+		/// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
+		/// <returns></returns>
 		public override async Task StopAsync(CancellationToken cancellationToken)
 		{
 			// Stop called without start
@@ -109,6 +135,14 @@ namespace CampaignKit.WorldMap.Services
 
 		#region Protected Methods
 
+		/// <summary>
+		/// This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The implementation should return a task that represents
+		/// the lifetime of the long running operation(s) being performed.
+		/// </summary>
+		/// <param name="stoppingToken">Triggered when <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is called.</param>
+		/// <returns>
+		/// A <see cref="T:System.Threading.Tasks.Task" /> that represents the long running operations.
+		/// </returns>
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			do
@@ -134,7 +168,7 @@ namespace CampaignKit.WorldMap.Services
 			using (IServiceScope scope = _serviceProvider.CreateScope())
 			{
 				// Retrieve the db context from the container
-				var dbContext = scope.ServiceProvider.GetRequiredService<MappingContext>();
+				var dbContext = scope.ServiceProvider.GetRequiredService<WorldMapDBContext>();
 				var filePathService = scope.ServiceProvider.GetRequiredService<IFilePathService>();
 
 				// Open the db connection
@@ -148,7 +182,7 @@ namespace CampaignKit.WorldMap.Services
 
 				if (tiles.Count > 0)
 				{
-					_logger.LogDebug($"{tiles.Count} Tiles found.");
+					_loggerService.LogDebug($"{tiles.Count} Tiles found.");
 
 					// Process each map with unprocessed tiles
 					var mapList = tiles.Select(o => o.MapId).Distinct();
@@ -242,11 +276,12 @@ namespace CampaignKit.WorldMap.Services
 		}
 
 		/// <summary>
-		///     Creates the zoom level tile file.
+		/// Creates the zoom level tile file.
 		/// </summary>
-		/// <param name="zoomLevelBaseFilePath">The zoom level base file path.</param>
-		/// <param name="x">The tile to create.</param>
+		/// <param name="baseImage">The base image.</param>
+		/// <param name="tile">The tile.</param>
 		/// <param name="zoomLevelTileFilePath">The zoom level tile file path.</param>
+		/// <returns></returns>
 		private bool CreateZoomLevelTileFile(Image<Rgba32> baseImage, Tile tile, string zoomLevelTileFilePath)
 		{
 			if (!File.Exists(zoomLevelTileFilePath))

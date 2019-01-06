@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿/// <binding BeforeBuild='default' />
+// Copyright 2017-2018 Jochen Linnemann
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -77,6 +78,16 @@ module.exports = function(grunt) {
                     }
                 ]
             },
+            oidcclient: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: "node_modules/oidc-client/dist",
+                        src: "oidc-client.js",
+                        dest: "wwwroot/js/"
+                    }
+                ]
+            },
             jQuery: {
                 files: [
                     {
@@ -147,7 +158,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-sass");
     grunt.loadNpmTasks("grunt-subgrunt");
 
-    grunt.registerTask("default", ["copy:leaflet", "copy:jQuery", "copy:bootstrap", "copy:leaflet_draw", "copy:quill"]);
+    grunt.registerTask("default", ["copy:leaflet", "copy:jQuery", "copy:bootstrap", "copy:leaflet_draw", "copy:quill", "copy:oidcclient"]);
     grunt.registerTask("default-sass", ["default", "sass"]);
     grunt.registerTask("full", ["subgrunt:bootswatch", "default"]);
     grunt.registerTask("beforeBuild", ["default"]);

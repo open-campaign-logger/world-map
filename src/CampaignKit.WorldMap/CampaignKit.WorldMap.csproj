@@ -24,15 +24,9 @@
     <Version>2.17.3</Version>
  </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="App_Data\.gitignore" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="App_Data\.gitignore">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Update="wwwroot\**\*;Views\**\*">

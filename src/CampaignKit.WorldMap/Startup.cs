@@ -15,7 +15,6 @@
 using System;
 
 using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -50,7 +49,8 @@ namespace CampaignKit.WorldMap
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json")
+				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
             _configuration = builder.Build();
@@ -112,7 +112,7 @@ namespace CampaignKit.WorldMap
 			services.AddSingleton(_configuration);
 
 			// Instantiate the database and add to the context
-			services.AddDbContext<MappingContext>
+			services.AddDbContext<WorldMapDBContext>
  				(options => options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
 			
 			// Add the MVC service
@@ -124,7 +124,7 @@ namespace CampaignKit.WorldMap
 			services.AddScoped<IFilePathService, DefaultFilePathService>();
             services.AddScoped<IRandomDataService, DefaultRandomDataService>();
             services.AddScoped<IProgressService, DefaultProgressService>();
-			services.AddScoped<IMapDataService, DefaultMapDataService>();
+			services.AddScoped<IMapRepository, DefaultMapRepository>();
 
 			// Add background services
 			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
