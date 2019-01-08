@@ -13,9 +13,15 @@
 // limitations under the License.
 
 using System;
-
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Principal;
+using System.Threading.Tasks;
 using CampaignKit.WorldMap.Entities;
-
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +29,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json;
 
 namespace CampaignKit.WorldMap
@@ -95,12 +101,15 @@ namespace CampaignKit.WorldMap
 			// Enable all static file middleware (except directory browsing) for the current request path in the current directory.
 			app.UseFileServer();
 
+			// Enable authentication
+			app.UseAuthentication();
+
 			// Adds MVC to the IApplicationBuilder request execution pipeline.
 			// Using multiple routes to support callback from oidc-connect authority
 			// see: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-2.2#multiple-routes
 			app.UseMvc(routes =>
 			{
-				routes.MapRoute("oidc", "oidc-callback", defaults: new { controller = "Home", action = "Index" });
+				routes.MapRoute("oidc", "oidc-callback", defaults: new { controller = "Home", action = "OidcConnectCallback" });
 				routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
 			});
 			
@@ -118,6 +127,39 @@ namespace CampaignKit.WorldMap
 
 			// Add the configuration to the context
 			services.AddSingleton(_configuration);
+
+			// Add Campaign-Identity authentication
+			services.AddAuthentication(options =>
+			{
+				options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+				options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
+			})
+			.AddCookie()
+			.AddOpenIdConnect(options =>
+			{
+				options.Authority = "https://campaign-identity.com";
+				options.ClientId = "worldmap.ui";
+				options.ClientSecret = _configuration["CID_ClientSecret"];
+				options.ResponseType = OpenIdConnectResponseType.Code;
+				options.CallbackPath = "/signin-oidc";
+				options.Scope.Add("openid");
+				options.Scope.Add("profile");
+				options.GetClaimsFromUserInfoEndpoint = true;
+				options.Events = new OpenIdConnectEvents
+				{
+					OnTokenValidated = context =>
+					{
+						if (context.SecurityToken is JwtSecurityToken jwt)
+						{
+							var userName = context.Principal.FindFirstValue("preferred_username") ?? context.Principal.FindFirstValue("name");
+							var identity = new GenericIdentity(userName);
+							context.Principal.AddIdentity(identity);
+						}
+
+						return Task.CompletedTask;
+					}
+				};
+			});
 
 			// Instantiate the database and add to the context
 			services.AddDbContext<WorldMapDBContext>

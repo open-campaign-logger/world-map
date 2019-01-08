@@ -48,9 +48,7 @@ limitations under the License.
 						<li><a asp-controller="Map" asp-action="Sample">Sample</a></li>
 						<li><a asp-controller="Map" asp-action="Create">Create your own!</a></li>
 						<li><a asp-controller="Map" asp-action="Index">See all</a></li>
-						<li><a id="login" href="#">Login</a></li>
-						<li><a id="api" href="#">API</a></li>
-						<li><a id="logout" href="#">Logout</a></li>
+						<li><a asp-controller="Home" asp-action="OidcConnectLogin">Login</a></li>
 						<li><a asp-controller="Home" asp-action="Legalities">Legalities/Imprint</a></li>
 						<li class="navbar-image">
 							<a href="https://campaign-logger.com" target="_blank">
@@ -71,8 +69,8 @@ limitations under the License.
 	<script src="~/js/jquery.validate.unobtrusive.js"></script>
 	<script src="~/js/bootstrap.min.js"></script>
 	<script src="~/js/bootstrap-dialog.min.js"></script>
-	<script src="~/js/oidc-client.js"></script>
-	<script src="~/js/worldmap-core.js"></script>
+	@*<script src="~/js/oidc-client.js"></script>
+	<script src="~/js/worldmap-core.js"></script>*@
 	@RenderSection("scripts", false)
 </body>
 </html>

@@ -29,9 +29,11 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - Working with npm behind a proxy: https://superuser.com/questions/347476/how-to-install-npm-behind-authentication-proxy-on-windows
 
 ## OpenID Connect
-
-- http://docs.identityserver.io/en/latest/
-- https://mderriey.com/2016/08/21/openid-connect-and-js-applications-with-oidc-client-js/
+- Jochen's Gist: https://gist.github.com/JochenLinnemann/6f6e89538cf3f9d3693a1d505ba4a608
+- IdentityServer4 Examples: https://github.com/IdentityServer/IdentityServer4.Samples
+- IdentityServer4 QuickStart - Adding User Authentication with OpenID Connect: http://docs.identityserver.io/en/latest/quickstarts/3_interactive_login.html
+- Interactive Login: http://docs.identityserver.io/en/latest/quickstarts/3_interactive_login.html
+- External Providers: http://docs.identityserver.io/en/latest/topics/signin_external_providers.html
 
 ## Reference Tutorials
 - Testing: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-2.2

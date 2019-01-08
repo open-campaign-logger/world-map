@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 using CampaignKit.WorldMap.Entities;
-
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -68,6 +72,7 @@ namespace CampaignKit.WorldMap.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
+
 			var model = (await _mapRepository.FindAll())
 				.Where(m => m.MapId != 1)
 				.OrderByDescending(m => m.CreationTimestamp)
@@ -84,6 +89,31 @@ namespace CampaignKit.WorldMap.Controllers
 		public ActionResult Legalities()
 		{
 			return View();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		public ActionResult OidcConnectLogin()
+		{
+			var authenticationProperties = new AuthenticationProperties
+			{
+				RedirectUri = Url.Action("OidcConnectCallback", "Home")
+			};
+
+			return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		public async Task<ActionResult> OidcConnectCallback()
+		{
+			return RedirectToAction("Index", "Home");
 		}
 
 		#endregion Public Methods
