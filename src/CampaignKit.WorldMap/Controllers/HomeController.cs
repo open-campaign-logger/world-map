@@ -96,24 +96,9 @@ namespace CampaignKit.WorldMap.Controllers
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
-		public ActionResult OidcConnectLogin()
-		{
-			var authenticationProperties = new AuthenticationProperties
-			{
-				RedirectUri = Url.Action("OidcConnectCallback", "Home")
-			};
-
-			return Challenge(authenticationProperties, OpenIdConnectDefaults.AuthenticationScheme);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-		[HttpGet]
 		public async Task<ActionResult> OidcConnectCallback()
 		{
-			return RedirectToAction("Index", "Home");
+			return File("~/oidc-callback.html", "text/html");
 		}
 
 		#endregion Public Methods

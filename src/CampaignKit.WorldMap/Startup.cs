@@ -103,7 +103,7 @@ namespace CampaignKit.WorldMap
 
 			// Enable authentication
 			app.UseAuthentication();
-
+			
 			// Adds MVC to the IApplicationBuilder request execution pipeline.
 			// Using multiple routes to support callback from oidc-connect authority
 			// see: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-2.2#multiple-routes

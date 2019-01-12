@@ -13,7 +13,6 @@
 }
 
 document.getElementById("login").addEventListener("click", login, false);
-document.getElementById("api").addEventListener("click", api, false);
 document.getElementById("logout").addEventListener("click", logout, false);
 
 const { protocol, hostname, port } = window.location;
