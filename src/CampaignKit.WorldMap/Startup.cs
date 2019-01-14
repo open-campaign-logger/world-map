@@ -18,6 +18,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using CampaignKit.WorldMap.Entities;
+using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -128,45 +129,32 @@ namespace CampaignKit.WorldMap
 			// Add the configuration to the context
 			services.AddSingleton(_configuration);
 
-			// Add Campaign-Identity authentication
-			services.AddAuthentication(options =>
-			{
-				options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-				options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
-			})
-			.AddCookie()
-			.AddOpenIdConnect(options =>
-			{
-				options.Authority = "https://campaign-identity.com";
-				options.ClientId = "worldmap.ui";
-				options.ClientSecret = _configuration["CID_ClientSecret"];
-				options.ResponseType = OpenIdConnectResponseType.Code;
-				options.CallbackPath = "/signin-oidc";
-				options.Scope.Add("openid");
-				options.Scope.Add("profile");
-				options.GetClaimsFromUserInfoEndpoint = true;
-				options.Events = new OpenIdConnectEvents
-				{
-					OnTokenValidated = context =>
-					{
-						if (context.SecurityToken is JwtSecurityToken jwt)
-						{
-							var userName = context.Principal.FindFirstValue("preferred_username") ?? context.Principal.FindFirstValue("name");
-							var identity = new GenericIdentity(userName);
-							context.Principal.AddIdentity(identity);
-						}
-
-						return Task.CompletedTask;
-					}
-				};
-			});
-
 			// Instantiate the database and add to the context
 			services.AddDbContext<WorldMapDBContext>
  				(options => options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
 			
+			// Add Campaign-Identity authentication
+			services.AddAuthentication();
+
 			// Add the MVC service
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+			// Configure services to expect an access_token in the Authorization header using the 
+			// JWT Bearer scheme.
+			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+				.AddJwtBearer(options =>
+				{
+					options.Authority = "https://campaign-identity.com";
+					options.Audience = "logger";
+				});
+
+			//services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+			//	.AddIdentityServerAuthentication(options =>
+			//	{
+			//		options.Authority = "https://campaign-identity.com";
+			//		options.ApiName = "logger";
+			//	});
+
 
 			// Add data services to context
 			// Note: these have been changed from singleton to scoped services in order

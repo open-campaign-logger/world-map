@@ -13,6 +13,7 @@
 }
 
 document.getElementById("login").addEventListener("click", login, false);
+document.getElementById("api").addEventListener("click", api, false);
 document.getElementById("logout").addEventListener("click", logout, false);
 
 const { protocol, hostname, port } = window.location;
@@ -32,9 +33,6 @@ const settings = {
 
 var mgr = new Oidc.UserManager(settings);
 
-
-
-
 mgr.getUser().then(function (user) {
     if (user) {
         log("User logged in", user.profile);
@@ -50,7 +48,7 @@ function login() {
 
 function api() {
     mgr.getUser().then(function (user) {
-        var url = "http://localhost:5001/identity";
+        var url = "http://localhost:3000/Home/Identity";
 
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url);

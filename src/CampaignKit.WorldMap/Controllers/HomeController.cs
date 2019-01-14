@@ -91,14 +91,26 @@ namespace CampaignKit.WorldMap.Controllers
 			return View();
 		}
 
+
+		/// <summary>
+		///		This action returns the static html callback page
+		///		which contains the callback JavaScript to parse/process
+		///		the user credentials passed back after a successful login.
+		/// </summary>
+		/// <returns></returns>
+		public ActionResult OidcConnectCallback()
+		{
+			return File("~/oidc-callback.html", "text/html");
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		[HttpGet]
-		public async Task<ActionResult> OidcConnectCallback()
+		[Authorize]
+		public IActionResult Identity()
 		{
-			return File("~/oidc-callback.html", "text/html");
+			return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
 		}
 
 		#endregion Public Methods

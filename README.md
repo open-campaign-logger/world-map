@@ -22,23 +22,25 @@ Service for managing world maps and associate them with Campaign Logger log entr
 
 - Git for Windows 2.20
 
-## npm/gulp
+## npm/gulp Reference Material
 
-- https://blog.bitscry.com/2018/03/13/using-npm-and-gulp-in-visual-studio-2017/
-- install Node.js which will install npm 
-- Working with npm behind a proxy: https://superuser.com/questions/347476/how-to-install-npm-behind-authentication-proxy-on-windows
+- Using gump and npm in VisualStudio: https://blog.bitscry.com/2018/03/13/using-npm-and-gulp-in-visual-studio-2017/
+	- install Node.js which will install npm 
+	- Working with npm behind a proxy: https://superuser.com/questions/347476/how-to-install-npm-behind-authentication-proxy-on-windows
 
-## OpenID Connect
-- Jochen's Gist: https://gist.github.com/JochenLinnemann/6f6e89538cf3f9d3693a1d505ba4a608
+## OpenID Connect Reference Material
+
+- OpenID Connect JavaScript Client library: https://github.com/IdentityModel/oidc-client-js
 - IdentityServer4 Examples: https://github.com/IdentityServer/IdentityServer4.Samples
 - IdentityServer4 QuickStart - Adding User Authentication with OpenID Connect: http://docs.identityserver.io/en/latest/quickstarts/3_interactive_login.html
-- Interactive Login: http://docs.identityserver.io/en/latest/quickstarts/3_interactive_login.html
-- External Providers: http://docs.identityserver.io/en/latest/topics/signin_external_providers.html
+- IdentityServer4 JavaScript Client Quickstart - http://docs.identityserver.io/en/latest/quickstarts/6_javascript_client.html
+- Configuring App to Recognize JWT authorization tokens - https://developer.okta.com/blog/2018/03/23/token-authentication-aspnetcore-complete-guide
 
-## Reference Tutorials
+## Testing Reference Material
+
 - Testing: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-2.2
 - Integration Testing: https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2
-- https://fullstackmark.com/post/20/painless-integration-testing-with-aspnet-core-web-api
+- Integratin Testing: https://fullstackmark.com/post/20/painless-integration-testing-with-aspnet-core-web-api
 - Integration Testing with OpenID Connect: https://github.com/stottle-uk/IntegrationTestingWithIdentityServer
 - see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
 - see: https://github.com/aspnet/Docs/blob/master/aspnetcore/test/integration-tests/samples/2.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs
