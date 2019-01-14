@@ -133,28 +133,17 @@ namespace CampaignKit.WorldMap
 			services.AddDbContext<WorldMapDBContext>
  				(options => options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
 			
-			// Add Campaign-Identity authentication
-			services.AddAuthentication();
-
 			// Add the MVC service
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-			// Configure services to expect an access_token in the Authorization header using the 
-			// JWT Bearer scheme.
+			// Configure services to expect a Campaign-Identity access_token in the 
+			// Authorization header using the JWT Bearer scheme.
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
 				{
 					options.Authority = "https://campaign-identity.com";
 					options.Audience = "logger";
 				});
-
-			//services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
-			//	.AddIdentityServerAuthentication(options =>
-			//	{
-			//		options.Authority = "https://campaign-identity.com";
-			//		options.ApiName = "logger";
-			//	});
-
 
 			// Add data services to context
 			// Note: these have been changed from singleton to scoped services in order
@@ -165,8 +154,7 @@ namespace CampaignKit.WorldMap
 			services.AddScoped<IMapRepository, DefaultMapRepository>();
 
 			// Add background services
-			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
-			
+			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();			
 
 		}
 
