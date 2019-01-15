@@ -65,10 +65,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\js\worldmap-core.js">
+    <Content Update="wwwroot\js\worldmap-base.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\js\worldmap-edit.js">
+    <Content Update="wwwroot\js\worldmap-map.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

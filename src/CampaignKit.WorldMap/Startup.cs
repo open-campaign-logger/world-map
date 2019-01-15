@@ -139,6 +139,7 @@ namespace CampaignKit.WorldMap
 			// Configure services to expect a Campaign-Identity access_token in the 
 			// Authorization header using the JWT Bearer scheme.
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+				.AddCookie()
 				.AddJwtBearer(options =>
 				{
 					options.Authority = "https://campaign-identity.com";

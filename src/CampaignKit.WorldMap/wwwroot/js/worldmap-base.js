@@ -1,4 +1,5 @@
-﻿function log() {
+﻿// Used for testing purposes only
+function log() {
     document.getElementById('results').innerText = '';
 
     Array.prototype.forEach.call(arguments, function (msg) {
@@ -12,10 +13,7 @@
     });
 }
 
-document.getElementById("login").addEventListener("click", login, false);
-document.getElementById("api").addEventListener("click", api, false);
-document.getElementById("logout").addEventListener("click", logout, false);
-
+// Setup oidc-connect-js settings
 const { protocol, hostname, port } = window.location;
 const rootUri = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
 
@@ -23,7 +21,7 @@ const settings = {
     authority: 'https://campaign-identity.com',
     client_id: 'worldmap.ui',
     redirect_uri: `${rootUri}/oidc-callback`,
-    post_logout_redirect_uri: `${rootUri}/oidc-callback.html`,
+    post_logout_redirect_uri: `${rootUri}/Home`,
     automaticSilentRenew: true,
     silent_redirect_uri: `${rootUri}/oidc-renew.html`,
     loadUserInfo: true,
@@ -31,19 +29,48 @@ const settings = {
     scope: 'openid profile logger.ro',
 };
 
+// Attach event listeners to screen actions
+document.getElementById("login").addEventListener("click", login, false);
+document.getElementById("logout").addEventListener("click", logout, false);
+document.getElementById("create").addEventListener("click", create, false);
+document.getElementById("index").addEventListener("click", index, false);
+
+// Create an oidc-connect-js user manager
 var mgr = new Oidc.UserManager(settings);
 
+// Determine if user has valid access token
+var isAuthenticated = false;
 mgr.getUser().then(function (user) {
     if (user) {
+        isAuthenticated = true;
+        $(".loggedout").hide();
         log("User logged in", user.profile);
     }
     else {
+        isAuthenticated = false;
+        $(".loggedin").hide();
         log("User not logged in");
     }
 });
 
+// Screen action handlers
+
+// Login screen action
 function login() {
     mgr.signinRedirect();
+}
+
+// Logout screen action
+function logout() {
+    mgr.signoutRedirect();
+}
+
+// Create screen action
+function create() {
+}
+
+// Index screen action
+function index() {
 }
 
 function api() {
@@ -58,8 +85,4 @@ function api() {
         xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
         xhr.send();
     });
-}
-
-function logout() {
-    mgr.signoutRedirect();
 }
