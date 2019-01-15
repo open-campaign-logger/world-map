@@ -21,9 +21,9 @@ const settings = {
     authority: 'https://campaign-identity.com',
     client_id: 'worldmap.ui',
     redirect_uri: `${rootUri}/oidc-callback`,
-    post_logout_redirect_uri: `${rootUri}/Home`,
+    post_logout_redirect_uri: `${rootUri}/oidc-callback`,
     automaticSilentRenew: true,
-    silent_redirect_uri: `${rootUri}/oidc-renew.html`,
+    silent_redirect_uri: `${rootUri}/silent_renew.html`,
     loadUserInfo: true,
     response_type: 'token id_token',
     scope: 'openid profile logger.ro',
@@ -34,6 +34,7 @@ document.getElementById("login").addEventListener("click", login, false);
 document.getElementById("logout").addEventListener("click", logout, false);
 document.getElementById("create").addEventListener("click", create, false);
 document.getElementById("index").addEventListener("click", index, false);
+document.getElementById("api").addEventListener("click", api, false);
 
 // Create an oidc-connect-js user manager
 var mgr = new Oidc.UserManager(settings);

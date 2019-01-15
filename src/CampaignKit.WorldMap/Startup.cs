@@ -144,6 +144,17 @@ namespace CampaignKit.WorldMap
 				{
 					options.Authority = "https://campaign-identity.com";
 					options.Audience = "logger";
+					options.Events = new JwtBearerEvents
+					{
+						OnTokenValidated = context =>
+						{
+							var userName = context.Principal.FindFirstValue("preferred_username") ?? context.Principal.FindFirstValue("name");
+							var identity = new GenericIdentity(userName);
+							context.Principal.AddIdentity(identity);
+
+							return Task.CompletedTask;
+						}
+					};
 				});
 
 			// Add data services to context
