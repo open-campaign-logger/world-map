@@ -18,6 +18,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using CampaignKit.WorldMap.Entities;
+using CampaignKit.WorldMap.Services;
 using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -102,6 +103,9 @@ namespace CampaignKit.WorldMap
 			// Enable all static file middleware (except directory browsing) for the current request path in the current directory.
 			app.UseFileServer();
 
+			// Use custom JWT cookie middleware component
+			app.UseMiddleware<JWTInHeaderMiddleware>();
+			
 			// Enable authentication
 			app.UseAuthentication();
 			
@@ -139,7 +143,6 @@ namespace CampaignKit.WorldMap
 			// Configure services to expect a Campaign-Identity access_token in the 
 			// Authorization header using the JWT Bearer scheme.
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-				.AddCookie()
 				.AddJwtBearer(options =>
 				{
 					options.Authority = "https://campaign-identity.com";
@@ -148,9 +151,22 @@ namespace CampaignKit.WorldMap
 					{
 						OnTokenValidated = context =>
 						{
+							// Create an asp.net identity object for the user
 							var userName = context.Principal.FindFirstValue("preferred_username") ?? context.Principal.FindFirstValue("name");
 							var identity = new GenericIdentity(userName);
 							context.Principal.AddIdentity(identity);
+
+							// Store the JWT bearer details in a client side cookie.
+							var tokenString = context.Request.Headers["Authorization"];
+
+							context.Response.Cookies.Append(
+								".worldmap.ui",
+								tokenString,
+								new Microsoft.AspNetCore.Http.CookieOptions()
+								{
+									Path = "/"
+								}
+							);
 
 							return Task.CompletedTask;
 						}
