@@ -8,7 +8,7 @@ const settings = {
     redirect_uri: `${rootUri}/oidc-callback`,
     post_logout_redirect_uri: `${rootUri}/oidc-callback`,
     automaticSilentRenew: true,
-    silent_redirect_uri: `${rootUri}/silent_renew.html`,
+    silent_redirect_uri: `${rootUri}/oidc_renew.html`,
     loadUserInfo: true,
     response_type: 'token id_token',
     scope: 'openid profile logger.ro',

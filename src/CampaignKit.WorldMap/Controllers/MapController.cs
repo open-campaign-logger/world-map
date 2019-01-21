@@ -118,8 +118,8 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="model">The map model to create.</param>
 		/// <returns>Map view with tile progress creation window displayed.</returns>
 		[HttpPost]
-		[ValidateAntiForgeryToken]
 		[Authorize]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Create(MapCreateViewModel model)
 		{
 			if (!ModelState.IsValid)
@@ -195,8 +195,8 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="model">The model.</param>
 		/// <returns>Redirect to home view.</returns>
 		[HttpPost]
-		[ValidateAntiForgeryToken]
 		[Authorize]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Delete(int id, string secret, MapDeleteViewModel model)
 		{
 			if (!ModelState.IsValid)
@@ -252,8 +252,8 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="model">The model.</param>
 		/// <returns>Map show view.</returns>
 		[HttpPost]
-		[ValidateAntiForgeryToken]
 		[Authorize]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Edit(int id, string secret, MapEditViewModel model)
 		{
 			if (!ModelState.IsValid)
@@ -284,6 +284,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// </summary>
 		/// <returns>View showin all maps.</returns>
 		[HttpGet]
+		[Authorize]
 		public async Task<IActionResult> Index()
 		{
 			var model = await _mapRepository.FindAll();
@@ -297,6 +298,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="id">The identifier.</param>
 		/// <returns>Tile creation progress for map in JSON format.</returns>
 		[HttpGet]
+		[Authorize]
 		public IActionResult Progress(int id)
 		{
 			return Json(new { Progress = _progressService.GetMapProgress($"{id}") });
@@ -335,6 +337,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="showProgress">if set to <c>true</c> [show progress].</param>
 		/// <returns>The selected map.</returns>
 		[HttpGet]
+		[Authorize]
 		public async Task<IActionResult> Show(int id, string secret = null, bool showProgress = false)
 		{
 			var map = await _mapRepository.Find(id);
@@ -374,6 +377,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="id">The map identifier.</param>
 		/// <returns>The map's marker data in JSON format.</returns>
 		[HttpGet]
+		[Authorize]
 		public async Task<IActionResult> MarkerData(int id)
 		{
 			var map = await _mapRepository.Find(id);
@@ -390,6 +394,8 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="model">Map marker data.</param>
 		/// <returns></returns>
 		[HttpPost]
+		[Authorize]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> MarkerData([FromBody] MarkerEditViewModel model)
 		{
 			var map = await _mapRepository.Find(model.MapId);

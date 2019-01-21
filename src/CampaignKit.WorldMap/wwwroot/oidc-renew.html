@@ -1,0 +1,12 @@
+﻿<head>
+	<title></title>
+</head>
+<body>
+	<script src="js/oidc-client.js"></script>
+	<script>
+		new Oidc.UserManager().signinSilentCallback()
+			.catch((err) => {
+				console.log(err);
+			});
+	</script>
+</body>

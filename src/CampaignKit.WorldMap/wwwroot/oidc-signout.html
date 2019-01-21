@@ -7,7 +7,7 @@
 <body>
 	<script src="js/oidc-client.js"></script>
 	<script>
-		new Oidc.UserManager().signinRedirectCallback().then(function () {
+		new Oidc.UserManager().signoutRedirectCallback().then(function () {
 			window.location = "/";
         }).catch(function (e) {
             console.error(e);

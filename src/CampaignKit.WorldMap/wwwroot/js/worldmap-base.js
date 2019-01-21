@@ -2,7 +2,10 @@
 document.getElementById("login").addEventListener("click", login, false);
 document.getElementById("logout").addEventListener("click", logout, false);
 
-
+// Cookie handling functions
+function delete_cookie(name) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
 
 // Login screen action
 function login() {
@@ -11,6 +14,7 @@ function login() {
 
 // Logout screen action
 function logout() {
+    delete_cookie(".worldmap.ui");
     mgr.signoutRedirect();
 }
 

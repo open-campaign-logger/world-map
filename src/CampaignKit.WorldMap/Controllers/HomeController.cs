@@ -98,6 +98,7 @@ namespace CampaignKit.WorldMap.Controllers
 		///		the user's authorization  token created by the login process.
 		/// </summary>
 		/// <returns></returns>
+		[HttpGet]
 		public ActionResult OidcConnectCallback()
 		{
 			return File("~/oidc-callback.html", "text/html");
@@ -113,6 +114,7 @@ namespace CampaignKit.WorldMap.Controllers
 		///		automatically.
 		/// </summary>
 		/// <returns></returns>
+		[HttpGet]
 		[Authorize]
 		public ActionResult JwtCookie()
 		{
