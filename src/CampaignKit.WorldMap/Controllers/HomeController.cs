@@ -95,22 +95,28 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <summary>
 		///		This action returns the static html callback page
 		///		which contains the callback JavaScript to parse/process
-		///		the user credentials passed back after a successful login.
+		///		the user's authorization  token created by the login process.
 		/// </summary>
 		/// <returns></returns>
 		public ActionResult OidcConnectCallback()
 		{
 			return File("~/oidc-callback.html", "text/html");
 		}
-		
+
 		/// <summary>
-		/// 
+		///		This action is called via an Ajax call with the 
+		///		JWT bearer details in the request header.  The action itself 
+		///		does nothing but the middleware will intercept the
+		///		JWT authorization token in the request header and create a 
+		///		new client side cookie containing the JWT auth token so that 
+		///		subsequent form submits will be able to send in the auth details
+		///		automatically.
 		/// </summary>
 		/// <returns></returns>
 		[Authorize]
-		public IActionResult Identity()
+		public ActionResult JwtCookie()
 		{
-			return new JsonResult(from c in User.Claims select new { c.Type, c.Value });
+			return View();
 		}
 
 		#endregion Public Methods

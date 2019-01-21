@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 using CampaignKit.WorldMap.Entities;
 using CampaignKit.WorldMap.ViewModels;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -104,6 +104,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// </summary>
 		/// <returns>Map creation view containing new randomly generated secret.</returns>
 		[HttpGet]
+		[Authorize]
 		public IActionResult Create()
 		{
 			var model = new MapCreateViewModel { Secret = _randomDataService.GetRandomText(8) };
@@ -118,6 +119,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <returns>Map view with tile progress creation window displayed.</returns>
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[Authorize]
 		public async Task<IActionResult> Create(MapCreateViewModel model)
 		{
 			if (!ModelState.IsValid)
@@ -172,6 +174,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="secret">The secret.</param>
 		/// <returns>Delete view displaying confirmation popup.</returns>
 		[HttpGet]
+		[Authorize]
 		public async Task<IActionResult> Delete(int id, string secret)
 		{
 			var model = await _mapRepository.Find(id);
@@ -193,6 +196,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <returns>Redirect to home view.</returns>
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[Authorize]
 		public async Task<IActionResult> Delete(int id, string secret, MapDeleteViewModel model)
 		{
 			if (!ModelState.IsValid)
@@ -224,6 +228,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="secret">The secret.</param>
 		/// <returns>Map edit view for the specified map.</returns>
 		[HttpGet]
+		[Authorize]
 		public async Task<IActionResult> Edit(int id, string secret)
 		{
 			var model = await _mapRepository.Find(id);
@@ -248,6 +253,7 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <returns>Map show view.</returns>
 		[HttpPost]
 		[ValidateAntiForgeryToken]
+		[Authorize]
 		public async Task<IActionResult> Edit(int id, string secret, MapEditViewModel model)
 		{
 			if (!ModelState.IsValid)

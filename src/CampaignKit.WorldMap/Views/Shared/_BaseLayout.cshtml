@@ -46,11 +46,9 @@ limitations under the License.
 				<div class="collapse navbar-collapse" id="worldmap-navbar-collapse">
 					<ul class="nav navbar-nav navbar-right">
 						<li><a asp-controller="Map" asp-action="Sample">Sample</a></li>
-						<li class="loggedin"><a id="create" href="#">Create your own!</a></li>
-						<li><a id="index" href="#">See all</a></li>
+						<li class="loggedin"><a asp-controller="Map" asp-action="Create">Create your own!</a></li>
+						<li><a asp-controller="Map" asp-action="Index">See all</a></li>
 						<li class="loggedout"><a id="login" href="#">Login</a></li>
-						<li class="loggedin"><a id="api" href="#">UserInfoJS</a></li>
-						<li class="loggedin"><a asp-controller="Home" asp-action="Identity">UserInfo</a></li>
 						<li class="loggedin"><a id="logout" href="#">Logout</a></li>
 						<li><a asp-controller="Home" asp-action="Legalities">Legalities/Imprint</a></li>
 						<li class="navbar-image">
@@ -73,6 +71,7 @@ limitations under the License.
 	<script src="~/js/bootstrap.min.js"></script>
 	<script src="~/js/bootstrap-dialog.min.js"></script>
 	<script src="~/js/oidc-client.js"></script>
+	<script src="~/js/worldmap-core.js"></script>
 	<script src="~/js/worldmap-base.js"></script>
 	@RenderSection("scripts", false)
 </body>
