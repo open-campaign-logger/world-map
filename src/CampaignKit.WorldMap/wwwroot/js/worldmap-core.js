@@ -5,8 +5,8 @@ const rootUri = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
 const settings = {
     authority: 'https://campaign-identity.com',
     client_id: 'worldmap.ui',
-    redirect_uri: `${rootUri}/oidc-callback`,
-    post_logout_redirect_uri: `${rootUri}/oidc-callback`,
+    redirect_uri: `${rootUri}/oidc-callback.html`,
+    post_logout_redirect_uri: `${rootUri}/oidc-logout.html`,
     automaticSilentRenew: true,
     silent_redirect_uri: `${rootUri}/oidc_renew.html`,
     loadUserInfo: true,

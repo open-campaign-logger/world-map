@@ -114,7 +114,6 @@ namespace CampaignKit.WorldMap
 			// see: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-2.2#multiple-routes
 			app.UseMvc(routes =>
 			{
-				routes.MapRoute("oidc", "oidc-callback", defaults: new { controller = "Home", action = "OidcConnectCallback" });
 				routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
 			});
 			

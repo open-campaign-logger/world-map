@@ -90,20 +90,7 @@ namespace CampaignKit.WorldMap.Controllers
 		{
 			return View();
 		}
-
-
-		/// <summary>
-		///		This action returns the static html callback page
-		///		which contains the callback JavaScript to parse/process
-		///		the user's authorization  token created by the login process.
-		/// </summary>
-		/// <returns></returns>
-		[HttpGet]
-		public ActionResult OidcConnectCallback()
-		{
-			return File("~/oidc-callback.html", "text/html");
-		}
-
+		
 		/// <summary>
 		///		This action is called via an Ajax call with the 
 		///		JWT bearer details in the request header.  The action itself 
