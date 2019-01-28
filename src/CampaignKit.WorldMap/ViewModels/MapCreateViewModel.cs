@@ -69,14 +69,6 @@ namespace CampaignKit.WorldMap.ViewModels
         public bool RepeatMapInX { get; set; }
 
         /// <summary>
-        ///     Gets or sets the secret.
-        /// </summary>
-        /// <value>The secret.</value>
-        [Display(Name = "Secret Key", Description = "You will need this key to edit or delete your map.")]
-        [Required]
-        public string Secret { get; set; }
-
-        /// <summary>
         ///     Gets or sets a value indicating whether [this is my own creation published rightfully].
         /// </summary>
         /// <value><c>true</c> if [this is my own creation published rightfully]; otherwise, <c>false</c>.</value>

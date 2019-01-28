@@ -108,15 +108,9 @@ namespace CampaignKit.WorldMap
 			
 			// Enable authentication
 			app.UseAuthentication();
-			
+
 			// Adds MVC to the IApplicationBuilder request execution pipeline.
-			// Using multiple routes to support callback from oidc-connect authority
-			// see: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-2.2#multiple-routes
-			app.UseMvc(routes =>
-			{
-				routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
-			});
-			
+			app.UseMvcWithDefaultRoute();			
 
         }
 
@@ -179,6 +173,7 @@ namespace CampaignKit.WorldMap
             services.AddScoped<IRandomDataService, DefaultRandomDataService>();
             services.AddScoped<IProgressService, DefaultProgressService>();
 			services.AddScoped<IMapRepository, DefaultMapRepository>();
+			services.AddScoped<IUserManagerService, DefaultUserManagerService>();
 
 			// Add background services
 			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();			

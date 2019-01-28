@@ -40,6 +40,7 @@ mgr.getUser().then(function (user) {
         log("User logged in", user.profile);
     }
     else {
+        delete_cookie(".worldmap.ui");  // remove any old session cookies
         $(".loggedin").hide();
         log("User not logged in");
     }

@@ -81,10 +81,10 @@ namespace CampaignKit.WorldMap.Entities
 		public bool RepeatMapInX { get; set; }
 
 		/// <summary>
-		///     Gets or sets the secret.
+		///     Gets or sets the id of the user this map belongs to.
 		/// </summary>
-		/// <value>The secret.</value>
-		public string Secret { get; set; }
+		/// <value>The user id.</value>
+		public string UserId { get; set; }
 
 		/// <summary>
 		///     Gets or sets the world folder path.

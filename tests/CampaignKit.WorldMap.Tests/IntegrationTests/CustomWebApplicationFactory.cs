@@ -87,7 +87,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 						MaxZoomLevel = 0,
 						Name = "Map1",
 						RepeatMapInX = false,
-						Secret = "Map1",
+						UserId = "Map1",
 						ThumbnailPath = "",
 						WorldFolderPath = "",
 					};
@@ -106,7 +106,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 						MaxZoomLevel = 0,
 						Name = "Map2",
 						RepeatMapInX = false,
-						Secret = "Map2",
+						UserId = "Map2",
 						ThumbnailPath = "",
 						WorldFolderPath = "",
 					};
@@ -125,7 +125,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 						MaxZoomLevel = 0,
 						Name = "Map3",
 						RepeatMapInX = false,
-						Secret = "Map3",
+						UserId = "Map3",
 						ThumbnailPath = "",
 						WorldFolderPath = "",
 					};
@@ -144,7 +144,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 						MaxZoomLevel = 0,
 						Name = "Map4",
 						RepeatMapInX = false,
-						Secret = "Map4",
+						UserId = "Map4",
 						ThumbnailPath = "",
 						WorldFolderPath = "",
 					};

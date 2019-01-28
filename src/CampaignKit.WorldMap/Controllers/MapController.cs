@@ -107,7 +107,7 @@ namespace CampaignKit.WorldMap.Controllers
 		[Authorize]
 		public IActionResult Create()
 		{
-			var model = new MapCreateViewModel { Secret = _randomDataService.GetRandomText(8) };
+			var model = new MapCreateViewModel();
 
 			return View(model);
 		}
@@ -145,7 +145,7 @@ namespace CampaignKit.WorldMap.Controllers
 			var map = new Entities.Map
 			{
 				Name = model.Name,
-				Secret = model.Secret,
+				UserId = User.Claims.First(c => c.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value,
 				Copyright = model.Copyright,
 				ContentType = model.MapImage.ContentType,
 				FileExtension = Path.GetExtension(model.MapImage.FileName ?? string.Empty).ToLower(),
@@ -161,7 +161,7 @@ namespace CampaignKit.WorldMap.Controllers
 			}
 			else
 			{
-				return RedirectToAction(nameof(Show), new { id, map.Secret, ShowProgress = true });
+				return RedirectToAction(nameof(Show), new { id, map.UserId, ShowProgress = true });
 			}
 
 			return View();
@@ -179,12 +179,12 @@ namespace CampaignKit.WorldMap.Controllers
 		{
 			var model = await _mapRepository.Find(id);
 
-			if (model == null || model.Secret != secret)
+			if (model == null || model.UserId != secret)
 			{
 				return DeleteErrorView();
 			}
 				
-			return View(new MapDeleteViewModel { Name = model.Name, HiddenId = model.MapId, HiddenSecret = model.Secret });
+			return View(new MapDeleteViewModel { Name = model.Name, HiddenId = model.MapId, HiddenSecret = model.UserId });
 		}
 
 		/// <summary>
@@ -204,10 +204,10 @@ namespace CampaignKit.WorldMap.Controllers
 
 			var map = await _mapRepository.Find(id);
 
-			if (map == null || map.Secret != secret)
+			if (map == null || map.UserId != secret)
 				return DeleteErrorView();
 
-			if (map.MapId != model.HiddenId || map.Secret != model.HiddenSecret)
+			if (map.MapId != model.HiddenId || map.UserId != model.HiddenSecret)
 			{
 				ModelState.AddModelError(string.Empty,
 					"Your map could not be deleted. Please try again.");
@@ -233,7 +233,7 @@ namespace CampaignKit.WorldMap.Controllers
 		{
 			var model = await _mapRepository.Find(id);
 
-			if (model == null || model.Secret != secret) return EditErrorView();
+			if (model == null || model.UserId != secret) return EditErrorView();
 
 			return View(new MapEditViewModel
 			{
@@ -263,7 +263,7 @@ namespace CampaignKit.WorldMap.Controllers
 
 			var map = await _mapRepository.Find(id);
 
-			if (map == null || map.Secret != secret) return EditErrorView();
+			if (map == null || map.UserId != secret) return EditErrorView();
 
 			map.Name = model.Name;
 			map.Copyright = model.Copyright;
@@ -274,7 +274,7 @@ namespace CampaignKit.WorldMap.Controllers
 				ModelState.AddModelError(string.Empty,
 					"Your map could not be saved. Please try again.");
 			else
-				return RedirectToAction(nameof(Show), new { map.MapId, map.Secret, ShowProgress = true });
+				return RedirectToAction(nameof(Show), new { map.MapId, map.UserId, ShowProgress = true });
 
 			return View();
 		}

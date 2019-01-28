@@ -29,9 +29,6 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 
 		[Theory]
 		[InlineData("/Map", "<h3>All Maps</h3>")]
-		[InlineData("/Map/Create", "<h2>Create your own!</h2>")]
-		[InlineData("/Map/Delete/2", "<h2>Not allowed</h2>")]
-		[InlineData("/Map/Edit/2", "<h2>Not allowed</h2>")]
 		[InlineData("/Map/Sample", "<title>Sample</title>")]
 		public async Task TestPageGet(string page, string titleTestString)
 		{
