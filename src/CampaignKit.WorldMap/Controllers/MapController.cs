@@ -65,6 +65,11 @@ namespace CampaignKit.WorldMap.Controllers
 		/// </summary>
 		private readonly ILogger _loggerService;
 
+		/// <summary>
+		///		The user manager service.
+		/// </summary>
+		private readonly IUserManagerService _userManagerService;
+
 		#endregion Private Fields
 
 		#region Public Constructors
@@ -78,12 +83,14 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="filePathService">The file path service.</param>
 		/// <param name="dbContext">The database context.</param>
 		/// <param name="loggerService">The logger service.</param>
+		/// <param name="userManagerService">The user manager service.</param>
 		public MapController(IRandomDataService randomDataService, 
 			IMapRepository mapRepository, 
 			IProgressService progressService, 
 			IFilePathService filePathService,
 			WorldMapDBContext dbContext,
-			ILogger<MapController> loggerService)
+			ILogger<MapController> loggerService,
+			IUserManagerService userManagerService)
 		{
 			_randomDataService = randomDataService;
 			_mapRepository = mapRepository;
@@ -91,6 +98,7 @@ namespace CampaignKit.WorldMap.Controllers
 			_filePathService = filePathService;
 			_dbContext = dbContext;
 			_loggerService = loggerService;
+			_userManagerService = userManagerService;
 		}
 
 		#endregion Public Constructors
@@ -107,7 +115,7 @@ namespace CampaignKit.WorldMap.Controllers
 		[Authorize]
 		public IActionResult Create()
 		{
-			var model = new MapCreateViewModel();
+			var model = new MapCreateViewModel { Secret = _randomDataService.GetRandomText(8) };
 
 			return View(model);
 		}
@@ -145,12 +153,14 @@ namespace CampaignKit.WorldMap.Controllers
 			var map = new Entities.Map
 			{
 				Name = model.Name,
-				UserId = User.Claims.First(c => c.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value,
+				UserId = _userManagerService.GetUserId(User),
 				Copyright = model.Copyright,
 				ContentType = model.MapImage.ContentType,
 				FileExtension = Path.GetExtension(model.MapImage.FileName ?? string.Empty).ToLower(),
 				CreationTimestamp = DateTime.UtcNow,
-				RepeatMapInX = model.RepeatMapInX
+				RepeatMapInX = model.RepeatMapInX,
+				IsPublic = model.MakeMapPublic,
+				Secret = model.Secret
 			};
 
 			var id = await _mapRepository.Create(map, model.MapImage.OpenReadStream());

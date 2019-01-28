@@ -45,6 +45,14 @@ namespace CampaignKit.WorldMap.ViewModels
         [Display(Name = "Repeat map horizontally")]
         public bool RepeatMapInX { get; set; }
 
-        #endregion Public Properties
-    }
+		/// <summary>
+		///     Gets or sets a value indicating whether this map should be made public.
+		/// </summary>
+		/// <value><c>true</c> if this map should be made public; otherwise, <c>false</c>.</value>
+		[Display(Name = "This map should be made public so others can view it.")]
+		[Required]
+		public bool MakeMapPublic { get; set; }
+
+		#endregion Public Properties
+	}
 }

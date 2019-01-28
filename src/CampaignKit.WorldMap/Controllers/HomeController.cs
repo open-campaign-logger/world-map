@@ -80,8 +80,11 @@ namespace CampaignKit.WorldMap.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
+			// Determine if the user is logged in
 			var userid = _userManagerService.GetUserId(User);
+			var isLoggedIn = (userid != null);
 
+			// Create a result set
 			var model = (await _mapRepository.FindAll())
 				.Where(m => m.MapId != 1)
 				.OrderByDescending(m => m.CreationTimestamp)
