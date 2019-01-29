@@ -56,6 +56,13 @@ namespace CampaignKit.WorldMap.Entities
 		public DateTime CreationTimestamp { get; set; }
 
 		/// <summary>
+		///     Gets or sets the update timestamp.
+		/// </summary>
+		/// <value>The update timestamp.</value>
+		[Column(TypeName = "datetime")]
+		public DateTime UpdateTimestamp { get; set; }
+
+		/// <summary>
 		///     Gets or sets the file extension.
 		/// </summary>
 		/// <value>The file extension.</value>

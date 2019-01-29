@@ -21,7 +21,7 @@ namespace CampaignKit.WorldMap.Entities
 	///     Interface IUserManagerService
 	/// </summary>
 	public interface IUserManagerService
-    {
+	{
 		#region Public Methods
 
 		/// <summary>
@@ -31,8 +31,8 @@ namespace CampaignKit.WorldMap.Entities
 		/// <returns>UserId (String) if found otherwise Null.</returns>
 		string GetUserId(ClaimsPrincipal user);
 
-        #endregion Public Methods
-    }
+		#endregion Public Methods
+	}
 
 	/// <inheritdoc />
 	/// <summary>
@@ -53,13 +53,14 @@ namespace CampaignKit.WorldMap.Entities
 			if (user.Claims.Count(c => c.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")) == 0)
 			{
 				return null;
-			} else
+			}
+			else
 			{
 				return user.Claims.First(c => c.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
 			}
 		}
-		
+
 		#endregion Public Methods
-		
+
 	}
 }

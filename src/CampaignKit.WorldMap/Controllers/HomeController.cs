@@ -85,11 +85,11 @@ namespace CampaignKit.WorldMap.Controllers
 			var isLoggedIn = (userid != null);
 
 			// Create a result set
-			var model = (await _mapRepository.FindAll())
+			var model = (await _mapRepository.FindAll(User))
 				.Where(m => m.MapId != 1)
 				.OrderByDescending(m => m.CreationTimestamp)
 				.Take(3);
-			
+
 			return View(model);
 		}
 
@@ -102,7 +102,7 @@ namespace CampaignKit.WorldMap.Controllers
 		{
 			return View();
 		}
-		
+
 		/// <summary>
 		///		This action is called via an Ajax call with the 
 		///		JWT bearer details in the request header.  The action itself 
@@ -121,6 +121,6 @@ namespace CampaignKit.WorldMap.Controllers
 		}
 
 		#endregion Public Methods
-		
+
 	}
 }

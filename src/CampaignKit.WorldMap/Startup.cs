@@ -40,64 +40,64 @@ namespace CampaignKit.WorldMap
 	///     Class Startup.
 	/// </summary>
 	public class Startup
-    {
-        #region Private Fields
+	{
+		#region Private Fields
 
-        private readonly IConfiguration _configuration;
+		private readonly IConfiguration _configuration;
 
-        #endregion Private Fields
+		#endregion Private Fields
 
-        #region Public Constructors
+		#region Public Constructors
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="Startup" /> class.
-        /// </summary>
-        /// <param name="env">The env.</param>
-        public Startup(IHostingEnvironment env)
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
+		/// <summary>
+		///     Initializes a new instance of the <see cref="Startup" /> class.
+		/// </summary>
+		/// <param name="env">The env.</param>
+		public Startup(IHostingEnvironment env)
+		{
+			var builder = new ConfigurationBuilder()
+				.SetBasePath(env.ContentRootPath)
 				.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
 				.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
+				.AddEnvironmentVariables();
 
-            _configuration = builder.Build();
-        }
+			_configuration = builder.Build();
+		}
 
-        #endregion Public Constructors
+		#endregion Public Constructors
 
-        #region Public Properties
+		#region Public Properties
 
-        /// <summary>
-        ///     Gets a value indicating whether this instance is development configured.
-        /// </summary>
-        /// <value><c>true</c> if this instance is development configured; otherwise, <c>false</c>.</value>
-        public bool IsDevelopmentConfigured =>
-            string.Equals(_configuration["IsDevelopment"], bool.TrueString, StringComparison.OrdinalIgnoreCase);
+		/// <summary>
+		///     Gets a value indicating whether this instance is development configured.
+		/// </summary>
+		/// <value><c>true</c> if this instance is development configured; otherwise, <c>false</c>.</value>
+		public bool IsDevelopmentConfigured =>
+			string.Equals(_configuration["IsDevelopment"], bool.TrueString, StringComparison.OrdinalIgnoreCase);
 
-        #endregion Public Properties
+		#endregion Public Properties
 
-        #region Public Methods
+		#region Public Methods
 
-        /// <summary>
-        ///     Configures the specified application.
-        /// </summary>
-        /// <param name="app">The application.</param>
-        /// <param name="env">The env.</param>
-        /// <param name="loggerFactory">The logger factory.</param>
+		/// <summary>
+		///     Configures the specified application.
+		/// </summary>
+		/// <param name="app">The application.</param>
+		/// <param name="env">The env.</param>
+		/// <param name="loggerFactory">The logger factory.</param>
 
-        // ReSharper disable once UnusedMember.Global
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {
-            // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		// ReSharper disable once UnusedMember.Global
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+		{
+			// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 
 			// Json conversion settings
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings { Formatting = Formatting.Indented };
+			JsonConvert.DefaultSettings = () => new JsonSerializerSettings { Formatting = Formatting.Indented };
 
 			// Reads the IsDevelopment configuration variable to determine if this is a development environment or not
 			if (env.IsDevelopment() || IsDevelopmentConfigured)
-			{ 
-                app.UseDeveloperExceptionPage();
+			{
+				app.UseDeveloperExceptionPage();
 			}
 
 			// Enable all static file middleware (except directory browsing) for the current request path in the current directory.
@@ -105,21 +105,21 @@ namespace CampaignKit.WorldMap
 
 			// Use custom JWT cookie middleware component
 			app.UseMiddleware<JWTInHeaderMiddleware>();
-			
+
 			// Enable authentication
 			app.UseAuthentication();
 
 			// Adds MVC to the IApplicationBuilder request execution pipeline.
-			app.UseMvcWithDefaultRoute();			
+			app.UseMvcWithDefaultRoute();
 
-        }
+		}
 
-        /// <summary>
-        ///     Configures the services.
-        /// </summary>
-        /// <param name="services">The services.</param>
-        public void ConfigureServices(IServiceCollection services)
-        {
+		/// <summary>
+		///     Configures the services.
+		/// </summary>
+		/// <param name="services">The services.</param>
+		public void ConfigureServices(IServiceCollection services)
+		{
 			// This method gets called by the runtime. Use this method to add services to the container.
 			// For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
 
@@ -129,7 +129,7 @@ namespace CampaignKit.WorldMap
 			// Instantiate the database and add to the context
 			services.AddDbContext<WorldMapDBContext>
  				(options => options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
-			
+
 			// Add the MVC service
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -170,16 +170,16 @@ namespace CampaignKit.WorldMap
 			// Note: these have been changed from singleton to scoped services in order
 			//       to work with the dbcontext which is scoped.
 			services.AddScoped<IFilePathService, DefaultFilePathService>();
-            services.AddScoped<IRandomDataService, DefaultRandomDataService>();
-            services.AddScoped<IProgressService, DefaultProgressService>();
+			services.AddScoped<IRandomDataService, DefaultRandomDataService>();
+			services.AddScoped<IProgressService, DefaultProgressService>();
 			services.AddScoped<IMapRepository, DefaultMapRepository>();
 			services.AddScoped<IUserManagerService, DefaultUserManagerService>();
 
 			// Add background services
-			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();			
+			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
 
 		}
 
-        #endregion Public Methods
-    }
+		#endregion Public Methods
+	}
 }
