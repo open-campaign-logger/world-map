@@ -23,7 +23,12 @@ var template = '<div id="popup_{id}" class="popup">\
 // **********************************************
 
 // This is used for testing purposes only.
-function loadMarkers() {
+function loadMarkers(secret) {
+
+    var url = "/Map/MarkerData/" + mapId;
+    if (secret) {
+        url += "?secret=" + secret;
+    }
 
     $.ajax({
         type: "GET",
@@ -102,6 +107,9 @@ function saveMarkers() {
         contentType: 'application/json',
         dataType: 'json',
         data: JSON.stringify(submissionData),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
+        },
         success: function (result) {
             console.log('Data received: ');
             console.log(result);

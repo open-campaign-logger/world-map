@@ -90,7 +90,7 @@ limitations under the License.
 		map.on(L.Draw.Event.DELETED, drawnItemEdited);
 
 		// Import marker data
-		loadMarkers();
+		loadMarkers(@Model.Secret);
 
 	</script>
 	@RenderSection("scripts", false)
