@@ -19,8 +19,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -50,11 +48,12 @@ namespace CampaignKit.WorldMap.Entities
 		/// <param name="secret">Map secret to be used by friends of map author.</param>
 		/// <returns><c>Map</c> if successful, <c>null</c> otherwise</returns>
 		Task<Entities.Map> Find(int id, ClaimsPrincipal user, string secret);
-
+		
 		/// <summary>Finds all maps.</summary>
 		/// <param name="user">The authenticated user.</param>
+		/// <param name="includePublic">Specify whether public maps should also be returned.</param>
 		/// <returns>IEnumerable&lt;Map&gt;.</returns>
-		Task<IEnumerable<Entities.Map>> FindAll(ClaimsPrincipal user);
+		Task<IEnumerable<Entities.Map>> FindAll(ClaimsPrincipal user, bool includePublic);
 
 		/// <summary> Creates the specified map. </summary>
 		/// <param name="map">The map entity to create.</param>
@@ -68,6 +67,12 @@ namespace CampaignKit.WorldMap.Entities
 		/// <param name="user">The authenticated user.</param>
 		/// <returns><c>id</c> if successful, <c>false</c> otherwise</returns>
 		Task<bool> Save(Entities.Map map, ClaimsPrincipal user);
+
+		/// <summary>Determines if user has rights to edit the map.</summary>
+		/// <param name="id">The map identifier.</param>
+		/// <param name="user">The authenticated user.</param>
+		/// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
+		Task<bool> CanEdit(int id, ClaimsPrincipal user);
 
 		#endregion Public Methods
 	}
@@ -132,8 +137,10 @@ namespace CampaignKit.WorldMap.Entities
 
 		/// <summary>
 		/// Deletes the specified map and all child entities.
+		/// 
 		/// Ensures that the authenticated user is owner of the map
 		/// before any database operation is performed.
+		/// 
 		/// </summary>
 		/// <param name="id">The map identifier.</param>
 		/// <param name="user">The authenticated user.</param>
@@ -141,19 +148,19 @@ namespace CampaignKit.WorldMap.Entities
 		///   <c>true</c> if successful, <c>false</c> otherwise</returns>
 		public async Task<bool> Delete(int id, ClaimsPrincipal user)
 		{
-			// Determine if this map exists
-			var map = await _dbContext.Maps.FindAsync(id);
-			if (map == null)
-			{
-				_loggerService.LogError($"Map with id:{id} not found");
-				return false;
-			}
-
 			// Ensure user is authenticated
 			var userid = _userManagerService.GetUserId(user);
 			if (userid == null)
 			{
 				_loggerService.LogError($"Database operation prohibited for non-authenticated user");
+				return false;
+			}
+
+			// Determine if this map exists
+			var map = await _dbContext.Maps.FindAsync(id);
+			if (map == null)
+			{
+				_loggerService.LogError($"Map with id:{id} not found");
 				return false;
 			}
 
@@ -179,15 +186,10 @@ namespace CampaignKit.WorldMap.Entities
 		}
 
 		/// <summary>
-		/// Finds the map associated with the identifier.  
+		/// Find a map based on its identifier.  
 		/// 
-		/// Public Maps
-		/// - For public maps authenticated user is not required.  If the map
-		///   is found it will be returned.
-		///   
-		/// Private Maps
-		/// - For private maps an authenticated user or map secred is required.  If
-		///   either match those on a map that is found then it will be returned.
+		/// If the map is private then the user must be owner of map or the 
+		/// correct secret must be provided.
 		///   
 		/// </summary>
 		/// <param name="id">The map identifier.</param>
@@ -195,7 +197,7 @@ namespace CampaignKit.WorldMap.Entities
 		/// <param name="secret">Map secret to be used by friends of map author.</param>
 		/// <returns>
 		///   <c>Map</c> if successful, <c>null</c> otherwise</returns>
-		public async Task<Entities.Map> Find(int id, ClaimsPrincipal user, string secret = "")
+		public async Task<Entities.Map> Find(int id, ClaimsPrincipal user, string secret)
 		{
 			// Retrieve the map entry and any associated markers.
 			var map = await _dbContext.Maps
@@ -223,24 +225,38 @@ namespace CampaignKit.WorldMap.Entities
 
 		}
 
+
+
 		/// <summary>
 		/// Finds all maps that the user is authorized to see.
-		/// Unauthenticated users will see public maps.
-		/// Authenticated users will see public maps and their own.
+		/// 
+		/// Unauthenticated users will have access only to public maps.
+		/// 
+		/// Authenticated users will see their maps and, optionally, public maps.
+		/// 
 		/// </summary>
 		/// <param name="user">The authenticated user.</param>
+		/// <param name="includePublic">Specify whether public maps should also be returned.</param>
 		/// <returns>IEnumerable&lt;Map&gt;.</returns>
-		public async Task<IEnumerable<Entities.Map>> FindAll(ClaimsPrincipal user)
+		public async Task<IEnumerable<Entities.Map>> FindAll(ClaimsPrincipal user, bool includePublic)
 		{
 			var userid = _userManagerService.GetUserId(user);
 
 			// Return public and owned maps to authenticated users
 			if (userid != null)
 			{
-				return await _dbContext.Maps
+				if (includePublic)
+				{
+					return await _dbContext.Maps
 					.Where(m => (m.IsPublic || m.UserId.Equals(userid)))
-					.ToListAsync();			
-			} else
+					.ToListAsync();
+				} else
+				{
+					return await _dbContext.Maps
+					.Where(m => (m.UserId.Equals(userid)))
+					.ToListAsync();
+				}
+			} else // Return only public maps
 			{
 				return await _dbContext.Maps
 					.Where(m => m.IsPublic)
@@ -249,7 +265,9 @@ namespace CampaignKit.WorldMap.Entities
 
 		}
 
-		/// <summary>Creates the specified map.</summary>
+		/// <summary>
+		///		Creates the specified map.  Requires an authenticated user.
+		/// </summary>
 		/// <param name="map">The map entity to create.</param>
 		/// <param name="stream">Map image data stream.</param>
 		/// <param name="user">The authenticated user.</param>
@@ -379,7 +397,9 @@ namespace CampaignKit.WorldMap.Entities
 			
 		}
 
-		/// <summary>Saves changes to the specified map.</summary>
+		/// <summary>
+		///		Saves changes to the specified map.  Only map owner may save changes.
+		///	</summary>
 		/// <param name="map">The map entity to save.</param>
 		/// <param name="user">The authenticated user.</param>
 		/// <returns>
@@ -408,6 +428,46 @@ namespace CampaignKit.WorldMap.Entities
 
 		}
 
+		/// <summary>
+		///		Determines if user owns the map.
+		///	</summary>
+		/// <param name="id">The map identifier.</param>
+		/// <param name="user">The authenticated user.</param>
+		/// <returns>
+		///   <c>id</c> if successful, <c>false</c> otherwise</returns>
+		public async Task<bool> CanEdit(int id, ClaimsPrincipal user)
+		{
+
+			// Ensure user is authenticated
+			var userid = _userManagerService.GetUserId(user);
+			if (userid == null)
+			{
+				_loggerService.LogError($"Database operation prohibited for non-authenticated user");
+				return false;
+			}
+
+			// Retrieve the map entry and any associated markers.
+			var map = await _dbContext.Maps
+				.FirstOrDefaultAsync(m => m.MapId == id);
+
+			// Ensure map has been found
+			if (map == null)
+			{
+				_loggerService.LogError($"Map with id:{id} not found");
+				return false;
+			}
+
+			// Determine if the user has rights to delete the map
+			if (!map.UserId.Equals(userid))
+			{
+				_loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
+				return false;
+			}
+
+			return true;
+
+		}
+
 		#endregion Public Methods
 
 		#endregion
@@ -429,7 +489,6 @@ namespace CampaignKit.WorldMap.Entities
 
 			return result;
 		}
-
 
 		#endregion
 

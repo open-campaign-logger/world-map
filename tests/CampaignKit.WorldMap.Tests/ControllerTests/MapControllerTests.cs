@@ -70,7 +70,7 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 				IActionResult result = await controller.Edit(3, "Map3", viewModel);
 
 				// Assert that map has been deleted
-				var editedMap = await mapRepository.Find(3);
+				var editedMap = await mapRepository.Find(3,null,null);
 				Assert.Equal(viewModel.Copyright, editedMap.Copyright);
 				Assert.Equal(viewModel.Name, editedMap.Name);
 				Assert.Equal(viewModel.RepeatMapInX, editedMap.RepeatMapInX);
@@ -108,10 +108,10 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 					HiddenSecret = "Map2",
 					Name = "Map2"
 				};
-				IActionResult result = await controller.Delete(viewModel.HiddenId, viewModel.HiddenSecret, viewModel);
+				IActionResult result = await controller.Delete(viewModel.HiddenId, viewModel);
 				
 				// Assert that map has been deleted
-				var deletedMap = await mapRepository.Find(viewModel.HiddenId);
+				var deletedMap = await mapRepository.Find(viewModel.HiddenId,null, null);
 				Assert.Null(deletedMap);
 
 			}

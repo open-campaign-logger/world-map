@@ -52,7 +52,7 @@ namespace CampaignKit.WorldMap.ViewModels
 		[Display(Name = "This map should be made public so others can view it.")]
 		[Required]
 		public bool MakeMapPublic { get; set; }
-
+		
 		#endregion Public Properties
 	}
 }

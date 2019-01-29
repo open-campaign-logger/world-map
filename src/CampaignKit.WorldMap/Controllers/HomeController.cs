@@ -44,12 +44,7 @@ namespace CampaignKit.WorldMap.Controllers
 		///		The application logging service.
 		/// </summary>
 		private readonly ILogger _loggerService;
-
-		/// <summary>
-		///		The user manager service.
-		/// </summary>
-		private readonly IUserManagerService _userManagerService;
-
+		
 		#endregion Private Fields
 
 		#region Public Constructors
@@ -59,14 +54,11 @@ namespace CampaignKit.WorldMap.Controllers
 		/// </summary>
 		/// <param name="mapDataService">The map data service.</param>
 		/// <param name="logger">The logger.</param>
-		/// <param name="userManagerService">The user manager service.</param>
 		public HomeController(IMapRepository mapDataService,
-			ILogger<HomeController> logger,
-			IUserManagerService userManagerService)
+			ILogger<HomeController> logger)
 		{
 			_mapRepository = mapDataService;
 			_loggerService = logger;
-			_userManagerService = userManagerService;
 		}
 
 		#endregion Public Constructors
@@ -80,12 +72,10 @@ namespace CampaignKit.WorldMap.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
-			// Determine if the user is logged in
-			var userid = _userManagerService.GetUserId(User);
-			var isLoggedIn = (userid != null);
-
-			// Create a result set
-			var model = (await _mapRepository.FindAll(User))
+			// Retrieve a listing of maps for this user.  
+			// Anonymous User: all public maps
+			// Authenticated User: all public and owned maps.
+			var model = (await _mapRepository.FindAll(User, true))
 				.Where(m => m.MapId != 1)
 				.OrderByDescending(m => m.CreationTimestamp)
 				.Take(3);

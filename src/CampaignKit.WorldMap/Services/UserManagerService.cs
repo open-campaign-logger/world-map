@@ -50,7 +50,11 @@ namespace CampaignKit.WorldMap.Entities
 		/// <returns>UserId (String) if found otherwise Null.</returns>
 		public string GetUserId(ClaimsPrincipal user)
 		{
-			if (user.Claims.Count(c => c.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")) == 0)
+			if (user == null)
+			{
+				return null;
+			}
+			else if (user.Claims.Count(c => c.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")) == 0)
 			{
 				return null;
 			}
