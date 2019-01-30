@@ -13,17 +13,14 @@
 // limitations under the License.
 
 using System;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
+
 using CampaignKit.WorldMap.Entities;
 using CampaignKit.WorldMap.Services;
-using IdentityServer4.AccessTokenValidation;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +28,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+
 using Newtonsoft.Json;
 
 namespace CampaignKit.WorldMap
@@ -48,7 +45,7 @@ namespace CampaignKit.WorldMap
 		#endregion Private Fields
 
 		#region Public Constructors
-
+		
 		/// <summary>
 		///     Initializes a new instance of the <see cref="Startup" /> class.
 		/// </summary>
@@ -113,7 +110,7 @@ namespace CampaignKit.WorldMap
 			app.UseMvcWithDefaultRoute();
 
 		}
-
+		
 		/// <summary>
 		///     Configures the services.
 		/// </summary>
@@ -133,6 +130,32 @@ namespace CampaignKit.WorldMap
 			// Add the MVC service
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+			// Configure Authentication
+			ConfigureAuth(services);
+
+			// Add data services to context
+			// Note: these have been changed from singleton to scoped services in order
+			//       to work with the dbcontext which is scoped.
+			services.AddScoped<IFilePathService, DefaultFilePathService>();
+			services.AddScoped<IRandomDataService, DefaultRandomDataService>();
+			services.AddScoped<IProgressService, DefaultProgressService>();
+			services.AddScoped<IMapRepository, DefaultMapRepository>();
+			services.AddScoped<IUserManagerService, DefaultUserManagerService>();
+
+			// Add background services
+			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
+
+		}
+		
+		/// <summary>
+		///		Configures the authentication.
+		///		This virtual method is used to encapsulate authentication
+		///		configuration information in a way that can be easily overridden 
+		///		in the unit testing project.
+		/// </summary>
+		/// <param name="services">The services.</param>
+		protected virtual void ConfigureAuth(IServiceCollection services)
+		{
 			// Configure services to expect a Campaign-Identity access_token in the 
 			// Authorization header using the JWT Bearer scheme.
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -165,19 +188,6 @@ namespace CampaignKit.WorldMap
 						}
 					};
 				});
-
-			// Add data services to context
-			// Note: these have been changed from singleton to scoped services in order
-			//       to work with the dbcontext which is scoped.
-			services.AddScoped<IFilePathService, DefaultFilePathService>();
-			services.AddScoped<IRandomDataService, DefaultRandomDataService>();
-			services.AddScoped<IProgressService, DefaultProgressService>();
-			services.AddScoped<IMapRepository, DefaultMapRepository>();
-			services.AddScoped<IUserManagerService, DefaultUserManagerService>();
-
-			// Add background services
-			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
-
 		}
 
 		#endregion Public Methods

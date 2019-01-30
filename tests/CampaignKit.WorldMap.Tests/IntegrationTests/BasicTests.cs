@@ -1,34 +1,24 @@
-﻿using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Tests.IntegrationTests;
-
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 
 using Xunit;
 
-namespace CampaignKit.WorldMap.Tests.IntegrationTests
+namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
-	public class BasicTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+	public class BasicTests
 	{
-
-		private readonly CustomWebApplicationFactory<Startup> _factory;
-		private HttpClient _client;
-		
-		public BasicTests(CustomWebApplicationFactory<Startup> webApplicationFactory)
-		{
-			this._factory = webApplicationFactory;
-			this._client = webApplicationFactory.CreateClient();
-			
-		}
 
 		[Fact]
 		public async Task TestHTTPResponse()
 		{
+
+			var testFixture = new TestFixture<Startup>();
+			var client = testFixture.Client;
+
 			// Arrange & Act
-			var response = await _client.GetAsync("/");
+			var response = await client.GetAsync("/");
 			response.EnsureSuccessStatusCode();
 			var stringResponse = await response.Content.ReadAsStringAsync();
 		}
@@ -36,36 +26,36 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		[Fact]
 		public void TestDataExists()
 		{
-			// Build the service provider.
-			var hostServices = _factory.Server.Host.Services;
+			//// Build the service provider.
+			//var hostServices = _factory.Server.Host.Services;
 
-			using (var scope = hostServices.CreateScope())
-			{
-				// Get the service provider
-				var scopedServices = scope.ServiceProvider;
+			//using (var scope = hostServices.CreateScope())
+			//{
+			//	// Get the service provider
+			//	var scopedServices = scope.ServiceProvider;
 
-				// Retrieve services from the scoped context
-				var service = scopedServices.GetService<WorldMapDBContext>();
-				Assert.True(service.Maps.Count() > 0);
-			}
+			//	// Retrieve services from the scoped context
+			//	var service = scopedServices.GetService<WorldMapDBContext>();
+			//	Assert.True(service.Maps.Count() > 0);
+			//}
 		}
 
 
 		[Fact]
 		public void TestDatabaseExists()
 		{
-			// Build the service provider.
-			var hostServices = _factory.Server.Host.Services;
+			//// Build the service provider.
+			//var hostServices = _factory.Server.Host.Services;
 
-			using (var scope = hostServices.CreateScope())
-			{
-				// Get the service provider
-				var scopedServices = scope.ServiceProvider;
+			//using (var scope = hostServices.CreateScope())
+			//{
+			//	// Get the service provider
+			//	var scopedServices = scope.ServiceProvider;
 
-				// Retrieve services from the scoped context
-				var db = scopedServices.GetService<WorldMapDBContext>();
-				Assert.True(db.Database.CanConnect());
-			}
+			//	// Retrieve services from the scoped context
+			//	var db = scopedServices.GetService<WorldMapDBContext>();
+			//	Assert.True(db.Database.CanConnect());
+			//}
 
 		}
 			   

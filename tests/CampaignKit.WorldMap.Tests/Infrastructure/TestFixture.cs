@@ -23,8 +23,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.Tests.IntegrationTests
+namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
+
 	/// <inheritdoc />
 	/// <summary>
 	///     A test fixture which hosts the target project (project we wish to test) in an in-memory server.
@@ -68,7 +69,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// The map data service.
 		/// </value>
 		public IMapRepository MapDataService { get; set; }
-		
+
 		/// <summary>
 		/// Gets or sets the progress service.
 		/// </summary>
@@ -136,11 +137,11 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 			// This is an older 1.x approach
 			// Preferred method for 2.x is to use 
 			// Create default builder: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
-			
+
 			var builder = new WebHostBuilder()
 				.UseContentRoot(contentRoot)
 				.UseEnvironment("Testing")
-				.UseStartup(typeof(Startup));
+				.UseStartup(typeof(TestStartup));
 
 
 			// Instantiate the web host
@@ -149,7 +150,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 			// Create the http client.
 			Client = _server.CreateClient();
 			Client.BaseAddress = new Uri("http://localhost");
-			
+
 		}
 
 		#endregion
