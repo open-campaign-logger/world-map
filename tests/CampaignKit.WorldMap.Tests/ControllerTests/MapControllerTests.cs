@@ -104,14 +104,14 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 				// call the controller method
 				var viewModel = new MapDeleteViewModel()
 				{
-					HiddenId = 2,
-					HiddenSecret = "Map2",
+					Id = 2,
+					// HiddenSecret = "Map2",
 					Name = "Map2"
 				};
-				IActionResult result = await controller.Delete(viewModel.HiddenId, viewModel);
+				IActionResult result = await controller.Delete(viewModel.Id, viewModel);
 				
 				// Assert that map has been deleted
-				var deletedMap = await mapRepository.Find(viewModel.HiddenId,null, null);
+				var deletedMap = await mapRepository.Find(viewModel.Id,null, null);
 				Assert.Null(deletedMap);
 
 			}

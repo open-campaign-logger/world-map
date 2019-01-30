@@ -45,9 +45,9 @@ limitations under the License.
 							<span class="text-danger" asp-validation-for="Secret"></span>
 						</div>
 						<div class="form-group">
-							<label class="control-label" asp-for="MapImage"></label>
-							<input class="form-control" asp-for="MapImage" />
-							<span class="text-danger" asp-validation-for="MapImage"></span>
+							<label class="control-label" asp-for="Image"></label>
+							<input class="form-control" asp-for="Image" />
+							<span class="text-danger" asp-validation-for="Image"></span>
 						</div>
 						<div class="form-group">
 							<div class="checkbox col-xs-12">
@@ -97,10 +97,10 @@ limitations under the License.
 						<div class="form-group">
 							<div class="checkbox col-xs-12">
 								<label>
-									<input asp-for="MakeMapPublic" />
-									<strong>@Html.DisplayNameFor(m => m.MakeMapPublic)</strong>
+									<input asp-for="IsPublic" />
+									<strong>@Html.DisplayNameFor(m => m.IsPublic)</strong>
 								</label>
-								<span class="text-danger" asp-validation-for="MakeMapPublic"></span>
+								<span class="text-danger" asp-validation-for="IsPublic"></span>
 							</div>
 						</div>
 						<div class="form-group">

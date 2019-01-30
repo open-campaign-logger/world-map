@@ -43,8 +43,8 @@ limitations under the License.
                     @if (!string.IsNullOrWhiteSpace(Model.Secret))
                     {
                         <div class="form-group">
-                            <label class="control-label" asp-for="MapShowUrl">Use this URL to <b>share</b> your map</label>
-                            <input class="form-control" asp-for="MapShowUrl" readonly />
+                            <label class="control-label" asp-for="ShowUrl">Use this URL to <b>share</b> your map</label>
+                            <input class="form-control" asp-for="ShowUrl" readonly />
                         </div>
                     }
                 </div>
@@ -87,40 +87,6 @@ limitations under the License.
             });
             updateProgress();
 
-            function createBlock() {
-                var $message = $('<div>');
-                var $secrectKey = $('<input type="text" class="form-control">');
-                $message.append($('<label class="control-label">').text('Please enter the secret key for this map:'));
-                $message.append($secrectKey);
-
-                return { message: $message, secrectKey: $secrectKey };
-            }
-
-            $('#deleteLink').click(function () {
-                var block = createBlock();
-                BootstrapDialog.confirm({
-                    title: 'Delete map',
-                    message: block.message,
-                    callback: function (confirmed) {
-                        if (confirmed) location.href = '@Model.MapBaseDeleteUrl?Secret=' + block.secrectKey.val();
-                    }
-                });
-
-                return false;
-            });
-
-            $('#editLink').click(function () {
-                var block = createBlock();
-                BootstrapDialog.confirm({
-                    title: 'Edit map',
-                    message: block.message,
-                    callback: function (confirmed) {
-                        if (confirmed) location.href = '@Model.MapBaseEditUrl?Secret=' + block.secrectKey.val();
-                    }
-                });
-
-                return false;
-            });
 		});
 		
     </script>

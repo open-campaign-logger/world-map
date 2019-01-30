@@ -145,14 +145,14 @@ namespace CampaignKit.WorldMap.Controllers
 			{
 				Name = model.Name,
 				Copyright = model.Copyright,
-				ContentType = model.MapImage.ContentType,
-				FileExtension = Path.GetExtension(model.MapImage.FileName ?? string.Empty).ToLower(),
+				ContentType = model.Image.ContentType,
+				FileExtension = Path.GetExtension(model.Image.FileName ?? string.Empty).ToLower(),
 				RepeatMapInX = model.RepeatMapInX,
-				IsPublic = model.MakeMapPublic,
+				IsPublic = model.IsPublic,
 				Secret = model.Secret
 			};
 
-			var id = await _mapRepository.Create(map, model.MapImage.OpenReadStream(), User);
+			var id = await _mapRepository.Create(map, model.Image.OpenReadStream(), User);
 			if (id == 0)
 			{
 				ModelState.AddModelError(string.Empty,
@@ -160,7 +160,7 @@ namespace CampaignKit.WorldMap.Controllers
 			}
 			else
 			{
-				return RedirectToAction(nameof(Show), new { id, map.UserId, ShowProgress = true });
+				return RedirectToAction(nameof(Show), new { id, map.Secret, ShowProgress = true });
 			}
 
 			return View();
@@ -182,7 +182,7 @@ namespace CampaignKit.WorldMap.Controllers
 				return DeleteErrorView();
 			}
 
-			return View(new MapDeleteViewModel { Name = model.Name, HiddenId = model.MapId});
+			return View(new MapDeleteViewModel { Name = model.Name, Id = model.MapId});
 		}
 
 		/// <summary>
@@ -370,10 +370,9 @@ namespace CampaignKit.WorldMap.Controllers
 				Secret = secret,
 				ShowProgress = showProgress,
 				ProgressUrl = Url.Action(nameof(Progress), new { Id = id }),
-				MapEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id, Secret = secret }, protocol, Request.Host.Value),
-				MapShowUrl = Url.Action(nameof(Show), "Map", new { Id = id }, protocol, Request.Host.Value),
-				MapBaseDeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
-				MapBaseEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
+				ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Secret = secret }, protocol, Request.Host.Value),
+				DeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
+				EditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
 				Id = id
 			};
 
@@ -392,10 +391,9 @@ namespace CampaignKit.WorldMap.Controllers
 		///		GET: /Map/MarkerData/{id?}
 		/// </summary>
 		/// <param name="id">The map identifier.</param>
-		/// <param name="secret">The secret.</param>
+		/// <param name="secret">The secret.  Required if </param>
 		/// <returns>The map's marker data in JSON format.</returns>
 		[HttpGet]
-		[Authorize]
 		public async Task<IActionResult> MarkerData(int id, string secret)
 		{
 			var map = await _mapRepository.Find(id, User, secret);
@@ -413,17 +411,24 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <returns></returns>
 		[HttpPost]
 		[Authorize]
-		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> MarkerData([FromBody] MarkerEditViewModel model)
 		{
-			var map = await _mapRepository.Find(model.MapId, User, String.Empty);
+			// Ensure that user has privileges to update map
+			var canEdit = await _mapRepository.CanEdit(model.MapId, User);
+			if (!canEdit)
+			{
+				return Json("Not Authorized");
+			}
 
+			// Attempt to retrieve the map
+			var map = await _mapRepository.Find(model.MapId, User, String.Empty);
 			if (map == null)
 			{
 				_loggerService.LogError($"Map with id:{model.MapId} not found");
 				return Json("Failed to update marker");
 			}
 
+			// Update the map
 			map.MarkerData = model.MarkerData;
 
 			await _dbContext.SaveChangesAsync();

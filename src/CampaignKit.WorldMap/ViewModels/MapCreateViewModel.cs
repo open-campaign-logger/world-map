@@ -23,26 +23,11 @@ namespace CampaignKit.WorldMap.ViewModels
 	/// </summary>
 	public class MapCreateViewModel
 	{
-		#region Public Properties
+		#region Hidden Properties
 
-		/// <summary>
-		///     Gets or sets the copyright.
-		/// </summary>
-		/// <value>The copyright.</value>
-		[Display(Description = "You might want to provide copyright information for your creation.")]
-		public string Copyright { get; set; }
+		#endregion
 
-		/// <summary>
-		///     Gets or sets the map image.
-		/// </summary>
-		/// <value>The map image.</value>
-		[Display(Name = "World Map Image")]
-		[Required]
-		[DataType(DataType.Upload)]
-
-		// Sadly, FileExtensions are currently not working:
-		//[FileExtensions(Extensions = "png,jpg,jpeg")]
-		public IFormFile MapImage { get; set; }
+		#region Required Properties
 
 		/// <summary>
 		///     Gets or sets the name.
@@ -51,22 +36,17 @@ namespace CampaignKit.WorldMap.ViewModels
 		[Display(Name = "World Name")]
 		[Required]
 		public string Name { get; set; }
-
+		
 		/// <summary>
-		///     Gets or sets a value indicating whether [processing saving publishing rights granted for this site].
+		///     Gets or sets the map image.
 		/// </summary>
-		/// <value><c>true</c> if [processing saving publishing rights granted for this site]; otherwise, <c>false</c>.</value>
-		[Display(Name =
-			"I am granting you (the site owner/maintainer) the right to process, save, and publish this map for display on this site.")]
+		/// <value>The map image.</value>
+		[Display(Name = "World Map Image")]
 		[Required]
-		public bool ProcessingSavingPublishingRightsGrantedForThisSite { get; set; }
-
-		/// <summary>
-		///     Gets or sets a value indicating whether [repeat map in x].
-		/// </summary>
-		/// <value><c>true</c> if [repeat map in x]; otherwise, <c>false</c>.</value>
-		[Display(Name = "Repeat map horizontally")]
-		public bool RepeatMapInX { get; set; }
+		[DataType(DataType.Upload)]
+		// Sadly, FileExtensions are currently not working:
+		//[FileExtensions(Extensions = "png,jpg,jpeg")]
+		public IFormFile Image { get; set; }
 
 		/// <summary>
 		///     Gets or sets the map secret.
@@ -77,12 +57,13 @@ namespace CampaignKit.WorldMap.ViewModels
 		public string Secret { get; set; }
 
 		/// <summary>
-		///     Gets or sets a value indicating whether this map should be made public.
+		///     Gets or sets a value indicating whether [processing saving publishing rights granted for this site].
 		/// </summary>
-		/// <value><c>true</c> if this map should be made public; otherwise, <c>false</c>.</value>
-		[Display(Name = "This map should be made public so others can view it.")]
+		/// <value><c>true</c> if [processing saving publishing rights granted for this site]; otherwise, <c>false</c>.</value>
+		[Display(Name =
+			"I am granting you (the site owner/maintainer) the right to process, save, and publish this map for display on this site.")]
 		[Required]
-		public bool MakeMapPublic { get; set; }
+		public bool ProcessingSavingPublishingRightsGrantedForThisSite { get; set; }
 
 		/// <summary>
 		///     Gets or sets a value indicating whether [this is my own creation published rightfully].
@@ -100,6 +81,32 @@ namespace CampaignKit.WorldMap.ViewModels
 		[Required]
 		public bool ThisIsNotOffensiveNorObviouslyIllegalContent { get; set; }
 
-		#endregion Public Properties
+		#endregion
+
+		#region Optional Properties
+
+		/// <summary>
+		///     Gets or sets the copyright.
+		/// </summary>
+		/// <value>The copyright.</value>
+		[Display(Description = "You might want to provide copyright information for your creation.")]
+		public string Copyright { get; set; }
+
+		/// <summary>
+		///     Gets or sets a value indicating whether [repeat map in x].
+		/// </summary>
+		/// <value><c>true</c> if [repeat map in x]; otherwise, <c>false</c>.</value>
+		[Display(Name = "Repeat map horizontally")]
+		public bool RepeatMapInX { get; set; }
+
+		/// <summary>
+		///     Gets or sets a value indicating whether this map should be made public.
+		/// </summary>
+		/// <value><c>true</c> if this map should be made public; otherwise, <c>false</c>.</value>
+		[Display(Name = "This map should be made public.")]
+		public bool IsPublic { get; set; }
+
+		#endregion
+
 	}
 }
