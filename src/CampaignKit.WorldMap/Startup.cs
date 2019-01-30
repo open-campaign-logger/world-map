@@ -124,8 +124,7 @@ namespace CampaignKit.WorldMap
 			services.AddSingleton(_configuration);
 
 			// Instantiate the database and add to the context
-			services.AddDbContext<WorldMapDBContext>
- 				(options => options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
+			ConfigureDB(services);
 
 			// Add the MVC service
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -146,7 +145,21 @@ namespace CampaignKit.WorldMap
 			services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, TileCreationService>();
 
 		}
-		
+
+		/// <summary>
+		///		Configures the database provider.
+		///		This virtual method is used to encapsulate database configuration 
+		///		information in a way that can be easily overridden in the unit 
+		///		testing project.
+		/// </summary>
+		/// <param name="services">The services.</param>
+		protected virtual void ConfigureDB(IServiceCollection services)
+		{
+			// Instantiate the database and add to the context
+			services.AddDbContext<WorldMapDBContext>
+ 				(options => options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
+		}
+
 		/// <summary>
 		///		Configures the authentication.
 		///		This virtual method is used to encapsulate authentication
