@@ -47,6 +47,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
 - see: https://github.com/aspnet/Docs/blob/master/aspnetcore/test/integration-tests/samples/2.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs
 - see: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/routing?view=aspnetcore-2.2#multiple-routes
+- Mocking authentication in integration tests: https://github.com/jackowild/aspnetcore-bypassing-authentication/tree/master/MockingAuthApi
 
 
 

@@ -1,4 +1,5 @@
-﻿using CampaignKit.WorldMap.Entities;
+﻿using System;
+using CampaignKit.WorldMap.Entities;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -6,21 +7,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
-	public class TestStartup : Startup
+	public class TestStartupNoAuth : Startup
 	{
 
-		public TestStartup(IHostingEnvironment env) : base (env)
+		public TestStartupNoAuth(IHostingEnvironment env) : base (env)
 		{
-
 		}
 
 		protected override void ConfigureAuth(IServiceCollection services)
 		{
-			services.AddAuthentication(options =>
-			{
-				options.DefaultAuthenticateScheme = "Test Scheme"; // has to match scheme in TestAuthenticationExtensions
-				options.DefaultChallengeScheme = "Test Scheme";
-			}).AddTestAuth(o => { });
 		}
 
 		protected override void ConfigureDB(IServiceCollection services)
@@ -37,6 +32,22 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 				options.UseInMemoryDatabase("InMemoryDbForTesting");
 				options.UseInternalServiceProvider(serviceProvider);
 			});
+
+			// Build the service provider.
+			var sp = services.BuildServiceProvider();
+
+			// Create a scope to obtain a reference to the database
+			// and other services
+			using (var scope = sp.CreateScope())
+			{
+				// Get a handle to the service provider
+				var scopedServices = scope.ServiceProvider;
+
+				// Get a handle to the database service
+				var databaseService = scopedServices.GetRequiredService<WorldMapDBContext>();
+				databaseService.Database.EnsureCreated();
+
+			}
 
 		}
 	}

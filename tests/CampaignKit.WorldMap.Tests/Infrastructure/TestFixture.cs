@@ -22,6 +22,7 @@ using CampaignKit.WorldMap.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
@@ -30,8 +31,9 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 	/// <summary>
 	///     A test fixture which hosts the target project (project we wish to test) in an in-memory server.
 	/// </summary>
-	/// <typeparam name="TStartup">Target project's startup type</typeparam>
-	public sealed class TestFixture<TStartup> : IDisposable
+	/// <typeparam name="TMainStartup">Target project's startup type.</typeparam>
+	/// <typeparam name="TTestStartup">Actual startup implementation to use for the test.</typeparam>
+	public sealed class TestFixture<TMainStartup, TTestStartup> : IDisposable
 	{
 		#region Static Fields
 
@@ -46,8 +48,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 		#endregion
 
 		#region Public Properties
-
-
+		
 		/// <summary>
 		///     Gets the client.
 		/// </summary>
@@ -130,7 +131,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 		/// <param name="solutionRelativeTargetProjectParentDir">The solution relative target project parent dir.</param>
 		private TestFixture(string solutionRelativeTargetProjectParentDir)
 		{
-			var startupAssembly = typeof(TStartup).GetTypeInfo().Assembly;
+			var startupAssembly = typeof(TMainStartup).GetTypeInfo().Assembly;
 			var contentRoot = GetProjectPath(solutionRelativeTargetProjectParentDir, startupAssembly);
 
 			// Create a web host builder
@@ -141,8 +142,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 			var builder = new WebHostBuilder()
 				.UseContentRoot(contentRoot)
 				.UseEnvironment("Testing")
-				.UseStartup(typeof(TestStartup));
-
+				.UseStartup(typeof(TTestStartup));
 
 			// Instantiate the web host
 			_server = new TestServer(builder);
@@ -151,9 +151,16 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 			Client = _server.CreateClient();
 			Client.BaseAddress = new Uri("http://localhost");
 
+			// Get Services from Scope
+			DatabaseService = _server.Host.Services.GetRequiredService<WorldMapDBContext>();
+			FilePathService  = _server.Host.Services.GetRequiredService<IFilePathService>();
+			MapDataService  = _server.Host.Services.GetRequiredService<IMapRepository>();
+			ProgressService  = _server.Host.Services.GetRequiredService<IProgressService>();
+			RandomDataService = _server.Host.Services.GetRequiredService<IRandomDataService>();
+
 		}
 
-		#endregion
+	#endregion
 
 		#region Implementations
 
@@ -162,10 +169,10 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 		///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose()
-		{
-			Client.Dispose();
-			_server.Dispose();
-		}
+			{
+				Client.Dispose();
+				_server.Dispose();
+			}
 
 		#endregion
 

@@ -1,8 +1,5 @@
 ﻿using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-
 using Xunit;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
@@ -11,10 +8,9 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 	{
 
 		[Fact]
-		public async Task TestHTTPResponse()
+		public async Task TestWebServer()
 		{
-
-			var testFixture = new TestFixture<Startup>();
+			var testFixture = new TestFixture<Startup, TestStartupNoAuth>();
 			var client = testFixture.Client;
 
 			// Arrange & Act
@@ -22,41 +18,14 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 			response.EnsureSuccessStatusCode();
 			var stringResponse = await response.Content.ReadAsStringAsync();
 		}
-
+		
 		[Fact]
-		public void TestDataExists()
+		public void TestDatabase()
 		{
-			//// Build the service provider.
-			//var hostServices = _factory.Server.Host.Services;
+			// Build the service provider.
+			var testFixture = new TestFixture<Startup, TestStartupNoAuth>();
 
-			//using (var scope = hostServices.CreateScope())
-			//{
-			//	// Get the service provider
-			//	var scopedServices = scope.ServiceProvider;
-
-			//	// Retrieve services from the scoped context
-			//	var service = scopedServices.GetService<WorldMapDBContext>();
-			//	Assert.True(service.Maps.Count() > 0);
-			//}
-		}
-
-
-		[Fact]
-		public void TestDatabaseExists()
-		{
-			//// Build the service provider.
-			//var hostServices = _factory.Server.Host.Services;
-
-			//using (var scope = hostServices.CreateScope())
-			//{
-			//	// Get the service provider
-			//	var scopedServices = scope.ServiceProvider;
-
-			//	// Retrieve services from the scoped context
-			//	var db = scopedServices.GetService<WorldMapDBContext>();
-			//	Assert.True(db.Database.CanConnect());
-			//}
-
+			Assert.True(testFixture.DatabaseService.Database.CanConnect());
 		}
 			   
 	}
