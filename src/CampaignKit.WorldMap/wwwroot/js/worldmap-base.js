@@ -18,31 +18,31 @@ function logout() {
     mgr.signoutRedirect();
 }
 
-// Used for testing purposes only
-function log() {
-    document.getElementById('results').innerText = '';
+//// Used for testing purposes only
+//function log() {
+//    document.getElementById('results').innerText = '';
 
-    Array.prototype.forEach.call(arguments, function (msg) {
-        if (msg instanceof Error) {
-            msg = "Error: " + msg.message;
-        }
-        else if (typeof msg !== 'string') {
-            msg = JSON.stringify(msg, null, 2);
-        }
-        document.getElementById('results').innerHTML += msg + '\r\n';
-    });
-}
+//    Array.prototype.forEach.call(arguments, function (msg) {
+//        if (msg instanceof Error) {
+//            msg = "Error: " + msg.message;
+//        }
+//        else if (typeof msg !== 'string') {
+//            msg = JSON.stringify(msg, null, 2);
+//        }
+//        document.getElementById('results').innerHTML += msg + '\r\n';
+//    });
+//}
 
 // Determine if user is logged in.
 mgr.getUser().then(function (user) {
     if (user) {
         $(".loggedout").hide();
-        log("User logged in", user.profile);
+        //log("User logged in", user.profile);
     }
     else {
         delete_cookie(".worldmap.ui");  // remove any old session cookies
         $(".loggedin").hide();
-        log("User not logged in");
+        //log("User not logged in");
     }
 });
 
