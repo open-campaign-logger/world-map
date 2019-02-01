@@ -301,10 +301,9 @@ namespace CampaignKit.WorldMap.Controllers
 		/// </summary>
 		/// <returns>Show all user maps.</returns>
 		[HttpGet]
-		[Authorize]
 		public async Task<IActionResult> Index()
 		{
-			var model = await _mapRepository.FindAll(User, false);
+			var model = await _mapRepository.FindAll(User, true);
 			model = model.OrderByDescending(m => m.CreationTimestamp);
 			return View(model);
 		}

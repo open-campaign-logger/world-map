@@ -158,6 +158,29 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 			ProgressService  = _server.Host.Services.GetRequiredService<IProgressService>();
 			RandomDataService = _server.Host.Services.GetRequiredService<IRandomDataService>();
 
+			// Create sample map
+			// Create a sample map
+			var map_1 = new Map()
+			{
+				AdjustedSize = 4000,
+				ContentType = "image/png",
+				Copyright = "Copyright 2017 Jochen Linnemann ",
+				CreationTimestamp = DateTime.Today.AddDays(-2),
+				FileExtension = ".png",
+				MaxZoomLevel = 4,
+				Name = "Sample",
+				RepeatMapInX = false,
+				UserId = TestAuthenticationOptions.TEST_ID,
+				WorldFolderPath = "C:\\Users\\mf1939\\source\\repos\\open-campaign-logger\\world-map\\src\\CampaignKit.WorldMap\\wwwroot\\world\\1",
+				ThumbnailPath = "~/world/1/0/zoom-level.png",
+				MarkerData = "[{ \"options\": { }, \"properties\": { } ] ",
+				Secret = "lNtqjEVQ",
+				IsPublic = true
+			};
+
+			DatabaseService.Maps.Add(map_1);
+			DatabaseService.SaveChanges();
+
 		}
 
 	#endregion
