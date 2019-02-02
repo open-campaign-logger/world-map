@@ -56,6 +56,13 @@ namespace CampaignKit.WorldMap.Entities
 		public DateTime CreationTimestamp { get; set; }
 
 		/// <summary>
+		///     Gets or sets the update timestamp.
+		/// </summary>
+		/// <value>The update timestamp.</value>
+		[Column(TypeName = "datetime")]
+		public DateTime UpdateTimestamp { get; set; }
+
+		/// <summary>
 		///     Gets or sets the file extension.
 		/// </summary>
 		/// <value>The file extension.</value>
@@ -81,10 +88,26 @@ namespace CampaignKit.WorldMap.Entities
 		public bool RepeatMapInX { get; set; }
 
 		/// <summary>
-		///     Gets or sets the secret.
+		///     Gets or sets the id of the user this map belongs to.
 		/// </summary>
-		/// <value>The secret.</value>
+		/// <value>The user id.</value>
+		public string UserId { get; set; }
+
+		/// <summary>
+		///		Gets or sets the map secret.
+		/// </summary>
+		/// <value>
+		/// The map secret.  Used for providing access to non-registered users.
+		/// </value>
 		public string Secret { get; set; }
+
+		/// <summary>
+		///		Gets or sets a value indicating whether this instance is public.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance is public; otherwise, <c>false</c>.
+		/// </value>
+		public bool IsPublic { get; set; }
 
 		/// <summary>
 		///     Gets or sets the world folder path.
@@ -109,7 +132,7 @@ namespace CampaignKit.WorldMap.Entities
 		/// </summary>
 		/// <value>A JSON representation of child marker entities for this map.</value>
 		public string MarkerData { get; set; }
-
+		
 		#endregion Public Properties
 	}
 }
