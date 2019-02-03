@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
@@ -54,6 +55,12 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 		/// </summary>
 		/// <value>The client.</value>
 		public HttpClient Client { get; }
+
+		/// <summary>
+		///		Gets the client handler.
+		/// </summary>
+		/// <value>The client handler.</value>
+		public HttpMessageHandler ClientHander { get; set; }
 
 		/// <summary>
 		/// Gets or sets the file path service.
@@ -150,7 +157,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 			// Create the http client.
 			Client = _server.CreateClient();
 			Client.BaseAddress = new Uri("http://localhost");
-
+						
 			// Get Services from Scope
 			DatabaseService = _server.Host.Services.GetRequiredService<WorldMapDBContext>();
 			FilePathService  = _server.Host.Services.GetRequiredService<IFilePathService>();

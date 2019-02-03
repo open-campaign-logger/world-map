@@ -25,14 +25,14 @@ var template = '<div id="popup_{id}" class="popup">\
 // This is used for testing purposes only.
 function loadMarkers(secret) {
 
-    var url = "/Map/MarkerData/" + mapId;
+    var requestUrl = "/Map/MarkerData/" + mapId;
     if (secret) {
-        url += "?secret=" + secret;
+        requestUrl += "?secret=" + secret;
     }
 
     $.ajax({
         type: "GET",
-        url: "/Map/MarkerData/" + mapId,
+        url: requestUrl,
         contentType: "application/json",
         dataType: "json",
         success: function (response) {
@@ -85,6 +85,17 @@ function loadMarkers(secret) {
 // This is used for testing purposes only.
 function saveMarkers() {
 
+    // Verify that user has logged in
+    if (!isAuthenticated) {
+        return;
+    }
+
+    // Ensure that the user is the map owner
+    if (userId !== mapUserId) {
+        return;
+    }
+
+    // Create a variable to hold map data to submit
     var data = [];
 
     // Create an array of layer items

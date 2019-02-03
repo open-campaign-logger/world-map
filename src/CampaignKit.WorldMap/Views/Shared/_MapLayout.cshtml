@@ -52,6 +52,9 @@ limitations under the License.
 		//                  Map Setup
 		// **********************************************
 
+		// Capture the map credentials
+		var mapUserId = '@Model.UserId';
+
 		// Create the map box
 		mapId = @Model.Id;
 		var map = L.map('map').setView([0, 0], 2);
@@ -90,7 +93,7 @@ limitations under the License.
 		map.on(L.Draw.Event.DELETED, drawnItemEdited);
 
 		// Import marker data
-		loadMarkers(@Model.Secret);
+		loadMarkers('@Model.Secret');
 
 	</script>
 	@RenderSection("scripts", false)

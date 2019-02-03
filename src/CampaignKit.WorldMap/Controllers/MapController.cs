@@ -149,7 +149,8 @@ namespace CampaignKit.WorldMap.Controllers
 				FileExtension = Path.GetExtension(model.Image.FileName ?? string.Empty).ToLower(),
 				RepeatMapInX = model.RepeatMapInX,
 				IsPublic = model.IsPublic,
-				Secret = model.Secret
+				Secret = model.Secret,
+				MarkerData = String.Empty
 			};
 
 			var id = await _mapRepository.Create(map, model.Image.OpenReadStream(), User);
@@ -335,7 +336,8 @@ namespace CampaignKit.WorldMap.Controllers
 			var model = new MapShowViewModel
 			{
 				Name = map.Name,
-				Id = map.MapId
+				Id = map.MapId,
+				UserId = map.UserId
 			};
 
 			ViewBag.MaxZoomLevel = map.MaxZoomLevel;
@@ -353,20 +355,25 @@ namespace CampaignKit.WorldMap.Controllers
 		/// <param name="showProgress">if set to <c>true</c> [show progress].</param>
 		/// <returns>The selected map.</returns>
 		[HttpGet]
-		[Authorize]
 		public async Task<IActionResult> Show(int id, string secret = null, bool showProgress = false)
 		{
-			var map = await _mapRepository.Find(id, User, secret);
-
-			if (map == null)
+			// Determine if user can view map
+			var canView = await _mapRepository.CanView(id, User, secret);
+			if (!canView)
+			{
 				return ShowErrorView();
+			}
 
+			// Retrieve the map
+			var map = await _mapRepository.Find(id, User, secret);
+				
+			// Create a view model
 			var protocol = Request.IsHttps ? "https" : "http";
-
 			var model = new MapShowViewModel
 			{
 				Name = map.Name,
 				Secret = secret,
+				UserId = map.UserId,
 				ShowProgress = showProgress,
 				ProgressUrl = Url.Action(nameof(Progress), new { Id = id }),
 				ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Secret = secret }, protocol, Request.Host.Value),
@@ -395,12 +402,23 @@ namespace CampaignKit.WorldMap.Controllers
 		[HttpGet]
 		public async Task<IActionResult> MarkerData(int id, string secret)
 		{
+			// Determine if user can view map
+			var canView = await _mapRepository.CanView(id, User, secret);
+			if (!canView)
+			{
+				return ShowErrorView();
+			}
+
+			// Retrieve the map
 			var map = await _mapRepository.Find(id, User, secret);
 
-			if (map == null)
-				return ShowErrorView();
-
-			return Json(map.MarkerData);
+			// Create response data
+			var markerData = map.MarkerData;
+			if (String.IsNullOrEmpty(markerData))
+			{
+				markerData = "[]";
+			}
+			return Json(markerData);
 		}
 
 		/// <summary>

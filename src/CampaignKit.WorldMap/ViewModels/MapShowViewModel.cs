@@ -31,6 +31,12 @@ namespace CampaignKit.WorldMap.ViewModels
 		public int Id { get; set; }
 
 		/// <summary>
+		///		The userid of the map owner.
+		/// </summary>
+		/// <value>The user id.</value>
+		public string UserId { get; set; }
+
+		/// <summary>
 		///     Gets the map base delete URL.
 		/// </summary>
 		/// <value>The map base delete URL.</value>

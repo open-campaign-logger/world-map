@@ -74,6 +74,13 @@ namespace CampaignKit.WorldMap.Entities
 		/// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
 		Task<bool> CanEdit(int id, ClaimsPrincipal user);
 
+		/// <summary>Determines if user has rights to view the map.</summary>
+		/// <param name="id">The map identifier.</param>
+		/// <param name="user">The authenticated user.</param>
+		/// <param name="secret">The map's secret key.</param>
+		/// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
+		Task<bool> CanView(int id, ClaimsPrincipal user, string secret);
+
 		#endregion Public Methods
 	}
 
@@ -224,8 +231,6 @@ namespace CampaignKit.WorldMap.Entities
 			return map;
 
 		}
-
-
 
 		/// <summary>
 		/// Finds all maps that the user is authorized to see.
@@ -457,6 +462,52 @@ namespace CampaignKit.WorldMap.Entities
 				return false;
 			}
 
+			// Determine if the user has rights to delete the map
+			if (!map.UserId.Equals(userid))
+			{
+				_loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
+				return false;
+			}
+
+			return true;
+
+		}
+
+		/// <summary>Determines if user has rights to view the map.</summary>
+		/// <param name="id">The map identifier.</param>
+		/// <param name="user">The authenticated user.</param>
+		/// <param name="secret">The map's secret key.</param>
+		/// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
+		public async Task<bool> CanView(int id, ClaimsPrincipal user, string secret)
+		{
+
+			// Retrieve the map entry and any associated markers.
+			var map = await _dbContext.Maps
+				.FirstOrDefaultAsync(m => m.MapId == id);
+
+			// Ensure map has been found
+			if (map == null)
+			{
+				_loggerService.LogError($"Map with id:{id} not found");
+				return false;
+			}
+
+			// Determine if this is a public map
+			if (map.IsPublic)
+			{
+				return true;
+			}
+
+			// Determine if provided secret matches
+			var isSecretProvided = !String.IsNullOrEmpty(secret);
+			if (isSecretProvided && map.Secret.Equals(secret))
+			{
+				return true;
+			}
+
+			// Determine if user is authenticated
+			var userid = _userManagerService.GetUserId(user);
+					   			 
 			// Determine if the user has rights to delete the map
 			if (!map.UserId.Equals(userid))
 			{
