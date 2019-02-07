@@ -45,5 +45,5 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - Integration Testing with OpenID Connect: https://github.com/stottle-uk/IntegrationTestingWithIdentityServer
 - Mocking authentication in integration tests: https://github.com/jackowild/aspnetcore-bypassing-authentication/tree/master/MockingAuthApi
 - Sharing test context between tests: https://xunit.github.io/docs/shared-context
-
+- Supporting AntiForgeryTokens: https://www.matheus.ro/2018/09/03/integration-tests-in-asp-net-core-controllers/
 

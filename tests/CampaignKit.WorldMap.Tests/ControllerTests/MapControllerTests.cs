@@ -15,15 +15,16 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 		}
 
 		[Theory]
-		[InlineData("/Map/Create", "")]
-		[InlineData("/Map/Delete", "")]
-		[InlineData("/Map/Edit", "")]
-		[InlineData("/Map/Progress", "")]
-		public async Task TestAuthorizedGets(string page, string titleTestString)
+		[InlineData("/Map/Create")]
+		[InlineData("/Map/Delete")]
+		[InlineData("/Map/Edit")]
+		[InlineData("/Map/Progress")]
+		public async Task TestAuthorizedGets(string page)
 		{
 			var response = await _testFixture.Client.GetAsync(page);
 			response.EnsureSuccessStatusCode();
-
+			var token = await AntiForgeryHelper.EnsureAntiForgeryTokenAsync(_testFixture.Client, page);
+			Assert.NotNull(token);
 		}
 
 	}
