@@ -36,19 +36,3 @@ function deleteJWTCookie() {
     document.cookie = '.worldmap.ui=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
-// Determine if user has valid access token
-var isAuthenticated = false;
-var userId = '';
-mgr.getUser().then(function (user) {
-    if (user) {
-        isAuthenticated = true;
-        if (document.cookie.indexOf('.worldmap.ui=') <= 0) {
-            getJWTCookie();
-        }
-        userId = user.profile.sub;
-    }
-    else {
-        isAuthenticated = false;
-        deleteJWTCookie();
-    }
-});

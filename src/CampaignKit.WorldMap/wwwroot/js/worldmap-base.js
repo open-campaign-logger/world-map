@@ -12,11 +12,20 @@ function logout() {
     mgr.signoutRedirect();
 }
 
-// Determine if user is logged in.
-if (isAuthenticated) {
-    $(".loggedout").hide();
-} else {
-    $(".loggedin").hide();
-}
+// Determine if user has valid access token
+var isAuthenticated = false;
+var userId = '';
+mgr.getUser().then(function (user) {
+    if (user) {
+        isAuthenticated = true;
+        userId = user.profile.sub;
+        $(".loggedout").hide();
+    }
+    else {
+        isAuthenticated = false;
+        $(".loggedin").hide();
+    }
+});
+
 
 

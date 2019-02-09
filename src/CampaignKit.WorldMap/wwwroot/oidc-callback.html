@@ -6,8 +6,10 @@
 </head>
 <body>
 	<script src="js/oidc-client.js"></script>
+	<script src="js/worldmap-core.js"></script>
 	<script>
-		new Oidc.UserManager().signinRedirectCallback().then(function () {
+		mgr.signinRedirectCallback().then(function () {
+			getJWTCookie();
 			window.location = "/";
         }).catch(function (e) {
             console.error(e);

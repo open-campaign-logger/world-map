@@ -6,12 +6,14 @@
 </head>
 <body>
 	<script src="js/oidc-client.js"></script>
+	<script src="js/worldmap-core.js"></script>
 	<script>
-		new Oidc.UserManager().signoutRedirectCallback().then(function () {
+		mgr.signoutRedirectCallback().then(function () {
+			deleteJWTCookie();
 			window.location = "/";
-        }).catch(function (e) {
-            console.error(e);
-        });
+		}).catch(function (e) {
+			console.error(e);
+		});
 	</script>
 </body>
 </html>
