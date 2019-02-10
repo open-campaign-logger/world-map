@@ -1,7 +1,8 @@
 ﻿// **********************************************
 //                 Globals
 // **********************************************
-var mapId = 1;
+var mapId, mapUserId, mapSecret, map;
+var featureGroup, drawControl;
 
 var template = '<div id="popup_{id}" class="popup">\
 <div class="popup_section">\
@@ -263,7 +264,6 @@ function popupClose(e) {
 
 }
 
-
 // **********************************************
 //              Utility Functions
 // **********************************************
@@ -282,3 +282,62 @@ var strLatLng = function (latlng) {
 var idLatLng = function (latlng) {
     return strLatLng(latlng).replace(/[\s\(\)\.]/g, "").replace(/[,]/g, "_");
 };
+
+
+// **********************************************
+//              Main Functions
+// **********************************************
+function initMap(pMapId, pMapUserId, pMapSecret, pWorldPath, pMaxZoomLevel, pNoWrap) {
+
+    // Populate global variables
+    mapId = pMapId;
+    mapUserId = pMapUserId;
+    mapSecret = pMapSecret;
+
+    // Clear the map if it already exists
+    if (map != undefined || map != null) {
+        map.off();
+        map.remove();
+        $("#map").html("");
+        $("#preMap").empty();
+        $("<div id=\"map\"></div>").appendTo("#preMap");
+    }
+
+    // Create the map box
+    map = L.map('map').setView([0, 0], 2);
+
+    L.tileLayer(pWorldPath + '/{z}/{x}_{y}.png', {
+        attribution: "Campaign Logger",
+        maxZoom: pMaxZoomLevel,
+        noWrap: (pNoWrap ? "true" : "false")
+    }).addTo(map);
+
+    // Add a feature group to the map to hold drawn items
+    featureGroup = L.featureGroup().addTo(map);
+
+    // Create a draw tool bar and bind it to the feature group
+    drawControl = new L.Control.Draw({
+        draw: {
+            position: 'topleft',
+            polygon: true,
+            polyline: false,
+            rectangle: true,
+            circle: true
+        },
+        edit: {
+            featureGroup: featureGroup
+        }
+    }).addTo(map);
+
+    // Add a listener to the map for items that are  added by a user
+    map.on(L.Draw.Event.CREATED, drawnItemCreated);
+
+    // Update all layers with any changes made by a user
+    map.on(L.Draw.Event.EDITED, drawnItemEdited);
+
+    // Update all layers with any changes made by a user
+    map.on(L.Draw.Event.DELETED, drawnItemEdited);
+
+    // Import marker data
+    loadMarkers(mapSecret);
+}

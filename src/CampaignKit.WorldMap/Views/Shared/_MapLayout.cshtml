@@ -40,7 +40,9 @@ limitations under the License.
 		}
 	</style>
 }
-<div id="map"></div>
+<div id="preMap">
+	<div id="map"></div>
+</div>
 @RenderBody()
 @section scripts {
 	<script src="~/js/leaflet.js"></script>
@@ -48,52 +50,13 @@ limitations under the License.
 	<script src="~/js/quill.js"></script>
 	<script src="~/js/worldmap-map.js"></script>
 	<script>
+
 		// **********************************************
-		//                  Map Setup
+		//               Initialize Map
 		// **********************************************
 
-		// Capture the map credentials
-		var mapUserId = '@Model.UserId';
+		initMap(@Model.Id, '@Model.UserId', '@Model.Secret', '@ViewBag.WorldPath', @ViewBag.MaxZoomLevel, '@ViewBag.NoWrap' );
 
-		// Create the map box
-		mapId = @Model.Id;
-		var map = L.map('map').setView([0, 0], 2);
-
-        L.tileLayer('@ViewBag.WorldPath/{z}/{x}_{y}.png', {
-            attribution: "Campaign Logger",
-            maxZoom: @ViewBag.MaxZoomLevel,
-            noWrap: @(ViewBag.NoWrap ? "true": "false"),
-            dummy: null
-		}).addTo(map);
-
-		// Add a feature group to the map to hold drawn items
-		var featureGroup = L.featureGroup().addTo(map);
-
-		// Create a draw tool bar and bind it to the feature group
-		var drawControl = new L.Control.Draw({
-			draw: {
-				position: 'topleft',
-				polygon: true,
-				polyline: false,
-				rectangle: true,
-				circle: true
-			},
-			edit: {
-				featureGroup: featureGroup
-			}
-		}).addTo(map);
-
-		// Add a listener to the map for items that are  added by a user
-		map.on(L.Draw.Event.CREATED, drawnItemCreated);
-
-		// Update all layers with any changes made by a user
-		map.on(L.Draw.Event.EDITED, drawnItemEdited);
-
-		// Update all layers with any changes made by a user
-		map.on(L.Draw.Event.DELETED, drawnItemEdited);
-
-		// Import marker data
-		loadMarkers('@Model.Secret');
 
 	</script>
 	@RenderSection("scripts", false)

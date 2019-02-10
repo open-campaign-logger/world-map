@@ -72,7 +72,8 @@ limitations under the License.
                             setTimeout(updateProgress, 500);
                         } else {
                             $progressBar.addClass('progress-bar-success');
-                            $('#close-button').addClass('btn-success').text('Done!');
+							$('#close-button').addClass('btn-success').text('Done!');
+							initMap(@Model.Id, '@Model.UserId', '@Model.Secret', '@ViewBag.WorldPath', @ViewBag.MaxZoomLevel, '@ViewBag.NoWrap');
                         }
                     } else {
                         $progressDialog.modal('hide');
@@ -89,7 +90,6 @@ limitations under the License.
                 keyboard: false
             });
             updateProgress();
-
 		});
 		
     </script>
