@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+</head>
+<body>
+	<script src="js/oidc-client.js"></script>
+	<script src="js/worldmap-core.js"></script>
+	<script>
+		mgr.signoutRedirectCallback().then(function () {
+			deleteJWTCookie();
+			window.location = "/";
+		}).catch(function (e) {
+			console.error(e);
+		});
+	</script>
+</body>
+</html>

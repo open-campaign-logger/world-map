@@ -31,43 +31,29 @@ namespace CampaignKit.WorldMap.ViewModels
 		public int Id { get; set; }
 
 		/// <summary>
+		///		The userid of the map owner.
+		/// </summary>
+		/// <value>The user id.</value>
+		public string UserId { get; set; }
+
+		/// <summary>
 		///     Gets the map base delete URL.
 		/// </summary>
 		/// <value>The map base delete URL.</value>
-		public string MapBaseDeleteUrl { get; set; }
+		public string DeleteUrl { get; set; }
 
 		/// <summary>
 		///     Gets the map base edit URL.
 		/// </summary>
 		/// <value>The map base edit URL.</value>
-		public string MapBaseEditUrl { get; set; }
-
-		/// <summary>
-		///     Gets or sets the map edit URL.
-		/// </summary>
-		/// <value>The map edit URL.</value>
-		public string MapEditUrl { get; set; }
-
+		public string EditUrl { get; set; }
+		
 		/// <summary>
 		///     Gets or sets the map show URL.
 		/// </summary>
 		/// <value>The map show URL.</value>
-		public string MapShowUrl { get; set; }
-
-		/// <summary>
-		///     Gets or sets the marker update URL.
-		///     HTTPPost: Marker data to update.
-		/// </summary>
-		/// <value>The marker update URL.</value>
-		public string MarkerUpdateUrl { get; set; }
-
-		/// <summary>
-		///     Gets or sets the marker delete URL.
-		///     HTTPPost: Marker data to delete.
-		/// </summary>
-		/// <value>The marker delete URL.</value>
-		public string MarkerDeleteUrl { get; set; }
-
+		public string ShowUrl { get; set; }
+		
 		/// <summary>
 		///     Gets or sets the name.
 		/// </summary>
@@ -91,6 +77,14 @@ namespace CampaignKit.WorldMap.ViewModels
 		/// </summary>
 		/// <value><c>true</c> if [show progress]; otherwise, <c>false</c>.</value>
 		public bool ShowProgress { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the user can edit.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance can edit; otherwise, <c>false</c>.
+		/// </value>
+		public bool CanEdit { get; set; }
 
         #endregion Public Properties
     }

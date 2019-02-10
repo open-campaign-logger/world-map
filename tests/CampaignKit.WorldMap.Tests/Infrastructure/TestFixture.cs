@@ -22,15 +22,19 @@ using CampaignKit.WorldMap.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 
-namespace CampaignKit.WorldMap.Tests.IntegrationTests
+namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
+
 	/// <inheritdoc />
 	/// <summary>
 	///     A test fixture which hosts the target project (project we wish to test) in an in-memory server.
 	/// </summary>
-	/// <typeparam name="TStartup">Target project's startup type</typeparam>
-	public sealed class TestFixture<TStartup> : IDisposable
+	/// <typeparam name="TMainStartup">Target project's startup type.</typeparam>
+	/// <typeparam name="TTestStartup">Actual startup implementation to use for the test.</typeparam>
+	public sealed class TestFixture<TMainStartup, TTestStartup> : IDisposable
 	{
 		#region Static Fields
 
@@ -45,13 +49,18 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		#endregion
 
 		#region Public Properties
-
-
+		
 		/// <summary>
 		///     Gets the client.
 		/// </summary>
 		/// <value>The client.</value>
 		public HttpClient Client { get; }
+
+		/// <summary>
+		///		Gets the client handler.
+		/// </summary>
+		/// <value>The client handler.</value>
+		public HttpMessageHandler ClientHander { get; set; }
 
 		/// <summary>
 		/// Gets or sets the file path service.
@@ -68,7 +77,7 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// The map data service.
 		/// </value>
 		public IMapRepository MapDataService { get; set; }
-		
+
 		/// <summary>
 		/// Gets or sets the progress service.
 		/// </summary>
@@ -129,19 +138,18 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		/// <param name="solutionRelativeTargetProjectParentDir">The solution relative target project parent dir.</param>
 		private TestFixture(string solutionRelativeTargetProjectParentDir)
 		{
-			var startupAssembly = typeof(TStartup).GetTypeInfo().Assembly;
+			var startupAssembly = typeof(TMainStartup).GetTypeInfo().Assembly;
 			var contentRoot = GetProjectPath(solutionRelativeTargetProjectParentDir, startupAssembly);
 
 			// Create a web host builder
 			// This is an older 1.x approach
 			// Preferred method for 2.x is to use 
 			// Create default builder: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
-			
+
 			var builder = new WebHostBuilder()
 				.UseContentRoot(contentRoot)
 				.UseEnvironment("Testing")
-				.UseStartup(typeof(Startup));
-
+				.UseStartup(typeof(TTestStartup));
 
 			// Instantiate the web host
 			_server = new TestServer(builder);
@@ -149,10 +157,40 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 			// Create the http client.
 			Client = _server.CreateClient();
 			Client.BaseAddress = new Uri("http://localhost");
-			
+						
+			// Get Services from Scope
+			DatabaseService = _server.Host.Services.GetRequiredService<WorldMapDBContext>();
+			FilePathService  = _server.Host.Services.GetRequiredService<IFilePathService>();
+			MapDataService  = _server.Host.Services.GetRequiredService<IMapRepository>();
+			ProgressService  = _server.Host.Services.GetRequiredService<IProgressService>();
+			RandomDataService = _server.Host.Services.GetRequiredService<IRandomDataService>();
+
+			// Create sample map
+			// Create a sample map
+			var map_1 = new Map()
+			{
+				AdjustedSize = 4000,
+				ContentType = "image/png",
+				Copyright = "Copyright 2017 Jochen Linnemann ",
+				CreationTimestamp = DateTime.Today.AddDays(-2),
+				FileExtension = ".png",
+				MaxZoomLevel = 4,
+				Name = "Sample",
+				RepeatMapInX = false,
+				UserId = TestAuthenticationOptions.TEST_ID,
+				WorldFolderPath = "C:\\Users\\mf1939\\source\\repos\\open-campaign-logger\\world-map\\src\\CampaignKit.WorldMap\\wwwroot\\world\\1",
+				ThumbnailPath = "~/world/1/0/zoom-level.png",
+				MarkerData = "[{ \"options\": { }, \"properties\": { } ] ",
+				Secret = "lNtqjEVQ",
+				IsPublic = true
+			};
+
+			DatabaseService.Maps.Add(map_1);
+			DatabaseService.SaveChanges();
+
 		}
 
-		#endregion
+	#endregion
 
 		#region Implementations
 
@@ -161,10 +199,10 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
 		///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose()
-		{
-			Client.Dispose();
-			_server.Dispose();
-		}
+			{
+				Client.Dispose();
+				_server.Dispose();
+			}
 
 		#endregion
 

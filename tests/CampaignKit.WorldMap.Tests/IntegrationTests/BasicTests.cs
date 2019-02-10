@@ -1,73 +1,49 @@
-﻿using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-
-using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Tests.IntegrationTests;
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
 
 using Xunit;
 
-namespace CampaignKit.WorldMap.Tests.IntegrationTests
+namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
-	public class BasicTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+	public class BasicTests : IClassFixture<TestFixture<Startup, TestStartupNoAuth>>
 	{
 
-		private readonly CustomWebApplicationFactory<Startup> _factory;
-		private HttpClient _client;
-		
-		public BasicTests(CustomWebApplicationFactory<Startup> webApplicationFactory)
+		private readonly TestFixture<Startup, TestStartupNoAuth> _testFixture;
+
+		public BasicTests(TestFixture<Startup, TestStartupNoAuth> testFixture)
 		{
-			this._factory = webApplicationFactory;
-			this._client = webApplicationFactory.CreateClient();
-			
+			this._testFixture = testFixture;
 		}
 
 		[Fact]
-		public async Task TestHTTPResponse()
+		public async Task TestWebServer()
 		{
-			// Arrange & Act
-			var response = await _client.GetAsync("/");
+			// Is the application home page available
+			var response = await _testFixture.Client.GetAsync("/");
 			response.EnsureSuccessStatusCode();
 			var stringResponse = await response.Content.ReadAsStringAsync();
 		}
-
+		
 		[Fact]
-		public void TestDataExists()
+		public void TestDatabase()
 		{
-			// Build the service provider.
-			var hostServices = _factory.Server.Host.Services;
-
-			using (var scope = hostServices.CreateScope())
-			{
-				// Get the service provider
-				var scopedServices = scope.ServiceProvider;
-
-				// Retrieve services from the scoped context
-				var service = scopedServices.GetService<WorldMapDBContext>();
-				Assert.True(service.Maps.Count() > 0);
-			}
+			// Is the database accessible?
+			Assert.True(_testFixture.DatabaseService.Database.CanConnect());
 		}
 
-
-		[Fact]
-		public void TestDatabaseExists()
+		[Theory]
+		[InlineData("/", "<h3>Welcome, Adventurer!</h3>")]
+		[InlineData("/Home", "<h3>Welcome, Adventurer!</h3>")]
+		[InlineData("/Home/Index", "<h3>Welcome, Adventurer!</h3>")]
+		[InlineData("/Home/Legalities", "<h2>Legalities</h2>")]
+		[InlineData("/Map/Sample", "<a href=\"/Map/Sample\">Sample</a>")]
+		[InlineData("/Map", "<a href=\"/\">World Map</a> - Map Index")]
+		public async Task TestPublicPages(string page, string titleTestString)
 		{
-			// Build the service provider.
-			var hostServices = _factory.Server.Host.Services;
-
-			using (var scope = hostServices.CreateScope())
-			{
-				// Get the service provider
-				var scopedServices = scope.ServiceProvider;
-
-				// Retrieve services from the scoped context
-				var db = scopedServices.GetService<WorldMapDBContext>();
-				Assert.True(db.Database.CanConnect());
-			}
-
+			var response = await _testFixture.Client.GetAsync(page);
+			response.EnsureSuccessStatusCode();
+			var stringResponse = await response.Content.ReadAsStringAsync();
+			Assert.Contains(titleTestString, stringResponse);
 		}
-			   
+
 	}
 }

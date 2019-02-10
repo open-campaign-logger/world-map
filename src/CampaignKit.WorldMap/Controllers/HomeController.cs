@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 
 using CampaignKit.WorldMap.Entities;
 
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +44,7 @@ namespace CampaignKit.WorldMap.Controllers
 		///		The application logging service.
 		/// </summary>
 		private readonly ILogger _loggerService;
-
+		
 		#endregion Private Fields
 
 		#region Public Constructors
@@ -68,11 +72,14 @@ namespace CampaignKit.WorldMap.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
-			var model = (await _mapRepository.FindAll())
+			// Retrieve a listing of maps for this user.  
+			// Anonymous User: all public maps
+			// Authenticated User: all public and owned maps.
+			var model = (await _mapRepository.FindAll(User, true))
 				.Where(m => m.MapId != 1)
 				.OrderByDescending(m => m.CreationTimestamp)
 				.Take(3);
-			
+
 			return View(model);
 		}
 
@@ -86,6 +93,24 @@ namespace CampaignKit.WorldMap.Controllers
 			return View();
 		}
 
+		/// <summary>
+		///		This action is called via an Ajax call with the 
+		///		JWT bearer details in the request header.  The action itself 
+		///		does nothing but the middleware will intercept the
+		///		JWT authorization token in the request header and create a 
+		///		new client side cookie containing the JWT auth token so that 
+		///		subsequent form submits will be able to send in the auth details
+		///		automatically.
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		[Authorize]
+		public ActionResult JwtCookie()
+		{
+			return View();
+		}
+
 		#endregion Public Methods
+
 	}
 }

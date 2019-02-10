@@ -20,12 +20,15 @@ limitations under the License.
     ViewBag.Title = "Showing " + Model.Name;
 }
 
+@if (Model.CanEdit)
+{
 <div style="position: absolute; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000;">
     <div style="position: absolute; right: 20px; bottom: 20px; pointer-events: all;">
-        <a href="#" id="deleteLink" style="padding: 10px;"><span class="glyphicon glyphicon-trash lead"></span></a>
-        <a href="#" id="editLink" style="padding: 10px;"><span class="glyphicon glyphicon-pencil lead"></span></a>
+        <a href="@Model.DeleteUrl" id="deleteLink" style="padding: 10px;"><span class="glyphicon glyphicon-trash lead"></span></a>
+        <a href="@Model.EditUrl" id="editLink" style="padding: 10px;"><span class="glyphicon glyphicon-pencil lead"></span></a>
     </div>
 </div>
+}
 
 @if (Model.ShowProgress)
 {
@@ -43,12 +46,8 @@ limitations under the License.
                     @if (!string.IsNullOrWhiteSpace(Model.Secret))
                     {
                         <div class="form-group">
-                            <label class="control-label" asp-for="MapShowUrl">Use this URL to <b>share</b> your map</label>
-                            <input class="form-control" asp-for="MapShowUrl" readonly />
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label" asp-for="MapEditUrl">Use this URL to <b>edit</b> your map (don't share this URL!)</label>
-                            <input class="form-control" asp-for="MapEditUrl" readonly />
+                            <label class="control-label" asp-for="ShowUrl">Use this URL to <b>share</b> your map</label>
+                            <input class="form-control" asp-for="ShowUrl" readonly />
                         </div>
                     }
                 </div>
@@ -91,40 +90,6 @@ limitations under the License.
             });
             updateProgress();
 
-            function createBlock() {
-                var $message = $('<div>');
-                var $secrectKey = $('<input type="text" class="form-control">');
-                $message.append($('<label class="control-label">').text('Please enter the secret key for this map:'));
-                $message.append($secrectKey);
-
-                return { message: $message, secrectKey: $secrectKey };
-            }
-
-            $('#deleteLink').click(function () {
-                var block = createBlock();
-                BootstrapDialog.confirm({
-                    title: 'Delete map',
-                    message: block.message,
-                    callback: function (confirmed) {
-                        if (confirmed) location.href = '@Model.MapBaseDeleteUrl?Secret=' + block.secrectKey.val();
-                    }
-                });
-
-                return false;
-            });
-
-            $('#editLink').click(function () {
-                var block = createBlock();
-                BootstrapDialog.confirm({
-                    title: 'Edit map',
-                    message: block.message,
-                    callback: function (confirmed) {
-                        if (confirmed) location.href = '@Model.MapBaseEditUrl?Secret=' + block.secrectKey.val();
-                    }
-                });
-
-                return false;
-            });
 		});
 		
     </script>

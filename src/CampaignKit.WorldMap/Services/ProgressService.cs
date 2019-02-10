@@ -89,17 +89,16 @@ namespace CampaignKit.WorldMap.Entities
 			var completed = tiles.Where(t => t.CompletionTimestamp > DateTime.MinValue).Count();
 
 			// Are there tiles defined for this map?
-			if (completed < total)
+			if (total > 0)
 			{
 				// Calculate the percentage complete ensuring to strongly type the 
 				// dividend and divisor so that the rounding does not occur during calculation
 				// and the resulting quotient is the correct data type.
 				progress = (double)completed / (double)total;
-
-			}
-			else
+			} else
 			{
-				_logger.LogError($"No tiles found for map with id={mapId}");
+				// nothing to do
+				progress = 1;
 			}
 
 			// Return the progress value
