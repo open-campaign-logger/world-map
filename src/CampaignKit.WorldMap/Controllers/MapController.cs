@@ -233,20 +233,23 @@ namespace CampaignKit.WorldMap.Controllers
 			}
 
 			// Load model
-			var model = await _mapRepository.Find(id, User, String.Empty);
-			if (model == null)
+			var map = await _mapRepository.Find(id, User, String.Empty);
+			if (map == null)
 			{
 				return EditErrorView();
 			}
 
 			// Return edit screen
+			var protocol = Request.IsHttps ? "https" : "http";
 			return View(new MapEditViewModel
 			{
-				Name = model.Name,
-				Copyright = model.Copyright,
-				RepeatMapInX = model.RepeatMapInX,
-				MakeMapPublic = model.IsPublic
-			});
+				Name = map.Name,
+				Copyright = map.Copyright,
+				RepeatMapInX = map.RepeatMapInX,
+				MakeMapPublic = map.IsPublic,
+				ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Secret = map.Secret }, protocol, Request.Host.Value),
+				
+		});
 
 		}
 
@@ -254,13 +257,12 @@ namespace CampaignKit.WorldMap.Controllers
 		///		POST: /Map/Edit/{id?}
 		/// </summary>
 		/// <param name="id">The identifier.</param>
-		/// <param name="secret">The secret.</param>
 		/// <param name="model">The model.</param>
 		/// <returns>Map show view.</returns>
 		[HttpPost]
 		[Authorize]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, string secret, MapEditViewModel model)
+		public async Task<IActionResult> Edit(int id, MapEditViewModel model)
 		{
 			// Determine if provided data is valid
 			if (!ModelState.IsValid)
@@ -292,7 +294,7 @@ namespace CampaignKit.WorldMap.Controllers
 				ModelState.AddModelError(string.Empty,
 					"Your map could not be saved. Please try again.");
 			else
-				return RedirectToAction(nameof(Show), new { map.MapId, String.Empty , ShowProgress = true });
+				return RedirectToAction(nameof(Show), new { model.Id });
 
 			return View();
 		}

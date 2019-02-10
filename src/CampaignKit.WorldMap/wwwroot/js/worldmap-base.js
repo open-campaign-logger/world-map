@@ -14,11 +14,11 @@ function logout() {
 
 // Determine if user has valid access token
 var isAuthenticated = false;
-var userId = '';
-mgr.getUser().then(function (user) {
-    if (user) {
+var user;
+mgr.getUser().then(function (obj) {
+    if (obj) {
         isAuthenticated = true;
-        userId = user.profile.sub;
+        user = obj;
         $(".loggedout").hide();
     }
     else {

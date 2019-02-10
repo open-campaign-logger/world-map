@@ -67,6 +67,12 @@ namespace CampaignKit.WorldMap.ViewModels
 		[Required]
 		public bool MakeMapPublic { get; set; }
 
+		/// <summary>
+		///     Gets or sets the map show URL.
+		/// </summary>
+		/// <value>The map show URL.</value>
+		public string ShowUrl { get; set; }
+
 		#endregion Public Properties
 
 	}

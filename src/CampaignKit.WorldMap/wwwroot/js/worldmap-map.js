@@ -91,7 +91,7 @@ function saveMarkers() {
     }
 
     // Ensure that the user is the map owner
-    if (userId !== mapUserId) {
+    if (user.profile.sub !== mapUserId) {
         return;
     }
 
