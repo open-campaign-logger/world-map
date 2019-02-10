@@ -8,12 +8,12 @@
 	<script src="js/oidc-client.js"></script>
 	<script src="js/worldmap-core.js"></script>
 	<script>
-		mgr.signinRedirectCallback().then(function () {
-			getJWTCookie();
+		mgr.signinRedirectCallback().then(function (user) {
+			getJWTCookie(user);
 			window.location = "/";
-        }).catch(function (e) {
-            console.error(e);
-        });
+		}).catch(function (e) {
+			console.error(e);
+		});
 	</script>
 </body>
 </html>

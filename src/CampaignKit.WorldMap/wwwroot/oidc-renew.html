@@ -1,12 +1,19 @@
-﻿<head>
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
 	<title></title>
 </head>
 <body>
 	<script src="js/oidc-client.js"></script>
+	<script src="js/worldmap-core.js"></script>
 	<script>
-		new Oidc.UserManager().signinSilentCallback()
-			.catch((err) => {
-				console.log(err);
-			});
+		mgr.signinSilentCallback().then(function (user) {
+			getJWTCookie(user);
+			window.location = "/";
+		}).catch(function (e) {
+			console.error(e);
+		});
 	</script>
 </body>
+</html>

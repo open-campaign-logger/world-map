@@ -17,18 +17,15 @@ const settings = {
 // Create an oidc-connect-js user manager
 var mgr = new Oidc.UserManager(settings);
 
-// Convert JWT token to cookie
-function getJWTCookie() {
-    mgr.getUser().then(function (user) {
+// Convert JWT token to JWT cookie
+function getJWTCookie(user) {
 
-        var url = `${rootUri}/Home/JwtCookie`;
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url);
-        xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
-        xhr.send();
-
-    });
+    var url = `${rootUri}/Home/JwtCookie`;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, false);
+    xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
+    xhr.send();
+       
 }
 
 // Cookie handling functions
