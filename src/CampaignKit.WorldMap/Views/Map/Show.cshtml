@@ -20,12 +20,15 @@ limitations under the License.
     ViewBag.Title = "Showing " + Model.Name;
 }
 
+@if (Model.CanEdit)
+{
 <div style="position: absolute; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2000;">
     <div style="position: absolute; right: 20px; bottom: 20px; pointer-events: all;">
         <a href="@Model.DeleteUrl" id="deleteLink" style="padding: 10px;"><span class="glyphicon glyphicon-trash lead"></span></a>
         <a href="@Model.EditUrl" id="editLink" style="padding: 10px;"><span class="glyphicon glyphicon-pencil lead"></span></a>
     </div>
 </div>
+}
 
 @if (Model.ShowProgress)
 {

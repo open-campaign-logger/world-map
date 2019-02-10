@@ -366,6 +366,9 @@ namespace CampaignKit.WorldMap.Controllers
 				return ShowErrorView();
 			}
 
+			// Determine if user can edit map
+			var canEdit = await _mapRepository.CanEdit(id, User);
+
 			// Retrieve the map
 			var map = await _mapRepository.Find(id, User, secret);
 				
@@ -381,7 +384,8 @@ namespace CampaignKit.WorldMap.Controllers
 				ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Secret = secret }, protocol, Request.Host.Value),
 				DeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
 				EditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
-				Id = id
+				Id = id,
+				CanEdit = canEdit
 			};
 
 			ViewBag.MaxZoomLevel = map.MaxZoomLevel;

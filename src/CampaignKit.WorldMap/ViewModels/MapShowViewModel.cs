@@ -78,6 +78,14 @@ namespace CampaignKit.WorldMap.ViewModels
 		/// <value><c>true</c> if [show progress]; otherwise, <c>false</c>.</value>
 		public bool ShowProgress { get; set; }
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the user can edit.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance can edit; otherwise, <c>false</c>.
+		/// </value>
+		public bool CanEdit { get; set; }
+
         #endregion Public Properties
     }
 }
