@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,101 +16,100 @@ using System.IO;
 
 using Microsoft.AspNetCore.Hosting;
 
-namespace CampaignKit.WorldMap.Entities
+namespace CampaignKit.WorldMap.Services
 {
-	/// <summary>
-	///     Interface IFilePathService
-	/// </summary>
-	public interface IFilePathService
-	{
-		#region Public Properties
+    /// <summary>
+    ///     Interface IFilePathService
+    /// </summary>
+    public interface IFilePathService
+    {
+        #region Properties
 
-		/// <summary>
-		///     Gets the application data path.
-		/// </summary>
-		/// <value>The application data path.</value>
-		string AppDataPath { get; }
+        /// <summary>
+        ///     Gets the application data path.
+        /// </summary>
+        /// <value>The application data path.</value>
+        string AppDataPath { get; }
 
-		/// <summary>
-		///     Gets the seed data path.
-		/// </summary>
-		/// <value>The seed data path.</value>
-		string SeedDataPath { get; }
+        /// <summary>
+        ///     Gets the world base path.
+        /// </summary>
+        /// <value>The world base path.</value>
+        string PhysicalWorldBasePath { get; }
 
-		/// <summary>
-		///     Gets the world base path.
-		/// </summary>
-		/// <value>The world base path.</value>
-		string PhysicalWorldBasePath { get; }
+        /// <summary>
+        ///     Gets the seed data path.
+        /// </summary>
+        /// <value>The seed data path.</value>
+        string SeedDataPath { get; }
 
-		/// <summary>
-		///     Gets the virtual world base path.
-		/// </summary>
-		/// <value>The virtual world base path.</value>
-		string VirtualWorldBasePath { get; }
+        /// <summary>
+        ///     Gets the virtual world base path.
+        /// </summary>
+        /// <value>The virtual world base path.</value>
+        string VirtualWorldBasePath { get; }
 
+        #endregion
+    }
 
-		#endregion Public Properties
-	}
+    /// <inheritdoc />
+    /// <summary>
+    ///     Class DefaultAppDataPathService.
+    /// </summary>
+    /// <seealso cref="T:CampaignKit.WorldMap.Services.IAppDataPathService" />
+    public class DefaultFilePathService : IFilePathService
+    {
+        #region Constructors
 
-	/// <inheritdoc />
-	/// <summary>
-	///     Class DefaultAppDataPathService.
-	/// </summary>
-	/// <seealso cref="T:CampaignKit.WorldMap.Services.IAppDataPathService" />
-	public class DefaultFilePathService : IFilePathService
-	{
-		#region Public Constructors
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DefaultFilePathService" /> class.
+        /// </summary>
+        /// <param name="env">The env.</param>
+        public DefaultFilePathService(IHostingEnvironment env)
+        {
+            AppDataPath = Path.Combine(env.ContentRootPath, "App_Data");
+            SeedDataPath = Path.Combine(AppDataPath, "Sample");
+            PhysicalWorldBasePath = Path.Combine(env.WebRootPath, "world");
+            VirtualWorldBasePath = "~/world";
+        }
 
-		/// <summary>
-		///     Initializes a new instance of the <see cref="DefaultFilePathService" /> class.
-		/// </summary>
-		/// <param name="env">The env.</param>
-		public DefaultFilePathService(IHostingEnvironment env)
-		{
-			AppDataPath = Path.Combine(env.ContentRootPath, "App_Data");
-			SeedDataPath = Path.Combine(AppDataPath, "Sample");
-			PhysicalWorldBasePath = Path.Combine(env.WebRootPath, "world");
-			VirtualWorldBasePath = "~/world";
-		}
+        #endregion
 
-		#endregion Public Constructors
+        #region IAppDataPathService Members
 
-		#region IAppDataPathService Members
+        #region Public Properties
 
-		#region Public Properties
+        /// <inheritdoc />
+        /// <summary>
+        ///     Gets the application data path.
+        /// </summary>
+        /// <value>The application data path.</value>
+        /// <exception cref="!:NotImplementedException"></exception>
+        public string AppDataPath { get; }
 
-		/// <inheritdoc />
-		/// <summary>
-		///     Gets the application data path.
-		/// </summary>
-		/// <value>The application data path.</value>
-		/// <exception cref="!:NotImplementedException"></exception>
-		public string AppDataPath { get; }
+        /// <inheritdoc />
+        /// <summary>
+        ///     Gets the world base path.
+        /// </summary>
+        /// <value>The world base path.</value>
+        public string PhysicalWorldBasePath { get; }
 
-		/// <inheritdoc />
-		/// <summary>
-		///     Gets the world base path.
-		/// </summary>
-		/// <value>The world base path.</value>
-		public string PhysicalWorldBasePath { get; }
+        /// <inheritdoc />
+        /// <summary>
+        ///     Gets or sets the virtual world base path.
+        /// </summary>
+        /// <value>The virtual world base path.</value>
+        public string VirtualWorldBasePath { get; }
 
-		/// <inheritdoc />
-		/// <summary>
-		///     Gets or sets the virtual world base path.
-		/// </summary>
-		/// <value>The virtual world base path.</value>
-		public string VirtualWorldBasePath { get; }
+        /// <inheritdoc />
+        /// <summary>
+        ///     Gets the seed data path.
+        /// </summary>
+        /// <value>The seed data path.</value>
+        public string SeedDataPath { get; }
 
-		/// <inheritdoc />		
-		/// <summary>
-		///     Gets the seed data path.
-		/// </summary>
-		/// <value>The seed data path.</value>
-		public string SeedDataPath { get; }
+        #endregion Public Properties
 
-		#endregion Public Properties
-
-		#endregion
-	}
+        #endregion
+    }
 }

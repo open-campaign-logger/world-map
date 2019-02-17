@@ -25,6 +25,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 
+using CampaignKit.WorldMap.Data;
+using CampaignKit.WorldMap.Services;
+
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
 

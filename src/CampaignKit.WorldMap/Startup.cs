@@ -17,6 +17,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 
+using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Entities;
 using CampaignKit.WorldMap.Services;
 

@@ -1,4 +1,6 @@
 ﻿using System;
+
+using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Entities;
 
 using Microsoft.AspNetCore.Hosting;

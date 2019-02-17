@@ -17,7 +17,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Entities;
+using CampaignKit.WorldMap.Services;
 
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
