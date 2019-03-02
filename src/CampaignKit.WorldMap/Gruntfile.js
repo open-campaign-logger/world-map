@@ -16,27 +16,27 @@
 /// <binding BeforeBuild='beforeBuild' />
 module.exports = function(grunt) {
     grunt.initConfig({
-        pkg: grunt.file.readJSON("package.json"),
+        pkg: grunt.file.readJSON('package.json'),
         copy: {
             leaflet: {
                 files: [
                     {
                         expand: true,
-                        cwd: "node_modules/leaflet/dist",
-                        src: "leaflet.js",
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/leaflet/dist',
+                        src: 'leaflet.js',
+                        dest: 'wwwroot/js/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/leaflet/dist",
-                        src: "leaflet.css",
-                        dest: "wwwroot/css/"
+                        cwd: 'node_modules/leaflet/dist',
+                        src: 'leaflet.css',
+                        dest: 'wwwroot/css/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/leaflet/dist/images",
-                        src: "**",
-                        dest: "wwwroot/css/images/"
+                        cwd: 'node_modules/leaflet/dist/images',
+                        src: '**',
+                        dest: 'wwwroot/css/images/'
                     }
                 ]
             },
@@ -44,21 +44,21 @@ module.exports = function(grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: "node_modules/leaflet-draw/dist",
-                        src: "leaflet.draw.js",
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/leaflet-draw/dist',
+                        src: 'leaflet.draw.js',
+                        dest: 'wwwroot/js/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/leaflet-draw/dist",
-                        src: "leaflet.draw.css",
-                        dest: "wwwroot/css/"
+                        cwd: 'node_modules/leaflet-draw/dist',
+                        src: 'leaflet.draw.css',
+                        dest: 'wwwroot/css/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/leaflet-draw/dist/images",
-                        src: "**",
-                        dest: "wwwroot/css/images/"
+                        cwd: 'node_modules/leaflet-draw/dist/images',
+                        src: '**',
+                        dest: 'wwwroot/css/images/'
                     }
                 ]
             },
@@ -66,15 +66,15 @@ module.exports = function(grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: "node_modules/quill/dist",
-                        src: "quill.js",
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/quill/dist',
+                        src: 'quill.js',
+                        dest: 'wwwroot/js/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/quill/dist",
-                        src: "*.css",
-                        dest: "wwwroot/css/"
+                        cwd: 'node_modules/quill/dist',
+                        src: '*.css',
+                        dest: 'wwwroot/css/'
                     }
                 ]
             },
@@ -82,9 +82,9 @@ module.exports = function(grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: "node_modules/oidc-client/dist",
-                        src: "oidc-client.js",
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/oidc-client/dist',
+                        src: 'oidc-client.js',
+                        dest: 'wwwroot/js/'
                     }
                 ]
             },
@@ -92,21 +92,21 @@ module.exports = function(grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: "node_modules/jQuery/dist",
-                        src: "**",
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/jQuery/dist',
+                        src: '**',
+                        dest: 'wwwroot/js/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/jquery-validation/dist",
-                        src: "*.js",
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/jquery-validation/dist',
+                        src: '*.js',
+                        dest: 'wwwroot/js/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/jquery-validation-unobtrusive",
-                        src: "jquery.validate.unobtrusive.js",
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/jquery-validation-unobtrusive',
+                        src: 'jquery.validate.unobtrusive.js',
+                        dest: 'wwwroot/js/'
                     }
                 ]
             },
@@ -114,33 +114,33 @@ module.exports = function(grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: "node_modules/bootstrap-sass/assets/fonts",
-                        src: "**",
-                        dest: "wwwroot/fonts/"
+                        cwd: 'node_modules/bootstrap-sass/assets/fonts',
+                        src: '**',
+                        dest: 'wwwroot/fonts/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/bootstrap-sass/assets/javascripts",
-                        src: ["bootstrap.js", "bootstrap.min.js"],
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/bootstrap-sass/assets/javascripts',
+                        src: ['bootstrap.js', 'bootstrap.min.js'],
+                        dest: 'wwwroot/js/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/bootstrap-dialog/dist/css",
-                        src: ["bootstrap-dialog.css", "bootstrap-dialog.min.css"],
-                        dest: "wwwroot/css/"
+                        cwd: 'node_modules/bootstrap-dialog/dist/css',
+                        src: ['bootstrap-dialog.css', 'bootstrap-dialog.min.css'],
+                        dest: 'wwwroot/css/'
                     },
                     {
                         expand: true,
-                        cwd: "node_modules/bootstrap-dialog/dist/js",
-                        src: ["bootstrap-dialog.js", "bootstrap-dialog.min.js"],
-                        dest: "wwwroot/js/"
+                        cwd: 'node_modules/bootstrap-dialog/dist/js',
+                        src: ['bootstrap-dialog.js', 'bootstrap-dialog.min.js'],
+                        dest: 'wwwroot/js/'
                     }
                 ]
             }
         },
         sass: {
-            "wwwroot/css/worldmap.css": ["wwwroot/css/worldmap.scss"]
+            "wwwroot/css/worldmap.css": ['wwwroot/css/worldmap.scss']
         },
         subgrunt: {
             bootswatch: {
@@ -148,18 +148,19 @@ module.exports = function(grunt) {
                     passGruntFlags: false
                 },
                 projects: {
-                    'node_modules/bootswatch-sass': "default"
+                    'node_modules/bootswatch-sass': 'default'
                 }
             }
         }
     });
 
-    grunt.loadNpmTasks("grunt-contrib-copy");
-    grunt.loadNpmTasks("grunt-contrib-sass");
-    grunt.loadNpmTasks("grunt-subgrunt");
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-subgrunt');
 
-    grunt.registerTask("default", ["copy:leaflet", "copy:jQuery", "copy:bootstrap", "copy:leaflet_draw", "copy:quill", "copy:oidcclient"]);
-    grunt.registerTask("default-sass", ["default", "sass"]);
-    grunt.registerTask("full", ["subgrunt:bootswatch", "default"]);
-    grunt.registerTask("beforeBuild", ["default"]);
+    grunt.registerTask('default',
+        ['copy:leaflet', 'copy:jQuery', 'copy:bootstrap', 'copy:leaflet_draw', 'copy:quill', 'copy:oidcclient']);
+    grunt.registerTask('default-sass', ['default', 'sass']);
+    grunt.registerTask('full', ['subgrunt:bootswatch', 'default']);
+    grunt.registerTask('beforeBuild', ['default']);
 };
