@@ -23,26 +23,29 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class MapEditViewModel
     {
+        #region Properties
 
-		#region Hidden Properties
-
-		/// <summary>
-		///     Gets or sets the Map identifier.
-		/// </summary>
-		/// <value>The map identifier.</value>
-		[HiddenInput]
-		public int Id { get; set; }
-
-		#endregion
-
-		#region Editable Properties
-
-		/// <summary>
-		///     Gets the copyright.
-		/// </summary>
-		/// <value>The copyright.</value>
-		[Display(Description = "You might want to provide copyright information for your creation.")]
+        /// <summary>
+        ///     Gets the copyright.
+        /// </summary>
+        /// <value>The copyright.</value>
+        [Display(Description = "You might want to provide copyright information for your creation.")]
         public string Copyright { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the Map identifier.
+        /// </summary>
+        /// <value>The map identifier.</value>
+        [HiddenInput]
+        public int Id { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether this map should be made public.
+        /// </summary>
+        /// <value><c>true</c> if this map should be made public; otherwise, <c>false</c>.</value>
+        [Display(Name = "This map should be made public so others can view it.")]
+        [Required]
+        public bool MakeMapPublic { get; set; }
 
         /// <summary>
         ///     Gets or sets the name.
@@ -59,21 +62,12 @@ namespace CampaignKit.WorldMap.ViewModels
         [Display(Name = "Repeat map horizontally")]
         public bool RepeatMapInX { get; set; }
 
-		/// <summary>
-		///     Gets or sets a value indicating whether this map should be made public.
-		/// </summary>
-		/// <value><c>true</c> if this map should be made public; otherwise, <c>false</c>.</value>
-		[Display(Name = "This map should be made public so others can view it.")]
-		[Required]
-		public bool MakeMapPublic { get; set; }
+        /// <summary>
+        ///     Gets or sets the map show URL.
+        /// </summary>
+        /// <value>The map show URL.</value>
+        public string ShowUrl { get; set; }
 
-		/// <summary>
-		///     Gets or sets the map show URL.
-		/// </summary>
-		/// <value>The map show URL.</value>
-		public string ShowUrl { get; set; }
-
-		#endregion Public Properties
-
-	}
+        #endregion
+    }
 }

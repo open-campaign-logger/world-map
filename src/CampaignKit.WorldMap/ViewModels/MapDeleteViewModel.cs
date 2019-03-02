@@ -12,37 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampaignKit.WorldMap.ViewModels
 {
-	/// <summary>
-	///     Class MapDeleteViewModel.
-	/// </summary>
-	public class MapDeleteViewModel
+    /// <summary>
+    ///     Class MapDeleteViewModel.
+    /// </summary>
+    public class MapDeleteViewModel
     {
+        #region Properties
 
-		#region Hidden Properties
+        /// <summary>
+        ///     Gets or sets the Map identifier.
+        /// </summary>
+        /// <value>The map identifier.</value>
+        [HiddenInput]
+        public int Id { get; set; }
 
-		/// <summary>
-		///     Gets or sets the Map identifier.
-		/// </summary>
-		/// <value>The map identifier.</value>
-		[HiddenInput]
-		public int Id { get; set; }
+        /// <summary>
+        ///     Gets or sets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        public string Name { get; set; }
 
-		#endregion
-
-		#region Public Properties
-
-		/// <summary>
-		///     Gets or sets the name.
-		/// </summary>
-		/// <value>The name.</value>
-		public string Name { get; set; }
-
-        #endregion Public Properties
-
+        #endregion
     }
 }

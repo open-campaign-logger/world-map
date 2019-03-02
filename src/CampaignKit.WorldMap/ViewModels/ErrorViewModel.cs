@@ -19,7 +19,7 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class ErrorViewModel
     {
-        #region Public Properties
+        #region Properties
 
         /// <summary>
         ///     Gets or sets the message.
@@ -33,6 +33,6 @@ namespace CampaignKit.WorldMap.ViewModels
         /// <value>The title.</value>
         public string Title { get; set; }
 
-        #endregion Public Properties
+        #endregion
     }
 }

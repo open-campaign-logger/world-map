@@ -12,36 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
 namespace CampaignKit.WorldMap.ViewModels
 {
-	/// <summary>
-	///     Class MapShowViewModel.
-	/// </summary>
-	public class MarkerEditViewModel
-	{
-		#region Public Constructor
-		public MarkerEditViewModel()
-		{
+    /// <summary>
+    ///     Class MapShowViewModel.
+    /// </summary>
+    public class MarkerEditViewModel
+    {
+        #region Constructors
 
-		}
-		#endregion
+        #region Public Constructor
 
-		#region Public Properties
+        #endregion
 
-		/// <summary>
-		///     Gets or sets the identifier.
-		/// </summary>
-		/// <value>The identifier.</value>
-		public int MapId { get; set; }
+        #endregion
 
-		/// <summary>
-		///		Map marker data in JSON format.
-		/// </summary>
-		public string MarkerData { get; set; }
+        #region Properties
 
-        #endregion Public Properties
+        /// <summary>
+        ///     Gets or sets the identifier.
+        /// </summary>
+        /// <value>The identifier.</value>
+        public int MapId { get; set; }
+
+        /// <summary>
+        ///     Map marker data in JSON format.
+        /// </summary>
+        public string MarkerData { get; set; }
+
+        #endregion
     }
 }
