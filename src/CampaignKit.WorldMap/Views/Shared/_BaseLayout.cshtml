@@ -16,9 +16,8 @@ limitations under the License.
 -->
 @{
 
-    var title = (string)ViewBag.Title;
+    var title = (string) ViewBag.Title;
     title = string.IsNullOrWhiteSpace(title) ? string.Empty : $"- {title.Trim()}";
-
 }
 <html>
 <head>
@@ -29,50 +28,62 @@ limitations under the License.
     @RenderSection("styles", false)
 </head>
 <body>
-	<header>
-		<nav class="navbar navbar-default">
-			<div class="container">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#worldmap-navbar-collapse" aria-expanded="false">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					<div class="navbar-brand">
-						<a href="~/">World Map</a> @title
-					</div>
-				</div>
-				<div class="collapse navbar-collapse" id="worldmap-navbar-collapse">
-					<ul class="nav navbar-nav navbar-right">
-						<li><a asp-controller="Map" asp-action="Sample">Sample</a></li>
-						<li class="loggedin"><a asp-controller="Map" asp-action="Create">Create your own!</a></li>
-						<li><a asp-controller="Map" asp-action="Index">See all</a></li>
-						<li class="loggedout"><a id="login" href="#">Login</a></li>
-						<li class="loggedin"><a id="logout" href="#">Logout</a></li>
-						<li><a asp-controller="Home" asp-action="Legalities">Legalities/Imprint</a></li>
-						<li class="navbar-image">
-							<a href="https://campaign-logger.com" target="_blank">
-								<img src="https://campaign-logger.com/img/icon.png" />
-							</a>
-						</li>
-					</ul>
-				</div>
-				@*<div>
+<header>
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#worldmap-navbar-collapse" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div class="navbar-brand">
+                    <a href="~/">World Map</a> @title
+                </div>
+            </div>
+            <div class="collapse navbar-collapse" id="worldmap-navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a asp-controller="Map" asp-action="Sample">Sample</a>
+                    </li>
+                    <li class="loggedin">
+                        <a asp-controller="Map" asp-action="Create">Create your own!</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Map" asp-action="Index">See all</a>
+                    </li>
+                    <li class="loggedout">
+                        <a id="login" href="#">Login</a>
+                    </li>
+                    <li class="loggedin">
+                        <a id="logout" href="#">Logout</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="Legalities">Legalities/Imprint</a>
+                    </li>
+                    <li class="navbar-image">
+                        <a href="https://campaign-logger.com" target="_blank">
+                            <img src="https://campaign-logger.com/img/icon.png" />
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            @*<div>
 					<pre id="results"></pre>
 				</div>*@
-			</div>
-		</nav>
-	</header>
-	@RenderBody()
-	<script src="~/js/jquery.min.js"></script>
-	<script src="~/js/jquery.validate.min.js"></script>
-	<script src="~/js/jquery.validate.unobtrusive.js"></script>
-	<script src="~/js/bootstrap.min.js"></script>
-	<script src="~/js/bootstrap-dialog.min.js"></script>
-	<script src="~/js/oidc-client.js"></script>
-	<script src="~/js/worldmap-core.js"></script>
-	<script src="~/js/worldmap-base.js"></script>
-	@RenderSection("scripts", false)
+        </div>
+    </nav>
+</header>
+@RenderBody()
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/jquery.validate.min.js"></script>
+<script src="~/js/jquery.validate.unobtrusive.js"></script>
+<script src="~/js/bootstrap.min.js"></script>
+<script src="~/js/bootstrap-dialog.min.js"></script>
+<script src="~/js/oidc-client.js"></script>
+<script src="~/js/worldmap-core.js"></script>
+<script src="~/js/worldmap-base.js"></script>
+@RenderSection("scripts", false)
 </body>
 </html>
