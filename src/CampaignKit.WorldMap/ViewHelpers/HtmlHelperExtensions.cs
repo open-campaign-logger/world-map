@@ -25,7 +25,7 @@ namespace CampaignKit.WorldMap.ViewHelpers
     /// </summary>
     public static class HtmlHelperExtensions
     {
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         ///     Descriptions for.
@@ -46,6 +46,6 @@ namespace CampaignKit.WorldMap.ViewHelpers
             return metadata.Description;
         }
 
-        #endregion Public Methods
+        #endregion
     }
 }
