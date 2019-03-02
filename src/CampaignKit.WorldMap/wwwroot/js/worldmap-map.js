@@ -1,4 +1,18 @@
-﻿// **********************************************
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// **********************************************
 //                 Globals
 // **********************************************
 var mapId, mapUserId, mapSecret, map;
@@ -18,7 +32,6 @@ var template = '<div id="popup_{id}" class="popup">\
 <div id="popup_editor_{id}" class="popup_editor"></div>\
 </div>';
 
-
 // **********************************************
 //              Map Event Handlers
 // **********************************************
@@ -26,23 +39,23 @@ var template = '<div id="popup_{id}" class="popup">\
 // This is used for testing purposes only.
 function loadMarkers(secret) {
 
-    var requestUrl = "/Map/MarkerData/" + mapId;
+    var requestUrl = `/Map/MarkerData/${mapId}`;
     if (secret) {
-        requestUrl += "?secret=" + secret;
+        requestUrl += `?secret=${secret}`;
     }
 
     $.ajax({
-        type: "GET",
+        type: 'GET',
         url: requestUrl,
-        contentType: "application/json",
-        dataType: "json",
-        success: function (response) {
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(response) {
 
-            var data = JSON.parse(response);
+            const data = JSON.parse(response);
 
-            for (var drawnitem of data) {
+            for (let drawnitem of data) {
 
-                var layer;
+                let layer;
 
                 if (drawnitem.properties.layerType == 'polygon') {
                     layer = L.polygon(drawnitem.latlngs);
@@ -76,7 +89,7 @@ function loadMarkers(secret) {
 
             };
         },
-        failure: function (response) {
+        failure: function(response) {
             alert(response);
         }
     });
@@ -97,19 +110,19 @@ function saveMarkers() {
     }
 
     // Create a variable to hold map data to submit
-    var data = [];
+    const data = [];
 
     // Create an array of layer items
-    for (var drawnItem of featureGroup.getLayers()) {
+    for (let drawnItem of featureGroup.getLayers()) {
         data.push(drawnItemToJSON(drawnItem));
     }
 
     // Prepare submission data
     // Note: model properties and values must be surrounded by quotes.
-    var submissionData = {
+    const submissionData = {
         "MapId": mapId,
         "MarkerData": JSON.stringify(data)
-    }
+    };
 
     // Post the data back to the controller
     console.log('Submitting form...');
@@ -119,10 +132,10 @@ function saveMarkers() {
         contentType: 'application/json',
         dataType: 'json',
         data: JSON.stringify(submissionData),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("Authorization", "Bearer " + user.access_token);
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', `Bearer ${user.access_token}`);
         },
-        success: function (result) {
+        success: function(result) {
             console.log('Data received: ');
             console.log(result);
         }
@@ -141,7 +154,7 @@ function drawnItemToJSON(layer) {
         latlngs = layer.getLatLng();
     }
 
-    var feature = {
+    const feature = {
         "options": layer.options,
         "properties": layer.properties,
         "latlngs": latlngs
@@ -159,7 +172,7 @@ function drawnItemToJSON(layer) {
 function drawnItemCreated(event) {
 
     // Retrieve the drawing layer from the event.
-    var layer = event.layer;
+    const layer = event.layer;
 
     // Calculate feature coordinates
     var latlngs;
@@ -170,11 +183,11 @@ function drawnItemCreated(event) {
     }
 
     // Format the coordinates
-    var latlng = latlngs[0];
+    const latlng = latlngs[0];
 
     // Add a properties array to the layer object
     layer.properties = {
-        title: "",
+        title: '',
         layerType: event.layerType,
         latlng: strLatLng(latlng),
         id: idLatLng(latlng),
@@ -196,9 +209,9 @@ function drawnItemCreated(event) {
 
 // Update the coordinates in the edited drawnItem's properties
 function drawnItemEdited(event) {
-    var layers = event.layers;
+    const layers = event.layers;
 
-    layers.eachLayer(function (layer) {
+    layers.eachLayer(function(layer) {
 
         // Calculate feature coordinates
         var latlngs;
@@ -209,7 +222,7 @@ function drawnItemEdited(event) {
         }
 
         // Format the coordinates
-        var latlng = latlngs[0];
+        const latlng = latlngs[0];
 
         // Add a properties array to the layer object
         layer.properties.latlng = strLatLng(latlng);
@@ -232,13 +245,14 @@ function popupOpen(e) {
     // Close any other open popups
 
     // Calculate the popup contents
-    var popupContent = L.Util.template(template, e.target.properties);
+    const popupContent = L.Util.template(template, e.target.properties);
     e.popup.setContent(popupContent);
 
     // Instantiate the popup editor
-    quill = new Quill("#popup_editor_" + e.target.properties.id, {
-        theme: 'snow'
-    });
+    quill = new Quill(`#popup_editor_${e.target.properties.id}`,
+        {
+            theme: 'snow'
+        });
 
     // Load the editor contents
     quill.setContents(e.target.properties.content);
@@ -249,7 +263,7 @@ function popupOpen(e) {
 function popupClose(e) {
 
     // Grab form field data
-    e.target.properties.title = L.DomUtil.get('popup_title_' + e.target.properties.id).value;
+    e.target.properties.title = L.DomUtil.get(`popup_title_${e.target.properties.id}`).value;
 
     // Save the editor contents into the
     // the geoJSONMarker's properties
@@ -269,20 +283,19 @@ function popupClose(e) {
 // **********************************************
 
 // Truncate value based on number of decimals
-var _round = function (num, len) {
+var _round = function(num, len) {
     return Math.round(num * (Math.pow(10, len))) / (Math.pow(10, len));
 };
 
 // Helper method to format LatLng object (x.xxxxxx, y.yyyyyy)
-var strLatLng = function (latlng) {
-    return "(" + _round(latlng.lat, 4) + ", " + _round(latlng.lng, 4) + ")";
+var strLatLng = function(latlng) {
+    return `(${_round(latlng.lat, 4)}, ${_round(latlng.lng, 4)})`;
 };
 
 // Helper method to format LatLng object (x.xxxxxx, y.yyyyyy)
-var idLatLng = function (latlng) {
-    return strLatLng(latlng).replace(/[\s\(\)\.]/g, "").replace(/[,]/g, "_");
+var idLatLng = function(latlng) {
+    return strLatLng(latlng).replace(/[\s\(\)\.]/g, '').replace(/[,]/g, '_');
 };
-
 
 // **********************************************
 //              Main Functions
@@ -298,19 +311,20 @@ function initMap(pMapId, pMapUserId, pMapSecret, pWorldPath, pMaxZoomLevel, pNoW
     if (map != undefined || map != null) {
         map.off();
         map.remove();
-        $("#map").html("");
-        $("#preMap").empty();
-        $("<div id=\"map\"></div>").appendTo("#preMap");
+        $('#map').html('');
+        $('#preMap').empty();
+        $('<div id="map"></div>').appendTo('#preMap');
     }
 
     // Create the map box
     map = L.map('map').setView([0, 0], 2);
 
-    L.tileLayer(pWorldPath + '/{z}/{x}_{y}.png', {
-        attribution: "Campaign Logger",
-        maxZoom: pMaxZoomLevel,
-        noWrap: (pNoWrap ? "true" : "false")
-    }).addTo(map);
+    L.tileLayer(pWorldPath + '/{z}/{x}_{y}.png',
+        {
+            attribution: 'Campaign Logger',
+            maxZoom: pMaxZoomLevel,
+            noWrap: (pNoWrap ? 'true' : 'false')
+        }).addTo(map);
 
     // Add a feature group to the map to hold drawn items
     featureGroup = L.featureGroup().addTo(map);
