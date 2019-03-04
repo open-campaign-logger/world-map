@@ -323,7 +323,7 @@ function initMap(pMapId, pMapUserId, pMapSecret, pWorldPath, pMaxZoomLevel, pNoW
         {
             attribution: 'Campaign Logger',
             maxZoom: pMaxZoomLevel,
-            noWrap: (pNoWrap ? 'true' : 'false')
+            noWrap: pNoWrap
         }).addTo(map);
 
     // Add a feature group to the map to hold drawn items
