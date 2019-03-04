@@ -29,7 +29,8 @@ var template = '<div id="popup_{id}" class="popup">\
 </div>\
 <div class="popup_section">\
 <label for="popup_editor_{id}" class="popup_label">Description</label></br>\
-<div id="popup_editor_{id}" class="popup_editor"></div>\
+<div id="popup_editor_spacer_{id}" class="popup_editor_spacer"></div>\
+<div id="popup_editor_{id}" class="popup_editor"><br/><br/><br/><br/><br/></div>\
 </div>';
 
 // **********************************************
@@ -76,8 +77,11 @@ function loadMarkers(secret) {
                     layer = L.marker(drawnitem.latlngs);
                 }
 
+                // Create the popup content
+                popupContent = L.Util.template(template, drawnitem.properties);
+
                 // Create a popup
-                layer.bindPopup('')
+                layer.bindPopup(popupContent)
                     .on('popupclose', popupClose)
                     .on('popupopen', popupOpen);
 
@@ -194,8 +198,11 @@ function drawnItemCreated(event) {
         content: ''
     };
 
+    // Create the popup content
+    popupContent = L.Util.template(template, layer.properties);
+
     // Create a popup
-    layer.bindPopup('')
+    layer.bindPopup(popupContent)
         .on('popupclose', popupClose)
         .on('popupopen', popupOpen);
 
@@ -241,12 +248,17 @@ function drawnItemEdited(event) {
 
 // Function to call when a popup is opened
 function popupOpen(e) {
+    
+    // The quill editor introduces a toolbar (div) which is about 75px in height.
+    // This throws off leafletjs which originally sized the popup to not include the toolbar.
+    // When a popup is opened near the top of the viewscreen leafletjs tries to pan the map 
+    // to include the popup but is now unaware that the popup is larger and part of the popup
+    // is opened out of the bounds of the viewscreen. To fix this problem a temporary spacer 
+    // is added when the popup is first created and in this step must now be removed.
 
-    // Close any other open popups
+    // Remove temporary spacer
+    $(`#popup_editor_spacer_${e.target.properties.id}`).remove();
 
-    // Calculate the popup contents
-    const popupContent = L.Util.template(template, e.target.properties);
-    e.popup.setContent(popupContent);
 
     // Instantiate the popup editor
     quill = new Quill(`#popup_editor_${e.target.properties.id}`,
@@ -256,7 +268,7 @@ function popupOpen(e) {
 
     // Load the editor contents
     quill.setContents(e.target.properties.content);
-
+        
 }
 
 // Function to call when a popup is closed
@@ -272,10 +284,7 @@ function popupClose(e) {
 
     // Save marker data
     saveMarkers();
-
-    // Clear the popup
-    e.popup.setContent('');
-
+    
 }
 
 // **********************************************
