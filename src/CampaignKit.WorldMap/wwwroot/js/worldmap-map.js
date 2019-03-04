@@ -268,7 +268,7 @@ function popupOpen(e) {
 
     // Load the editor contents
     quill.setContents(e.target.properties.content);
-
+        
 }
 
 // Function to call when a popup is closed
