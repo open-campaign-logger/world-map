@@ -144,23 +144,6 @@ namespace CampaignKit.WorldMap.Data
 
         #endregion
 
-        /*
-        /// <summary>
-        ///     Sums the specified values.
-        /// </summary>
-        /// <param name="from">From.</param>
-        /// <param name="to">To.</param>
-        /// <param name="valueGetter">The value getter.</param>
-        /// <returns>System.Int32.</returns>
-        private static int Sum(int from, int to, Func<int, int> valueGetter)
-        {
-            var result = 0;
-            for (var i = from; i <= to; i++) result += valueGetter.Invoke(i);
-
-            return result;
-        }
-        */
-
         #region IMapDataService Members
 
         #region Public Methods
