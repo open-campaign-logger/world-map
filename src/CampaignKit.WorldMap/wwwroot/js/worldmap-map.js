@@ -268,7 +268,7 @@ function popupOpen(e) {
 
     // Load the editor contents
     quill.setContents(e.target.properties.content);
-        
+
 }
 
 // Function to call when a popup is closed
@@ -324,17 +324,17 @@ function initMap(pMapId, pMapUserId, pMapSecret, pWorldPath, pMaxZoomLevel, pNoW
         $('#preMap').empty();
         $('<div id="map"></div>').appendTo('#preMap');
     }
+        
+    // Create the map
+    var map = L.map('map', {
+        crs: L.CRS.Simple      
+    }).setView([0, 0], 2);
 
-    // Create the map box
-    map = L.map('map').setView([0, 0], 2);
-
-    L.tileLayer(pWorldPath + '/{z}/{x}_{y}.png',
-        {
-            attribution: 'Campaign Logger',
-            maxZoom: pMaxZoomLevel,
-            noWrap: pNoWrap
-        }).addTo(map);
-
+    // Create the image overlay
+    var bounds = [[0, 0], [1000, 1000]];
+    var image = L.imageOverlay(pWorldPath + '/master-file.png', bounds).addTo(map);
+    map.fitBounds(bounds);
+            
     // Add a feature group to the map to hold drawn items
     featureGroup = L.featureGroup().addTo(map);
 
