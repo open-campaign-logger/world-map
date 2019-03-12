@@ -47,9 +47,9 @@ namespace CampaignKit.WorldMap.Data
         /// <summary>Determines if user has rights to view the map.</summary>
         /// <param name="id">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
-        /// <param name="secret">The map's secret key.</param>
+        /// <param name="shareKey">The map's secret key.</param>
         /// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
-        Task<bool> CanView(int id, ClaimsPrincipal user, string secret);
+        Task<bool> CanView(int id, ClaimsPrincipal user, string shareKey);
 
         /// <summary> Creates the specified map. </summary>
         /// <param name="map">The map entity to create.</param>
@@ -67,9 +67,9 @@ namespace CampaignKit.WorldMap.Data
         /// <summary>Finds the map associated with the identifier.</summary>
         /// <param name="id">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
-        /// <param name="secret">Map secret to be used by friends of map author.</param>
+        /// <param name="shareKey">Map secret to be used by friends of map author.</param>
         /// <returns><c>Map</c> if successful, <c>null</c> otherwise</returns>
-        Task<Map> Find(int id, ClaimsPrincipal user, string secret);
+        Task<Map> Find(int id, ClaimsPrincipal user, string shareKey);
 
         /// <summary>Finds all maps.</summary>
         /// <param name="user">The authenticated user.</param>
@@ -201,11 +201,11 @@ namespace CampaignKit.WorldMap.Data
         /// </summary>
         /// <param name="id">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
-        /// <param name="secret">Map secret to be used by friends of map author.</param>
+        /// <param name="shareKey">Map secret to be used by friends of map author.</param>
         /// <returns>
         ///     <c>Map</c> if successful, <c>null</c> otherwise
         /// </returns>
-        public async Task<Map> Find(int id, ClaimsPrincipal user, string secret)
+        public async Task<Map> Find(int id, ClaimsPrincipal user, string shareKey)
         {
             // Retrieve the map entry and any associated markers.
             var map = await _dbContext.Maps
@@ -222,7 +222,7 @@ namespace CampaignKit.WorldMap.Data
             if (!map.IsPublic)
             {
                 var userid = _userManagerService.GetUserId(user);
-                if (!map.UserId.Equals(userid) && !map.Secret.Equals(secret))
+                if (!map.UserId.Equals(userid) && !map.ShareKey.Equals(shareKey))
                 {
                     _loggerService.LogError($"User not authorized to access map with id:{id}.");
                     return null;
@@ -458,9 +458,9 @@ namespace CampaignKit.WorldMap.Data
         /// <summary>Determines if user has rights to view the map.</summary>
         /// <param name="id">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
-        /// <param name="secret">The map's secret key.</param>
+        /// <param name="shareKey">The map's secret key.</param>
         /// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
-        public async Task<bool> CanView(int id, ClaimsPrincipal user, string secret)
+        public async Task<bool> CanView(int id, ClaimsPrincipal user, string shareKey)
         {
             // Retrieve the map entry and any associated markers.
             var map = await _dbContext.Maps
@@ -477,8 +477,8 @@ namespace CampaignKit.WorldMap.Data
             if (map.IsPublic) return true;
 
             // Determine if provided secret matches
-            var isSecretProvided = !string.IsNullOrEmpty(secret);
-            if (isSecretProvided && map.Secret.Equals(secret)) return true;
+            var isSecretProvided = !string.IsNullOrEmpty(shareKey);
+            if (isSecretProvided && map.ShareKey.Equals(shareKey)) return true;
 
             // Determine if user is authenticated
             var userid = _userManagerService.GetUserId(user);

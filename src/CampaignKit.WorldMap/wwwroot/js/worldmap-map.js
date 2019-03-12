@@ -15,7 +15,7 @@
 // **********************************************
 //                 Globals
 // **********************************************
-var mapId, mapUserId, mapSecret, map;
+var mapId, mapUserId, mapShare, map;
 var featureGroup, drawControl;
 
 var template = '<div id="popup_{id}" class="popup">\
@@ -38,11 +38,11 @@ var template = '<div id="popup_{id}" class="popup">\
 // **********************************************
 
 // This is used for testing purposes only.
-function loadMarkers(secret) {
+function loadMarkers(share) {
 
     var requestUrl = `/Map/MarkerData/${mapId}`;
-    if (secret) {
-        requestUrl += `?secret=${secret}`;
+    if (share) {
+        requestUrl += `?shareKey=${share}`;
     }
 
     $.ajax({
@@ -309,12 +309,12 @@ var idLatLng = function(latlng) {
 // **********************************************
 //              Main Functions
 // **********************************************
-function initMap(pMapId, pMapUserId, pMapSecret, pWorldPath, pMaxZoomLevel, pNoWrap) {
+function initMap(pMapId, pMapUserId, pMapShare, pWorldPath, pMaxZoomLevel, pNoWrap) {
 
     // Populate global variables
     mapId = pMapId;
     mapUserId = pMapUserId;
-    mapSecret = pMapSecret;
+    mapShare = pMapShare;
 
     // Clear the map if it already exists
     if (map != undefined || map != null) {
@@ -362,5 +362,5 @@ function initMap(pMapId, pMapUserId, pMapSecret, pWorldPath, pMaxZoomLevel, pNoW
     map.on(L.Draw.Event.DELETED, drawnItemEdited);
 
     // Import marker data
-    loadMarkers(mapSecret);
+    loadMarkers(mapShare);
 }

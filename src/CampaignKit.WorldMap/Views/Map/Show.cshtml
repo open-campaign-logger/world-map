@@ -47,7 +47,7 @@ limitations under the License.
                     <div class="progress">
                         <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
                     </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.Secret))
+                    @if (!string.IsNullOrWhiteSpace(Model.Share))
                     {
                         <div class="form-group">
                             <label class="control-label" asp-for="ShowUrl">Use this URL to <b>share</b> your map</label>
@@ -79,7 +79,7 @@ limitations under the License.
                                 $('#close-button').addClass('btn-success').text('Done!');
                                 initMap(@Model.Id,
                                     '@Model.UserId',
-                                    '@Model.Secret',
+                                    '@Model.Share',
                                     '@ViewBag.WorldPath',
                                     @ViewBag.MaxZoomLevel,
                                     '@ViewBag.NoWrap' === '@true');

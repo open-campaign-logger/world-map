@@ -95,12 +95,12 @@ namespace CampaignKit.WorldMap.Entities
         public bool RepeatMapInX { get; set; }
 
         /// <summary>
-        ///     Gets or sets the map secret.
+        ///     Gets or sets the map share key.
         /// </summary>
         /// <value>
-        ///     The map secret.  Used for providing access to non-registered users.
+        ///     The map share key.  Used for providing access to non-registered users.
         /// </value>
-        public string Secret { get; set; }
+        public string ShareKey { get; set; }
 
         /// <summary>
         ///     Gets or sets the map's thumbnail path.

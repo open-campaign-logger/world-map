@@ -60,10 +60,10 @@ namespace CampaignKit.WorldMap.ViewModels
         public string ProgressUrl { get; set; }
 
         /// <summary>
-        ///     Gets the secret.
+        ///     Gets the map share key.
         /// </summary>
-        /// <value>The secret.</value>
-        public string Secret { get; set; }
+        /// <value>The share key.</value>
+        public string Share { get; set; }
 
         /// <summary>
         ///     Gets a value indicating whether [show progress].

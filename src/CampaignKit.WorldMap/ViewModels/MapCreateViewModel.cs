@@ -75,12 +75,12 @@ namespace CampaignKit.WorldMap.ViewModels
         public bool RepeatMapInX { get; set; }
 
         /// <summary>
-        ///     Gets or sets the map secret.
+        ///     Gets or sets the map sharing key.
         /// </summary>
-        /// <value>The secret.</value>
-        [Display(Name = "Secret Key", Description = "You will need this key to share your map.")]
+        /// <value>The sharing key.</value>
+        [Display(Name = "Share Key", Description = "You will need this key to share your map.")]
         [Required]
-        public string Secret { get; set; }
+        public string Share { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether [this is my own creation published rightfully].

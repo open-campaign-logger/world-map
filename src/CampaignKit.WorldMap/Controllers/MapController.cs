@@ -104,7 +104,7 @@ namespace CampaignKit.WorldMap.Controllers
             {
                 Title = "Not allowed",
                 Message =
-                    "You are not allowed to delete this map. It either does not exist (anymore) on this server or your secret key is wrong."
+                    "You are not allowed to delete this map. It either does not exist (anymore) on this server or your share key is wrong."
             });
         }
 
@@ -114,7 +114,7 @@ namespace CampaignKit.WorldMap.Controllers
             {
                 Title = "Not allowed",
                 Message =
-                    "You are not allowed to edit this map. It either does not exist (anymore) on this server or your secret key is wrong."
+                    "You are not allowed to edit this map. It either does not exist (anymore) on this server or your share key is wrong."
             });
         }
 
@@ -140,7 +140,7 @@ namespace CampaignKit.WorldMap.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            var model = new MapCreateViewModel { Secret = _randomDataService.GetRandomText(8) };
+            var model = new MapCreateViewModel { Share = _randomDataService.GetRandomText(8) };
             return View(model);
         }
 
@@ -182,7 +182,7 @@ namespace CampaignKit.WorldMap.Controllers
                 FileExtension = Path.GetExtension(model.Image.FileName ?? string.Empty).ToLower(),
                 RepeatMapInX = model.RepeatMapInX,
                 IsPublic = model.IsPublic,
-                Secret = model.Secret,
+                ShareKey = model.Share,
                 MarkerData = string.Empty
             };
 
@@ -191,7 +191,7 @@ namespace CampaignKit.WorldMap.Controllers
                 ModelState.AddModelError(string.Empty,
                     "Your map could not be saved. Please try again.");
             else
-                return RedirectToAction(nameof(Show), new { id, map.Secret, ShowProgress = true });
+                return RedirectToAction(nameof(Show), new { id, map.ShareKey, ShowProgress = true });
 
             return View();
         }
@@ -267,7 +267,7 @@ namespace CampaignKit.WorldMap.Controllers
                 Copyright = map.Copyright,
                 RepeatMapInX = map.RepeatMapInX,
                 MakeMapPublic = map.IsPublic,
-                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, map.Secret }, protocol, Request.Host.Value)
+                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, map.ShareKey }, protocol, Request.Host.Value)
             });
         }
 
@@ -362,32 +362,32 @@ namespace CampaignKit.WorldMap.Controllers
         ///     GET: /Map/Show/{id?}
         /// </summary>
         /// <param name="id">The identifier.</param>
-        /// <param name="secret">The secret.</param>
+        /// <param name="shareKey">The share key.</param>
         /// <param name="showProgress">if set to <c>true</c> [show progress].</param>
         /// <returns>The selected map.</returns>
         [HttpGet]
-        public async Task<IActionResult> Show(int id, string secret = null, bool showProgress = false)
+        public async Task<IActionResult> Show(int id, string shareKey = null, bool showProgress = false)
         {
             // Determine if user can view map
-            var canView = await _mapRepository.CanView(id, User, secret);
+            var canView = await _mapRepository.CanView(id, User, shareKey);
             if (!canView) return ShowErrorView();
 
             // Determine if user can edit map
             var canEdit = await _mapRepository.CanEdit(id, User);
 
             // Retrieve the map
-            var map = await _mapRepository.Find(id, User, secret);
+            var map = await _mapRepository.Find(id, User, shareKey);
 
             // Create a view model
             var protocol = Request.IsHttps ? "https" : "http";
             var model = new MapShowViewModel
             {
                 Name = map.Name,
-                Secret = secret,
+                Share = shareKey,
                 UserId = map.UserId,
                 ShowProgress = showProgress,
                 ProgressUrl = Url.Action(nameof(Progress), new { Id = id }),
-                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Secret = secret }, protocol, Request.Host.Value),
+                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Share = shareKey }, protocol, Request.Host.Value),
                 DeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
                 EditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
                 Id = id,
@@ -409,17 +409,17 @@ namespace CampaignKit.WorldMap.Controllers
         ///     GET: /Map/MarkerData/{id?}
         /// </summary>
         /// <param name="id">The map identifier.</param>
-        /// <param name="secret">The secret.  Required if </param>
+        /// <param name="shareKey">The map's shareKey.</param>
         /// <returns>The map's marker data in JSON format.</returns>
         [HttpGet]
-        public async Task<IActionResult> MarkerData(int id, string secret)
+        public async Task<IActionResult> MarkerData(int id, string shareKey)
         {
             // Determine if user can view map
-            var canView = await _mapRepository.CanView(id, User, secret);
+            var canView = await _mapRepository.CanView(id, User, shareKey);
             if (!canView) return ShowErrorView();
 
             // Retrieve the map
-            var map = await _mapRepository.Find(id, User, secret);
+            var map = await _mapRepository.Find(id, User, shareKey);
 
             // Create response data
             var markerData = map.MarkerData;

@@ -109,7 +109,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
                 WorldFolderPath = "C:\\Users\\mf1939\\source\\repos\\open-campaign-logger\\world-map\\src\\CampaignKit.WorldMap\\wwwroot\\world\\1",
                 ThumbnailPath = "~/world/1/0/zoom-level.png",
                 MarkerData = "[{ \"options\": { }, \"properties\": { } ] ",
-                Secret = "lNtqjEVQ",
+                ShareKey = "lNtqjEVQ",
                 IsPublic = true
             };
 
