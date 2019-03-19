@@ -56,3 +56,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - Sharing test context between tests: https://xunit.github.io/docs/shared-context
 - Supporting AntiForgeryTokens: https://www.matheus.ro/2018/09/03/integration-tests-in-asp-net-core-controllers/
 
+## Security Material
+
+- Running .Net Core 2.1 With Self-Signed Cert: https://www.hanselman.com/blog/DevelopingLocallyWithASPNETCoreUnderHTTPSSSLAndSelfSignedCerts.aspx
+- Configure HTTPS in ASP.Net Core 2.1: https://asp.net-hacker.rocks/2018/07/09/aspnetcore-ssl.html
