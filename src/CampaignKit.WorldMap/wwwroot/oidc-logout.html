@@ -25,7 +25,7 @@ limitations under the License.
 <script>
     mgr.signoutRedirectCallback().then(function() {
         deleteJWTCookie();
-        window.location = "/";
+        window.location = rootUri;
     }).catch(function(e) {
         console.error(e);
     });

@@ -30,6 +30,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="App_Data\Sample\Sample.db" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App_Data\Sample\Sample.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="wwwroot\**\*;Views\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>

@@ -25,7 +25,7 @@ limitations under the License.
 <script>
     mgr.signinRedirectCallback().then(function(user) {
         getJWTCookie(user);
-        window.location = "/";
+        window.location = rootUri;
     }).catch(function(e) {
         console.error(e);
     });

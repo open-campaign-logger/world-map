@@ -14,7 +14,7 @@
 
 // Setup oidc-connect-js settings
 const { protocol, hostname, port } = window.location;
-const rootUri = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+const rootUri = `${protocol}//${hostname}${port ? `:${port}` : ''}${hostname === 'kit.campaign-logger.com' ? '/worldmap' : ''}`;
 
 const settings = {
     authority: 'https://campaign-identity.com',
