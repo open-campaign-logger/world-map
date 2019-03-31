@@ -330,3 +330,4 @@ ASALocalRun/
 .mfractor/
 /src/CampaignKit.WorldMap/App_Data/MapData.db
 /src/CampaignKit.WorldMap/App_Data/WorldMap.db
+/src/CampaignKit.WorldMap/Logs/log.txt

@@ -140,6 +140,8 @@ namespace CampaignKit.WorldMap.Controllers
         [Authorize]
         public IActionResult Create()
         {
+            _loggerService.Log(LogLevel.Debug, 0, "Enter GET Map/Create");
+
             var model = new MapCreateViewModel { Share = _randomDataService.GetRandomText(8) };
             return View(model);
         }
@@ -154,6 +156,8 @@ namespace CampaignKit.WorldMap.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MapCreateViewModel model)
         {
+            _loggerService.Log(LogLevel.Debug, 0, "Enter POST Map/Create");
+
             if (!ModelState.IsValid)
                 return View();
 

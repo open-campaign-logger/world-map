@@ -17,6 +17,7 @@ using CampaignKit.WorldMap.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
@@ -24,7 +25,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
     {
         #region Constructors
 
-        public TestStartupNoAuth(IHostingEnvironment env) : base(env)
+        public TestStartupNoAuth(IHostingEnvironment env, ILoggerFactory loggerFactory) : base(env, loggerFactory)
         {
         }
 

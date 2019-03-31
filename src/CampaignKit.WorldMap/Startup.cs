@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -45,6 +47,7 @@ namespace CampaignKit.WorldMap
         #region Fields
 
         private readonly IConfiguration _configuration;
+        private readonly ILogger<Startup> _logger;
 
         #endregion
 
@@ -54,7 +57,7 @@ namespace CampaignKit.WorldMap
         ///     Initializes a new instance of the <see cref="Startup" /> class.
         /// </summary>
         /// <param name="env">The env.</param>
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -63,6 +66,8 @@ namespace CampaignKit.WorldMap
                 .AddEnvironmentVariables();
 
             _configuration = builder.Build();
+
+            _logger = loggerFactory.CreateLogger<Startup>();
         }
 
         #endregion
@@ -88,7 +93,7 @@ namespace CampaignKit.WorldMap
         /// <param name="loggerFactory">The logger factory.</param>
 
         // ReSharper disable once UnusedMember.Global
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 
@@ -122,6 +127,19 @@ namespace CampaignKit.WorldMap
             // This method gets called by the runtime. Use this method to add services to the container.
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
 
+            services.AddLogging(builder =>
+            {
+                builder.AddConsole();
+                builder.AddTraceSource(
+                    new SourceSwitch("default", "Verbose"),
+                    new TextWriterTraceListener(new FileStream("Logs/log.txt", FileMode.Append))
+                    {
+                        Filter = new SourceFilter("default")
+                    });
+            });
+
+            _logger.Log(LogLevel.Information, 0, "Logging set up");
+
             // Add the configuration to the context
             services.AddSingleton(_configuration);
 
@@ -154,6 +172,7 @@ namespace CampaignKit.WorldMap
         ///     in the unit testing project.
         /// </summary>
         /// <param name="services">The services.</param>
+        /// <param name="logger">The logger.</param>
         protected virtual void ConfigureAuth(IServiceCollection services)
         {
             // Configure services to expect a Campaign-Identity access_token in the 
