@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,13 @@
 
 using System.IO;
 
+using CampaignKit.WorldMap.Data;
+using CampaignKit.WorldMap.Services;
+
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CampaignKit.WorldMap
 {
@@ -23,7 +29,21 @@ namespace CampaignKit.WorldMap
     /// </summary>
     public class Program
     {
-        #region Public Methods
+        #region Methods
+
+        /// <summary>
+        ///     Creates the core web host.
+        ///     see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
+        ///     see:
+        ///     https://github.com/aspnet/Docs/blob/master/aspnetcore/test/integration-tests/samples/2.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
+        }
 
         /// <summary>
         ///     Defines the entry point of the application.
@@ -31,16 +51,32 @@ namespace CampaignKit.WorldMap
         /// <param name="args">The arguments.</param>
         public static void Main(string[] args)
         {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .Build();
+            // Build the web host
+            var host = CreateWebHostBuilder(args).Build();
 
+            // Seed the database if required
+            using (var scope = host.Services.CreateScope())
+            {
+                // Get the service provider
+                var services = scope.ServiceProvider;
+
+                // Determine if database has been created
+                // WorldMap.db
+                var filePathService = services.GetService<IFilePathService>();
+                var sampleDB = Path.Combine(filePathService.AppDataPath, "Sample", "Sample.db");
+                var appDB = Path.Combine(filePathService.AppDataPath, "WorldMap.db");
+                if (!File.Exists(appDB)) File.Copy(sampleDB, appDB);
+
+                // Get the database provider and ensure that it is created and ready.
+                var dbContext = services.GetRequiredService<WorldMapDBContext>();
+                dbContext.Database.EnsureCreated();
+                dbContext.Database.GetDbConnection();
+            }
+
+            // Run the web host
             host.Run();
         }
 
-        #endregion Public Methods
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,79 +12,147 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
+using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Entities;
 using CampaignKit.WorldMap.Services;
 using CampaignKit.WorldMap.ViewModels;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Controllers
 {
     /// <inheritdoc />
     /// <summary>
-    ///     Class MapController.
+    ///     Map MVC controller for application.
     /// </summary>
     /// <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
     public class MapController : Controller
     {
-        #region Public Constructors
+        #region Fields
+
+        /// <summary>
+        ///     The database context
+        /// </summary>
+        private readonly WorldMapDBContext _dbContext;
+
+        /// <summary>
+        ///     The file path service
+        /// </summary>
+        private readonly IFilePathService _filePathService;
+
+        /// <summary>
+        ///     The application logging service.
+        /// </summary>
+        private readonly ILogger _loggerService;
+
+        /// <summary>
+        ///     The EntityFramework repository for Map data elements.
+        /// </summary>
+        private readonly IMapRepository _mapRepository;
+
+        /// <summary>
+        ///     The progress service.
+        /// </summary>
+        private readonly IProgressService _progressService;
+
+        /// <summary>
+        ///     The random data service
+        /// </summary>
+        private readonly IRandomDataService _randomDataService;
+
+        #endregion
+
+        #region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="MapController" /> class.
         /// </summary>
-        /// <param name="appDataPathService">The application data path service.</param>
-        /// <param name="worldBasePathService">The world base path service.</param>
         /// <param name="randomDataService">The random data service.</param>
-        /// <param name="mapDataService">The map data service.</param>
-        /// <param name="tileCreationService">The tile creation service.</param>
+        /// <param name="mapRepository">The map repository.</param>
         /// <param name="progressService">The progress service.</param>
-        public MapController(
-            IAppDataPathService appDataPathService, IWorldBasePathService worldBasePathService,
-            IRandomDataService randomDataService, IMapDataService mapDataService,
-            ITileCreationService tileCreationService, IProgressService progressService)
+        /// <param name="filePathService">The file path service.</param>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="loggerService">The logger service.</param>
+        public MapController(IRandomDataService randomDataService,
+            IMapRepository mapRepository,
+            IProgressService progressService,
+            IFilePathService filePathService,
+            WorldMapDBContext dbContext,
+            ILogger<MapController> loggerService)
         {
-            _appDataPath = appDataPathService.AppDataPath;
-            _virtualWorldBasePath = worldBasePathService.VirtualWorldBasePath;
-
             _randomDataService = randomDataService;
-            _mapDataService = mapDataService;
-
-            _tileCreationService = tileCreationService;
-
+            _mapRepository = mapRepository;
             _progressService = progressService;
+            _filePathService = filePathService;
+            _dbContext = dbContext;
+            _loggerService = loggerService;
         }
 
-        #endregion Public Constructors
+        #endregion
 
-        #region Private Fields
+        #region Methods
 
-        // ReSharper disable once NotAccessedField.Local
-        private readonly string _appDataPath;
-        private readonly IMapDataService _mapDataService;
-        private readonly IProgressService _progressService;
-        private readonly IRandomDataService _randomDataService;
-        private readonly ITileCreationService _tileCreationService;
-        private readonly string _virtualWorldBasePath;
+        private IActionResult DeleteErrorView()
+        {
+            return View("Error", new ErrorViewModel
+            {
+                Title = "Not allowed",
+                Message =
+                    "You are not allowed to delete this map. It either does not exist (anymore) on this server or your share key is wrong."
+            });
+        }
 
-        #endregion Private Fields
+        private IActionResult EditErrorView()
+        {
+            return View("Error", new ErrorViewModel
+            {
+                Title = "Not allowed",
+                Message =
+                    "You are not allowed to edit this map. It either does not exist (anymore) on this server or your share key is wrong."
+            });
+        }
 
-        #region Public Methods
+        private ViewResult ShowErrorView()
+        {
+            return View("Error", new ErrorViewModel
+            {
+                Title = "Unknown map",
+                Message =
+                    "The map you requested does not exist on this server. It may have been deleted or you might have followed an invalid link."
+            });
+        }
 
+        #endregion
+
+        #region Map Related Actions
+
+        /// <summary>
+        ///     GET: /Map/Create
+        /// </summary>
+        /// <returns>Map creation view containing new randomly generated secret.</returns>
         [HttpGet]
+        [Authorize]
         public IActionResult Create()
         {
-            var model = new MapCreateViewModel { Secret = _randomDataService.GetRandomText(8) };
-
+            var model = new MapCreateViewModel { Share = _randomDataService.GetRandomText(8) };
             return View(model);
         }
 
+        /// <summary>
+        ///     POST: /Map/Create
+        /// </summary>
+        /// <param name="model">The map model to create.</param>
+        /// <returns>Map view with tile progress creation window displayed.</returns>
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(MapCreateViewModel model)
+        public async Task<IActionResult> Create(MapCreateViewModel model)
         {
             if (!ModelState.IsValid)
                 return View();
@@ -108,205 +176,286 @@ namespace CampaignKit.WorldMap.Controllers
 
             var map = new Map
             {
-                Id = Guid.NewGuid(),
                 Name = model.Name,
-                Secret = model.Secret,
                 Copyright = model.Copyright,
-                ContentType = model.MapImage.ContentType,
-                FileExtension = Path.GetExtension(model.MapImage.FileName ?? string.Empty).ToLower(),
-                CreationTimestamp = DateTime.UtcNow,
-                RepeatMapInX = model.RepeatMapInX
+                ContentType = model.Image.ContentType,
+                FileExtension = Path.GetExtension(model.Image.FileName ?? string.Empty).ToLower(),
+                RepeatMapInX = model.RepeatMapInX,
+                IsPublic = model.IsPublic,
+                ShareKey = model.Share,
+                MarkerData = string.Empty
             };
 
-            if (!_mapDataService.Save(map))
-            {
+            var id = await _mapRepository.Create(map, model.Image.OpenReadStream(), User);
+            if (id == 0)
                 ModelState.AddModelError(string.Empty,
                     "Your map could not be saved. Please try again.");
-            }
             else
-            {
-                var imageFile = model.MapImage;
-
-                // ReSharper disable once UnusedVariable
-                var task = _tileCreationService.CreateTilesAsync(map.Id, imageFile.OpenReadStream());
-
-                return RedirectToAction(nameof(Show), new { map.Id, map.Secret, ShowProgress = true });
-            }
+                return RedirectToAction(nameof(Show), new { id, map.ShareKey, ShowProgress = true });
 
             return View();
         }
 
+        /// <summary>
+        ///     GET: /Map/Delete/{id?}
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Delete view displaying confirmation popup.</returns>
         [HttpGet]
-        public IActionResult Delete(string id, string secret)
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
         {
-            var model = _mapDataService.Find(id);
+            var model = await _mapRepository.Find(id, User, string.Empty);
 
-            if (model == null || model.Secret != secret)
-                return DeleteErrorView();
-
-            return View(new MapDeleteViewModel { Name = model.Name, HiddenId = model.Id, HiddenSecret = model.Secret });
+            return model == null
+                ? DeleteErrorView()
+                : View(new MapDeleteViewModel { Name = model.Name, Id = model.MapId });
         }
 
+        /// <summary>
+        ///     POST: /Map/Delete/{id?}
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="_">The .</param>
+        /// <returns>Redirect to home view.</returns>
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(string id, string secret, MapDeleteViewModel model)
+        public async Task<IActionResult> Delete(int id, MapDeleteViewModel _)
         {
             if (!ModelState.IsValid)
                 return View();
 
-            var map = _mapDataService.Find(id);
+            var map = await _mapRepository.Delete(id, User);
 
-            if (map == null || map.Secret != secret)
-                return DeleteErrorView();
-
-            if (map.Id != model.HiddenId || map.Secret != model.HiddenSecret)
+            if (!map)
             {
                 ModelState.AddModelError(string.Empty,
                     "Your map could not be deleted. Please try again.");
             }
             else
             {
-                _mapDataService.Delete(id);
-                _tileCreationService.RemoveTiles(map.Id);
-
+                await _mapRepository.Delete(id, User);
                 return RedirectToAction(nameof(Index));
             }
 
             return View();
         }
 
+        /// <summary>
+        ///     GET: /Map/Edit/{id?}
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Map edit view for the specified map.</returns>
         [HttpGet]
-        public IActionResult Edit(string id, string secret)
+        [Authorize]
+        public async Task<IActionResult> Edit(int id)
         {
-            var model = _mapDataService.Find(id);
+            // Determine if user has rights to edit this map
+            var canEdit = await _mapRepository.CanEdit(id, User);
+            if (!canEdit) return EditErrorView();
 
-            if (model == null || model.Secret != secret) return EditErrorView();
+            // Load model
+            var map = await _mapRepository.Find(id, User, string.Empty);
+            if (map == null) return EditErrorView();
 
+            // Return edit screen
+            var protocol = Request.IsHttps ? "https" : "http";
             return View(new MapEditViewModel
             {
-                Name = model.Name,
-                Copyright = model.Copyright,
-                RepeatMapInX = model.RepeatMapInX
+                Name = map.Name,
+                Copyright = map.Copyright,
+                RepeatMapInX = map.RepeatMapInX,
+                MakeMapPublic = map.IsPublic,
+                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, map.ShareKey }, protocol, Request.Host.Value)
             });
         }
 
+        /// <summary>
+        ///     POST: /Map/Edit/{id?}
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="model">The model.</param>
+        /// <returns>Map show view.</returns>
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(string id, string secret, MapEditViewModel model)
+        public async Task<IActionResult> Edit(int id, MapEditViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View();
+            // Determine if provided data is valid
+            if (!ModelState.IsValid) return View();
 
-            var map = _mapDataService.Find(id);
+            // Determine if user has rights to edit this map
+            var canEdit = await _mapRepository.CanEdit(id, User);
+            if (!canEdit) return EditErrorView();
 
-            if (map == null || map.Secret != secret) return EditErrorView();
+            // Load model
+            var map = await _mapRepository.Find(id, User, string.Empty);
+            if (map == null) return EditErrorView();
 
             map.Name = model.Name;
             map.Copyright = model.Copyright;
             map.RepeatMapInX = model.RepeatMapInX;
+            map.IsPublic = model.MakeMapPublic;
 
-            if (!_mapDataService.Save(map))
+            var result = await _mapRepository.Save(map, User);
+            if (!result)
                 ModelState.AddModelError(string.Empty,
                     "Your map could not be saved. Please try again.");
             else
-                return RedirectToAction(nameof(Show), new { map.Id, map.Secret, ShowProgress = true });
+                return RedirectToAction(nameof(Show), new { model.Id });
 
             return View();
         }
 
-        public IActionResult Index()
+        /// <summary>
+        ///     GET: /Map/
+        /// </summary>
+        /// <returns>Show all user maps.</returns>
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            var model = _mapDataService.FindAll().OrderByDescending(m => m.CreationTimestamp);
-
+            var model = await _mapRepository.FindAll(User, true);
+            model = model.OrderByDescending(m => m.CreationTimestamp);
             return View(model);
         }
 
-        public IActionResult Progress(string id)
+        /// <summary>
+        ///     GET: /Map/Progress/{id?}
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <returns>Tile creation progress for map in JSON format.</returns>
+        [HttpGet]
+        [Authorize]
+        public IActionResult Progress(int id)
         {
-            return Json(new { Progress = _progressService.GetProgress(id) });
+            return Json(new { Progress = _progressService.GetMapProgress($"{id}") });
         }
 
-        public IActionResult Sample()
+        /// <summary>
+        ///     GET: /Map/Sample
+        /// </summary>
+        /// <returns>Map sample view.</returns>
+        [HttpGet]
+        public async Task<IActionResult> Sample()
         {
-            if (!Request.Path.Value.EndsWith("/"))
-            {
-                var actionUrl = Url.Action("Sample");
-                if (!actionUrl.EndsWith("/")) actionUrl += "/";
-
-                return Redirect(actionUrl);
-            }
-
-            ViewBag.MaxZoomLevel = 4;
-            ViewBag.WorldPath = Url.Content($"{_virtualWorldBasePath}/sample");
-            ViewBag.NoWrap = false;
-
-            return View();
-        }
-
-        public IActionResult Show(string id, string secret = null, bool showProgress = false)
-        {
-            var map = _mapDataService.Find(id);
+            var map = await _mapRepository.Find(1, User, string.Empty);
 
             if (map == null)
                 return ShowErrorView();
 
-            var protocol = Request.IsHttps ? "https" : "http";
-
             var model = new MapShowViewModel
             {
                 Name = map.Name,
-                Secret = secret,
-                ShowProgress = showProgress,
-                ProgressUrl = Url.Action(nameof(Progress), new { Id = id }),
-                MapEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id, Secret = secret }, protocol,
-                    Request.Host.Value),
-                MapShowUrl = Url.Action(nameof(Show), "Map", new { Id = id }, protocol, Request.Host.Value),
-
-                MapBaseDeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
-                MapBaseEditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value)
+                Id = map.MapId,
+                UserId = map.UserId
             };
 
             ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            ViewBag.WorldPath = Url.Content($"{_virtualWorldBasePath}/{id}");
+            ViewBag.WorldPath = Url.Content($"{_filePathService.VirtualWorldBasePath}/1");
             ViewBag.NoWrap = !map.RepeatMapInX;
 
             return View(model);
         }
 
-        #endregion Public Methods
-
-        #region Private Methods
-
-        private IActionResult DeleteErrorView()
+        /// <summary>
+        ///     GET: /Map/Show/{id?}
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="shareKey">The share key.</param>
+        /// <param name="showProgress">if set to <c>true</c> [show progress].</param>
+        /// <returns>The selected map.</returns>
+        [HttpGet]
+        public async Task<IActionResult> Show(int id, string shareKey = null, bool showProgress = false)
         {
-            return View("Error", new ErrorViewModel
+            // Determine if user can view map
+            var canView = await _mapRepository.CanView(id, User, shareKey);
+            if (!canView) return ShowErrorView();
+
+            // Determine if user can edit map
+            var canEdit = await _mapRepository.CanEdit(id, User);
+
+            // Retrieve the map
+            var map = await _mapRepository.Find(id, User, shareKey);
+
+            // Create a view model
+            var protocol = Request.IsHttps ? "https" : "http";
+            var model = new MapShowViewModel
             {
-                Title = "Not allowed",
-                Message =
-                    "You are not allowed to delete this map. It either does not exist (anymore) on this server or your secret key is wrong."
-            });
+                Name = map.Name,
+                Share = shareKey,
+                UserId = map.UserId,
+                ShowProgress = showProgress,
+                ProgressUrl = Url.Action(nameof(Progress), new { Id = id }),
+                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Share = shareKey }, protocol, Request.Host.Value),
+                DeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
+                EditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
+                Id = id,
+                CanEdit = canEdit
+            };
+
+            ViewBag.MaxZoomLevel = map.MaxZoomLevel;
+            ViewBag.WorldPath = Url.Content($"{_filePathService.VirtualWorldBasePath}/{id}");
+            ViewBag.NoWrap = !map.RepeatMapInX;
+
+            return View(model);
         }
 
-        private IActionResult EditErrorView()
+        #endregion
+
+        #region  Marker Related Actions    
+
+        /// <summary>
+        ///     GET: /Map/MarkerData/{id?}
+        /// </summary>
+        /// <param name="id">The map identifier.</param>
+        /// <param name="shareKey">The map's shareKey.</param>
+        /// <returns>The map's marker data in JSON format.</returns>
+        [HttpGet]
+        public async Task<IActionResult> MarkerData(int id, string shareKey)
         {
-            return View("Error", new ErrorViewModel
-            {
-                Title = "Not allowed",
-                Message =
-                    "You are not allowed to edit this map. It either does not exist (anymore) on this server or your secret key is wrong."
-            });
+            // Determine if user can view map
+            var canView = await _mapRepository.CanView(id, User, shareKey);
+            if (!canView) return ShowErrorView();
+
+            // Retrieve the map
+            var map = await _mapRepository.Find(id, User, shareKey);
+
+            // Create response data
+            var markerData = map.MarkerData;
+            if (string.IsNullOrEmpty(markerData)) markerData = "[]";
+            return Json(markerData);
         }
 
-        private ViewResult ShowErrorView()
+        /// <summary>
+        ///     POST: Map/MarkerData/{MapId}
+        /// </summary>
+        /// <param name="model">Map marker data.</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> MarkerData([FromBody] MarkerEditViewModel model)
         {
-            return View("Error", new ErrorViewModel
+            // Ensure that user has privileges to update map
+            var canEdit = await _mapRepository.CanEdit(model.MapId, User);
+            if (!canEdit) return Json("Not Authorized");
+
+            // Attempt to retrieve the map
+            var map = await _mapRepository.Find(model.MapId, User, string.Empty);
+            if (map == null)
             {
-                Title = "Unknown map",
-                Message =
-                    "The map you requested does not exist on this server. It may have been deleted or you might have followed an invalid link."
-            });
+                _loggerService.LogError($"Map with id:{model.MapId} not found");
+                return Json("Failed to update marker");
+            }
+
+            // Update the map
+            map.MarkerData = model.MarkerData;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Json("Success");
         }
 
-        #endregion Private Methods
+        #endregion
     }
 }

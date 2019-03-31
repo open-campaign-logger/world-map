@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace CampaignKit.WorldMap.Services
     /// </summary>
     public interface IRandomDataService
     {
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         ///     Gets the random text.
@@ -31,7 +31,7 @@ namespace CampaignKit.WorldMap.Services
         /// <returns>System.String.</returns>
         string GetRandomText(int numberOfCharacters);
 
-        #endregion Public Methods
+        #endregion
     }
 
     /// <inheritdoc />
@@ -41,11 +41,13 @@ namespace CampaignKit.WorldMap.Services
     /// <seealso cref="T:CampaignKit.WorldMap.Services.IRandomDataService" />
     public class DefaultRandomDataService : IRandomDataService
     {
-        #region Private Fields
+        #region Fields
 
         private readonly Random _rand = new Random();
 
-        #endregion Private Fields
+        #endregion
+
+        #region Implementations
 
         #region IRandomDataService Members
 
@@ -73,6 +75,8 @@ namespace CampaignKit.WorldMap.Services
         }
 
         #endregion Public Methods
+
+        #endregion
 
         #endregion
     }

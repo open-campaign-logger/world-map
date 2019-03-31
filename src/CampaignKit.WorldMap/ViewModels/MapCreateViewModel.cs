@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class MapCreateViewModel
     {
-        #region Public Properties
+        #region Properties
 
         /// <summary>
         ///     Gets or sets the copyright.
@@ -39,10 +39,16 @@ namespace CampaignKit.WorldMap.ViewModels
         [Display(Name = "World Map Image")]
         [Required]
         [DataType(DataType.Upload)]
-
         // Sadly, FileExtensions are currently not working:
         //[FileExtensions(Extensions = "png,jpg,jpeg")]
-        public IFormFile MapImage { get; set; }
+        public IFormFile Image { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether this map should be made public.
+        /// </summary>
+        /// <value><c>true</c> if this map should be made public; otherwise, <c>false</c>.</value>
+        [Display(Name = "This map should be made public.")]
+        public bool IsPublic { get; set; }
 
         /// <summary>
         ///     Gets or sets the name.
@@ -69,12 +75,12 @@ namespace CampaignKit.WorldMap.ViewModels
         public bool RepeatMapInX { get; set; }
 
         /// <summary>
-        ///     Gets or sets the secret.
+        ///     Gets or sets the map sharing key.
         /// </summary>
-        /// <value>The secret.</value>
-        [Display(Name = "Secret Key", Description = "You will need this key to edit or delete your map.")]
+        /// <value>The sharing key.</value>
+        [Display(Name = "Share Key", Description = "You will need this key to share your map.")]
         [Required]
-        public string Secret { get; set; }
+        public string Share { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether [this is my own creation published rightfully].
@@ -92,6 +98,6 @@ namespace CampaignKit.WorldMap.ViewModels
         [Required]
         public bool ThisIsNotOffensiveNorObviouslyIllegalContent { get; set; }
 
-        #endregion Public Properties
+        #endregion
     }
 }

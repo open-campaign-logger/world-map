@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,53 +13,100 @@
 // limitations under the License.
 
 using System.Linq;
+using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Services;
+using CampaignKit.WorldMap.Data;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Controllers
 {
     /// <inheritdoc />
     /// <summary>
-    ///     Class HomeController.
+    ///     Main MVC controller for application.
     /// </summary>
     /// <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
     public class HomeController : Controller
     {
-        #region Private Fields
+        #region Fields
 
-        private readonly IMapDataService _mapDataService;
+        /// <summary>
+        ///     The application logging service.
+        /// </summary>
+        private readonly ILogger _loggerService;
 
-        #endregion Private Fields
+        /// <summary>
+        ///     The EntityFramework repository for Map data elements.
+        /// </summary>
+        private readonly IMapRepository _mapRepository;
 
-        #region Public Constructors
+        #endregion
+
+        #region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="HomeController" /> class.
         /// </summary>
         /// <param name="mapDataService">The map data service.</param>
-        public HomeController(IMapDataService mapDataService)
+        /// <param name="logger">The logger.</param>
+        public HomeController(IMapRepository mapDataService,
+            ILogger<HomeController> logger)
         {
-            _mapDataService = mapDataService;
+            _mapRepository = mapDataService;
+            _loggerService = logger;
         }
 
-        #endregion Public Constructors
+        #endregion
 
-        #region Public Methods
+        #region Methods
 
-        public IActionResult Index()
+        /// <summary>
+        ///     GET: /
+        /// </summary>
+        /// <returns>Home view showing last three created maps.</returns>
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            var model = _mapDataService.FindAll().OrderByDescending(m => m.CreationTimestamp).Take(3);
+            // Retrieve a listing of maps for this user.  
+            // Anonymous User: all public maps
+            // Authenticated User: all public and owned maps.
+            var model = (await _mapRepository.FindAll(User, true))
+                .Where(m => m.MapId != 1)
+                .OrderByDescending(m => m.CreationTimestamp)
+                .Take(3);
 
             return View(model);
         }
 
+        /// <summary>
+        ///     This action is called via an Ajax call with the
+        ///     JWT bearer details in the request header.  The action itself
+        ///     does nothing but the middleware will intercept the
+        ///     JWT authorization token in the request header and create a
+        ///     new client side cookie containing the JWT auth token so that
+        ///     subsequent form submits will be able to send in the auth details
+        ///     automatically.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize]
+        public ActionResult JwtCookie()
+        {
+            return View();
+        }
+
+        /// <summary>
+        ///     GET: /Home/Legalities
+        /// </summary>
+        /// <returns>Application legalities view.</returns>
+        [HttpGet]
         public ActionResult Legalities()
         {
             return View();
         }
 
-        #endregion Public Methods
+        #endregion
     }
 }

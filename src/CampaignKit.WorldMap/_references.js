@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,3 +21,5 @@
 /// <reference path="wwwroot/js/jquery.validate.js" />
 /// <reference path="wwwroot/js/jquery.validate.unobtrusive.js" />
 /// <reference path="wwwroot/js/leaflet.js" />
+/// <reference path="wwwroot/js/leaflet.draw.js" />
+/// <reference path="wwwroot/js/quill.js" />

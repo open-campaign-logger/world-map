@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CampaignKit.WorldMap.Entities
 {
-    /// <summary>
-    ///     Class Map.
-    /// </summary>
+    /// <summary>Map Entity</summary>
     public class Map
     {
-        #region Public Properties
+        #region Properties
 
         /// <summary>
         ///     Gets or sets the size of the adjusted.
@@ -46,6 +46,7 @@ namespace CampaignKit.WorldMap.Entities
         ///     Gets or sets the creation timestamp.
         /// </summary>
         /// <value>The creation timestamp.</value>
+        [Column(TypeName = "datetime")]
         public DateTime CreationTimestamp { get; set; }
 
         /// <summary>
@@ -55,10 +56,24 @@ namespace CampaignKit.WorldMap.Entities
         public string FileExtension { get; set; }
 
         /// <summary>
+        ///     Gets or sets a value indicating whether this instance is public.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is public; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsPublic { get; set; }
+
+        /// <summary>
         ///     Gets or sets the identifier.
         /// </summary>
         /// <value>The identifier.</value>
-        public Guid Id { get; set; }
+        public int MapId { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the marker data for this map.
+        /// </summary>
+        /// <value>A JSON representation of child marker entities for this map.</value>
+        public string MarkerData { get; set; }
 
         /// <summary>
         ///     Gets or sets the maximum zoom level.
@@ -80,17 +95,44 @@ namespace CampaignKit.WorldMap.Entities
         public bool RepeatMapInX { get; set; }
 
         /// <summary>
-        ///     Gets or sets the secret.
+        ///     Gets or sets the map share key.
         /// </summary>
-        /// <value>The secret.</value>
-        public string Secret { get; set; }
+        /// <value>
+        ///     The map share key.  Used for providing access to non-registered users.
+        /// </value>
+        public string ShareKey { get; set; }
 
         /// <summary>
-        ///     Gets or sets the thumbnail path.
+        ///     Gets or sets the map's thumbnail path.
         /// </summary>
-        /// <value>The thumbnail path.</value>
+        /// <value>The map's thumbnail path.</value>
         public string ThumbnailPath { get; set; }
 
-        #endregion Public Properties
+        /// <summary>
+        ///     Gets or sets the tile collection for this map.
+        /// </summary>
+        /// <value>A collection of child tile entities.</value>
+        public ICollection<Tile> Tiles { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the update timestamp.
+        /// </summary>
+        /// <value>The update timestamp.</value>
+        [Column(TypeName = "datetime")]
+        public DateTime UpdateTimestamp { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the id of the user this map belongs to.
+        /// </summary>
+        /// <value>The user id.</value>
+        public string UserId { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the world folder path.
+        /// </summary>
+        /// <value>The world folder path.</value>
+        public string WorldFolderPath { get; set; }
+
+        #endregion
     }
 }

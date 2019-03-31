@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,50 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
+using System.Linq;
+
+using CampaignKit.WorldMap.Data;
+
+using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Services
 {
-    /// <summary>
-    ///     Interface IProgressIndicator
-    /// </summary>
-    public interface IProgressIndicator
-    {
-        #region Public Methods
-
-        /// <summary>
-        ///     Sets the progress.
-        ///     0.0 = 0% .. 1.0 = 100%
-        /// </summary>
-        /// <param name="progress">The progress.</param>
-        void SetProgress(double progress);
-
-        #endregion Public Methods
-    }
-
     /// <summary>
     ///     Interface IProgressService
     /// </summary>
     public interface IProgressService
     {
-        #region Public Methods
+        #region Methods
 
         /// <summary>
-        ///     Creates the indicator.
-        /// </summary>
-        /// <param name="indicatorId">The indicator identifier.</param>
-        /// <returns>IProgressIndicator.</returns>
-        IProgressIndicator CreateIndicator(string indicatorId);
-
-        /// <summary>
-        ///     Gets the progress.
+        ///     Gets the map creation progress.
         ///     0.0 = 0% .. 1.0 = 100%
         /// </summary>
-        /// <param name="indicatorId">The indicator identifier.</param>
+        /// <param name="mapId">The map identifier.</param>
         /// <returns>System.Double.</returns>
-        double? GetProgress(string indicatorId);
+        double GetMapProgress(string mapId);
 
-        #endregion Public Methods
+        #endregion
     }
 
     /// <inheritdoc />
@@ -65,84 +46,65 @@ namespace CampaignKit.WorldMap.Services
     /// <seealso cref="T:CampaignKit.WorldMap.Services.IProgressService" />
     public class DefaultProgressService : IProgressService
     {
-        #region Private Fields
+        #region Fields
 
-        private readonly SortedDictionary<string, DefaultProgressIndicator> _indicators =
-            new SortedDictionary<string, DefaultProgressIndicator>();
-
-        #endregion Private Fields
-
-        #region Nested type: DefaultProgressIndicator
-
-        #region Private Classes
-
-        /// <inheritdoc />
-        /// <summary>
-        ///     Class DefaultProgressIndicator.
-        /// </summary>
-        /// <seealso cref="T:CampaignKit.WorldMap.Services.IProgressIndicator" />
-        private class DefaultProgressIndicator : IProgressIndicator
-        {
-            #region Public Properties
-
-            /// <summary>
-            ///     Gets or sets the progress.
-            /// </summary>
-            /// <value>The progress.</value>
-            public double Progress { get; private set; }
-
-            #endregion Public Properties
-
-            #region IProgressIndicator Members
-
-            #region Public Methods
-
-            /// <inheritdoc />
-            /// <summary>
-            ///     Sets the progress.
-            /// </summary>
-            /// <param name="progress">The progress.</param>
-            public void SetProgress(double progress)
-            {
-                Progress = progress;
-            }
-
-            #endregion Public Methods
-
-            #endregion
-        }
-
-        #endregion Private Classes
+        private readonly WorldMapDBContext _context;
+        private readonly ILogger _logger;
 
         #endregion
 
-        #region Public Methods
+        #region Constructors
 
-        /// <inheritdoc />
         /// <summary>
-        ///     Creates the indicator.
+        ///     Initializes a new instance of the <see cref="DefaultProgressService" /> class.
         /// </summary>
-        /// <param name="indicatorId">The indicator identifier.</param>
-        /// <returns>IProgressIndicator.</returns>
-        public IProgressIndicator CreateIndicator(string indicatorId)
+        public DefaultProgressService(WorldMapDBContext context,
+            ILogger<TileCreationService> logger)
         {
-            var indicator = new DefaultProgressIndicator();
-            _indicators.Add(indicatorId, indicator);
-
-            return indicator;
+            _context = context;
+            _logger = logger;
         }
 
-        /// <inheritdoc />
+        #endregion
+
+        #region Implementations
+
+        #region IProgressService Members
+
+        #region Public Methods
+
         /// <summary>
-        ///     Gets the progress.
+        ///     Gets the map creation progress.
+        ///     0.0 = 0% .. 1.0 = 100%
         /// </summary>
-        /// <param name="indicatorId">The indicator identifier.</param>
+        /// <param name="mapId">The map identifier.</param>
         /// <returns>System.Double.</returns>
-        public double? GetProgress(string indicatorId)
+        public double GetMapProgress(string mapId)
         {
-            return _indicators.ContainsKey(indicatorId) ? _indicators[indicatorId].Progress : (double?) null;
+            // Create a default return value
+            var progress = (double) 0;
+
+            // Find tiles related to this map
+            var tiles = (from t in _context.Tiles select t)
+                .Where(t => t.MapId == Convert.ToInt32(mapId))
+                .ToList();
+            var total = tiles.Count();
+            var completed = tiles.Where(t => t.CompletionTimestamp > DateTime.MinValue).Count();
+
+            // Are there tiles defined for this map?
+            if (total > 0)
+                progress = completed / (double) total;
+            else
+                progress = 1;
+
+            // Return the progress value
+            return progress;
         }
 
         #endregion Public Methods
+
+        #endregion
+
+        #endregion
     }
 }

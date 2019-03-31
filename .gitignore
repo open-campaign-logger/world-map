@@ -328,3 +328,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/src/CampaignKit.WorldMap/App_Data/MapData.db
+/src/CampaignKit.WorldMap/App_Data/WorldMap.db

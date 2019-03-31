@@ -1,5 +1,5 @@
 ﻿<!--
-Copyright 2017-2018 Jochen Linnemann
+Copyright 2017-2019 Jochen Linnemann, Cory Gill
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,13 +30,12 @@ limitations under the License.
                 <div class="panel-body">
                     <div class="text-danger" asp-validation-summary="ModelOnly"></div>
                     <form method="post" asp-antiforgery="true" enctype="multipart/form-data">
-                        <input asp-for="HiddenId" />
-                        <input asp-for="HiddenSecret" />
+                        <input asp-for="Id" />
                         <div class="form-group">
                             <label class="lead">Do you really want to delete the map @Model.Name?</label>
                         </div>
                         <div class="form-group">
-                            <a class="btn btn-default" asp-action="Show" asp-route-id="@Model.HiddenId">Cancel</a>
+                            <a class="btn btn-default" asp-action="Show" asp-route-id="@Model.Id">Cancel</a>
                             <input class="btn btn-warning pull-right" type="submit" value="Delete" />
                         </div>
                     </form>

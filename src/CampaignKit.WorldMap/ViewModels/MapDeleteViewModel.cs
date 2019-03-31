@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace CampaignKit.WorldMap.ViewModels
@@ -23,21 +21,14 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class MapDeleteViewModel
     {
-        #region Public Properties
+        #region Properties
 
         /// <summary>
-        ///     Gets or sets the hidden identifier.
+        ///     Gets or sets the Map identifier.
         /// </summary>
-        /// <value>The hidden identifier.</value>
+        /// <value>The map identifier.</value>
         [HiddenInput]
-        public Guid HiddenId { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the hidden secret.
-        /// </summary>
-        /// <value>The hidden secret.</value>
-        [HiddenInput]
-        public string HiddenSecret { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         ///     Gets or sets the name.
@@ -45,6 +36,6 @@ namespace CampaignKit.WorldMap.ViewModels
         /// <value>The name.</value>
         public string Name { get; set; }
 
-        #endregion Public Properties
+        #endregion
     }
 }

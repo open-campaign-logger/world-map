@@ -1,5 +1,5 @@
 ﻿<!--
-Copyright 2017-2018 Jochen Linnemann
+Copyright 2017-2019 Jochen Linnemann, Cory Gill
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,45 +13,58 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+@model MapShowViewModel
 @{
     Layout = "_BaseLayout";
 }
 
 @section styles {
     <link href="~/css/leaflet.css" rel="stylesheet" />
+    <link href="~/css/leaflet.draw.css" rel="stylesheet" />
+    <link href="~/css/quill.snow.css" rel="stylesheet" />
+    <link href="~/css/popup.css" rel="stylesheet" />
     <style type="text/css">
+
         html, body {
-            position: relative;
             height: 100%;
             margin: 0;
             padding: 0;
+            position: relative;
         }
 
         div#map {
-            position: absolute;
-            top: 65px;
-            left: 0;
-            right: 0;
             bottom: 0;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 65px;
         }
     </style>
 }
 
-<div id="map"></div>
-
+<div id="preMap">
+    <div id="map"></div>
+</div>
 @RenderBody()
 
 @section scripts {
     <script src="~/js/leaflet.js"></script>
+    <script src="~/js/leaflet.draw.js"></script>
+    <script src="~/js/quill.js"></script>
+    <script src="~/js/worldmap-map.js"></script>
     <script>
-        var map = L.map('map').setView([0, 0], 2);
 
-        L.tileLayer('@ViewBag.WorldPath/{z}/{x}_{y}.png', {
-            attribution: "Campaign Logger",
-            maxZoom: @ViewBag.MaxZoomLevel,
-            noWrap: @(ViewBag.NoWrap ? "true": "false"),
-            dummy: null
-        }).addTo(map);
+        // **********************************************
+        //               Initialize Map
+        // **********************************************
+
+        initMap(@Model.Id,
+            '@Model.UserId',
+            '@Model.Share',
+            '@ViewBag.WorldPath',
+            @ViewBag.MaxZoomLevel,
+            '@ViewBag.NoWrap' === '@true');
+
     </script>
     @RenderSection("scripts", false)
 }

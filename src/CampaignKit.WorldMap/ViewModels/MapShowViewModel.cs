@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace CampaignKit.WorldMap.ViewModels
 {
     /// <summary>
@@ -21,37 +19,33 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class MapShowViewModel
     {
-        #region Public Properties
+        #region Properties
 
         /// <summary>
-        ///     Gets or sets the identifier.
+        ///     Gets or sets a value indicating whether the user can edit.
         /// </summary>
-        /// <value>The identifier.</value>
-        public Guid Id { get; set; }
+        /// <value>
+        ///     <c>true</c> if this instance can edit; otherwise, <c>false</c>.
+        /// </value>
+        public bool CanEdit { get; set; }
 
         /// <summary>
         ///     Gets the map base delete URL.
         /// </summary>
         /// <value>The map base delete URL.</value>
-        public string MapBaseDeleteUrl { get; set; }
+        public string DeleteUrl { get; set; }
 
         /// <summary>
         ///     Gets the map base edit URL.
         /// </summary>
         /// <value>The map base edit URL.</value>
-        public string MapBaseEditUrl { get; set; }
+        public string EditUrl { get; set; }
 
         /// <summary>
-        ///     Gets or sets the map edit URL.
+        ///     Gets or sets the identifier.
         /// </summary>
-        /// <value>The map edit URL.</value>
-        public string MapEditUrl { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the map show URL.
-        /// </summary>
-        /// <value>The map show URL.</value>
-        public string MapShowUrl { get; set; }
+        /// <value>The identifier.</value>
+        public int Id { get; set; }
 
         /// <summary>
         ///     Gets or sets the name.
@@ -66,10 +60,10 @@ namespace CampaignKit.WorldMap.ViewModels
         public string ProgressUrl { get; set; }
 
         /// <summary>
-        ///     Gets the secret.
+        ///     Gets the map share key.
         /// </summary>
-        /// <value>The secret.</value>
-        public string Secret { get; set; }
+        /// <value>The share key.</value>
+        public string Share { get; set; }
 
         /// <summary>
         ///     Gets a value indicating whether [show progress].
@@ -77,6 +71,18 @@ namespace CampaignKit.WorldMap.ViewModels
         /// <value><c>true</c> if [show progress]; otherwise, <c>false</c>.</value>
         public bool ShowProgress { get; set; }
 
-        #endregion Public Properties
+        /// <summary>
+        ///     Gets or sets the map show URL.
+        /// </summary>
+        /// <value>The map show URL.</value>
+        public string ShowUrl { get; set; }
+
+        /// <summary>
+        ///     The userid of the map owner.
+        /// </summary>
+        /// <value>The user id.</value>
+        public string UserId { get; set; }
+
+        #endregion
     }
 }
