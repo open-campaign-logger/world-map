@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace CampaignKit.WorldMap.ViewHelpers
     /// </summary>
     public static class HtmlHelperExtensions
     {
-        #region Public Methods
+        #region Methods
 
         /// <summary>
         ///     Descriptions for.
@@ -46,6 +46,6 @@ namespace CampaignKit.WorldMap.ViewHelpers
             return metadata.Description;
         }
 
-        #endregion Public Methods
+        #endregion
     }
 }

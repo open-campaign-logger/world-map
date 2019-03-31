@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <UserSecretsId>89aee1ae-96c9-458a-886d-ad5a9ce657ec</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

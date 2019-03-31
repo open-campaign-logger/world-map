@@ -22,11 +22,22 @@
     <RepositoryUrl>https://github.com/open-campaign-logger/world-map</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Version>2.17.3</Version>
+    <UserSecretsId>9dc1a7bf-014e-4d41-a332-4d37e813ee60</UserSecretsId>
  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="App_Data\Sample\Sample.db" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App_Data\Sample\Sample.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="wwwroot\**\*;Views\**\*">

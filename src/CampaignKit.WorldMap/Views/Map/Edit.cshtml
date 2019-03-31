@@ -1,5 +1,5 @@
 ﻿<!--
-Copyright 2017-2018 Jochen Linnemann
+Copyright 2017-2019 Jochen Linnemann, Cory Gill
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -29,46 +29,46 @@ limitations under the License.
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="text-danger" asp-validation-summary="ModelOnly"></div>
-					<form method="post" asp-antiforgery="true" enctype="multipart/form-data">
-						<input asp-for="Id" />
-						<div class="form-group">
-							<label class="control-label" asp-for="Name"></label>
-							<input class="form-control" asp-for="Name" />
-							<span class="text-danger" asp-validation-for="Name"></span>
-						</div>
-						<div class="form-group">
-							<div class="checkbox col-xs-12">
-								<label>
-									<input asp-for="RepeatMapInX" />
-									@Html.DisplayNameFor(m => m.RepeatMapInX)
-								</label>
-								<span class="text-danger" asp-validation-for="RepeatMapInX"></span>
-							</div>
-							<div class="checkbox col-xs-12">
-								<label>
-									<input asp-for="MakeMapPublic" />
-									@Html.DisplayNameFor(m => m.MakeMapPublic)
-								</label>
-								<span class="text-danger" asp-validation-for="MakeMapPublic"></span>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="control-label" asp-for="Copyright"></label>
-							<a tabindex="0" role="button" data-toggle="popover" data-placement="right" data-trigger="focus"
-							   title="@Html.DisplayNameFor(m=>m.Copyright)" data-content="@Html.DescriptionFor(m => m.Copyright)">
-								<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
-							</a>
-							<input class="form-control" asp-for="Copyright" title="@Html.DescriptionFor(m => m.Copyright)" />
-							<span class="text-danger" asp-validation-for="Copyright"></span>
-						</div>
-						<div class="form-group">
-							<label class="control-label" asp-for="ShowUrl">Use this URL to <b>share</b> your map</label>
-							<input class="form-control" asp-for="ShowUrl" readonly />
-						</div>
-						<div class="form-group">
-							<input class="btn btn-primary pull-right" type="submit" />
-						</div>
-					</form>
+                    <form method="post" asp-antiforgery="true" enctype="multipart/form-data">
+                        <input asp-for="Id" />
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Name"></label>
+                            <input class="form-control" asp-for="Name" />
+                            <span class="text-danger" asp-validation-for="Name"></span>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox col-xs-12">
+                                <label>
+                                    <input asp-for="RepeatMapInX" />
+                                    @Html.DisplayNameFor(m => m.RepeatMapInX)
+                                </label>
+                                <span class="text-danger" asp-validation-for="RepeatMapInX"></span>
+                            </div>
+                            <div class="checkbox col-xs-12">
+                                <label>
+                                    <input asp-for="MakeMapPublic" />
+                                    @Html.DisplayNameFor(m => m.MakeMapPublic)
+                                </label>
+                                <span class="text-danger" asp-validation-for="MakeMapPublic"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Copyright"></label>
+                            <a tabindex="0" role="button" data-toggle="popover" data-placement="right" data-trigger="focus"
+                               title="@Html.DisplayNameFor(m => m.Copyright)" data-content="@Html.DescriptionFor(m => m.Copyright)">
+                                <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                            </a>
+                            <input class="form-control" asp-for="Copyright" title="@Html.DescriptionFor(m => m.Copyright)" />
+                            <span class="text-danger" asp-validation-for="Copyright"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" asp-for="ShowUrl">Use this URL to <b>share</b> your map</label>
+                            <input class="form-control" asp-for="ShowUrl" readonly />
+                        </div>
+                        <div class="form-group">
+                            <input class="btn btn-primary pull-right" type="submit" />
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -79,7 +79,7 @@ limitations under the License.
 
 @section scripts {
     <script>
-        $(function () {
+        $(function() {
             $('[data-toggle="popover"]').popover();
         });
     </script>

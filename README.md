@@ -6,17 +6,26 @@ Service for managing world maps and associate them with Campaign Logger log entr
 
 # Development Environment
 
-## Visual Studio
+## .Net SDK
+.Net Core 2.2 SDK: https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral
 
+## Git
+- Git for Windows 2.20: https://gitforwindows.org/
+	- Uncheked "Windows Explorer Integration"
+	- "Use Notepad++ ad Git's default editor"
+	- Checkout as-is, commit as-is
+- Tortoise Git (Recommended): https://tortoisegit.org/download/
+
+## Visual Studio
 - VS2017 Community
 - ASP.NET and web development workload
 - .Net Core cross-platform development
 
 ## Visual Studio Extensions
-
-- GhostDoc Community for VS2017
-- GitFlow for VisualStudio 2017
-- GitHub Extension for VisualStudio
+- GhostDoc: https://marketplace.visualstudio.com/items?itemName=sergeb.GhostDoc
+- GitHub Extension for VisualStudio: https://visualstudio.github.com/
+- GitFlow Extension for VisualStudio: https://marketplace.visualstudio.com/items?itemName=vs-publisher-57624.GitFlowforVisualStudio2017
+- Sqlite/SQL Server Compact Toolbox: https://marketplace.visualstudio.com/items?itemName=ErikEJ.SQLServerCompactSQLiteToolbox
 
 ## git
 
@@ -47,3 +56,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - Sharing test context between tests: https://xunit.github.io/docs/shared-context
 - Supporting AntiForgeryTokens: https://www.matheus.ro/2018/09/03/integration-tests-in-asp-net-core-controllers/
 
+## Security Material
+
+- Running .Net Core 2.1 With Self-Signed Cert: https://www.hanselman.com/blog/DevelopingLocallyWithASPNETCoreUnderHTTPSSSLAndSelfSignedCerts.aspx
+- Configure HTTPS in ASP.Net Core 2.1: https://asp.net-hacker.rocks/2018/07/09/aspnetcore-ssl.html

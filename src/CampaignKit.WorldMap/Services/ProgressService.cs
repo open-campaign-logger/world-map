@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,99 +15,96 @@
 using System;
 using System.Linq;
 
-using CampaignKit.WorldMap.Entities;
+using CampaignKit.WorldMap.Data;
 
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.Entities
+namespace CampaignKit.WorldMap.Services
 {
+    /// <summary>
+    ///     Interface IProgressService
+    /// </summary>
+    public interface IProgressService
+    {
+        #region Methods
 
-	/// <summary>
-	///     Interface IProgressService
-	/// </summary>
-	public interface IProgressService
-	{
-		#region Public Methods
+        /// <summary>
+        ///     Gets the map creation progress.
+        ///     0.0 = 0% .. 1.0 = 100%
+        /// </summary>
+        /// <param name="mapId">The map identifier.</param>
+        /// <returns>System.Double.</returns>
+        double GetMapProgress(string mapId);
 
-		/// <summary>
-		///     Gets the map creation progress.
-		///     0.0 = 0% .. 1.0 = 100%
-		/// </summary>
-		/// <param name="mapId">The map identifier.</param>
-		/// <returns>System.Double.</returns>
-		double GetMapProgress(string mapId);
+        #endregion
+    }
 
-		#endregion Public Methods
-	}
+    /// <inheritdoc />
+    /// <summary>
+    ///     Class DefaultProgressService.
+    /// </summary>
+    /// <seealso cref="T:CampaignKit.WorldMap.Services.IProgressService" />
+    public class DefaultProgressService : IProgressService
+    {
+        #region Fields
 
-	/// <inheritdoc />
-	/// <summary>
-	///     Class DefaultProgressService.
-	/// </summary>
-	/// <seealso cref="T:CampaignKit.WorldMap.Services.IProgressService" />
-	public class DefaultProgressService : IProgressService
-	{
-		#region Private Fields
+        private readonly WorldMapDBContext _context;
+        private readonly ILogger _logger;
 
-		private readonly WorldMapDBContext _context;
-		private readonly ILogger _logger;
+        #endregion
 
-		#endregion
+        #region Constructors
 
-		#region Public Constructors
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DefaultProgressService" /> class.
+        /// </summary>
+        public DefaultProgressService(WorldMapDBContext context,
+            ILogger<TileCreationService> logger)
+        {
+            _context = context;
+            _logger = logger;
+        }
 
-		/// <summary>
-		///     Initializes a new instance of the <see cref="DefaultProgressService" /> class.
-		/// </summary>
-		public DefaultProgressService(WorldMapDBContext context,
-				ILogger<TileCreationService> logger)
-		{
-			_context = context;
-			_logger = logger;
-		}
+        #endregion
 
-		#endregion
+        #region Implementations
 
-		#region IProgressService Members
+        #region IProgressService Members
 
-		#region Public Methods
+        #region Public Methods
 
-		/// <summary>Gets the map creation progress.
-		/// 0.0 = 0% .. 1.0 = 100%</summary>
-		/// <param name="mapId">The map identifier.</param>
-		/// <returns>System.Double.</returns>
-		public double GetMapProgress(string mapId)
-		{
-			// Create a default return value
-			var progress = (double)0;
+        /// <summary>
+        ///     Gets the map creation progress.
+        ///     0.0 = 0% .. 1.0 = 100%
+        /// </summary>
+        /// <param name="mapId">The map identifier.</param>
+        /// <returns>System.Double.</returns>
+        public double GetMapProgress(string mapId)
+        {
+            // Create a default return value
+            var progress = (double) 0;
 
-			// Find tiles related to this map
-			var tiles = (from t in _context.Tiles select t)
-				.Where(t => t.MapId == Convert.ToInt32(mapId))
-				.ToList();
-			var total = tiles.Count();
-			var completed = tiles.Where(t => t.CompletionTimestamp > DateTime.MinValue).Count();
+            // Find tiles related to this map
+            var tiles = (from t in _context.Tiles select t)
+                .Where(t => t.MapId == Convert.ToInt32(mapId))
+                .ToList();
+            var total = tiles.Count();
+            var completed = tiles.Where(t => t.CompletionTimestamp > DateTime.MinValue).Count();
 
-			// Are there tiles defined for this map?
-			if (total > 0)
-			{
-				// Calculate the percentage complete ensuring to strongly type the 
-				// dividend and divisor so that the rounding does not occur during calculation
-				// and the resulting quotient is the correct data type.
-				progress = (double)completed / (double)total;
-			} else
-			{
-				// nothing to do
-				progress = 1;
-			}
+            // Are there tiles defined for this map?
+            if (total > 0)
+                progress = completed / (double) total;
+            else
+                progress = 1;
 
-			// Return the progress value
-			return progress;
-		}
+            // Return the progress value
+            return progress;
+        }
 
-		#endregion Public Methods
+        #endregion Public Methods
 
-		#endregion
+        #endregion
 
-	}
+        #endregion
+    }
 }

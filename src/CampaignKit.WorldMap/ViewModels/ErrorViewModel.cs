@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class ErrorViewModel
     {
-        #region Public Properties
+        #region Properties
 
         /// <summary>
         ///     Gets or sets the message.
@@ -33,6 +33,6 @@ namespace CampaignKit.WorldMap.ViewModels
         /// <value>The title.</value>
         public string Title { get; set; }
 
-        #endregion Public Properties
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2018 Jochen Linnemann
+﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,95 +18,86 @@ using Microsoft.AspNetCore.Http;
 
 namespace CampaignKit.WorldMap.ViewModels
 {
-	/// <summary>
-	///     Class MapCreateViewModel.
-	/// </summary>
-	public class MapCreateViewModel
-	{
-		#region Hidden Properties
+    /// <summary>
+    ///     Class MapCreateViewModel.
+    /// </summary>
+    public class MapCreateViewModel
+    {
+        #region Properties
 
-		#endregion
+        /// <summary>
+        ///     Gets or sets the copyright.
+        /// </summary>
+        /// <value>The copyright.</value>
+        [Display(Description = "You might want to provide copyright information for your creation.")]
+        public string Copyright { get; set; }
 
-		#region Required Properties
+        /// <summary>
+        ///     Gets or sets the map image.
+        /// </summary>
+        /// <value>The map image.</value>
+        [Display(Name = "World Map Image")]
+        [Required]
+        [DataType(DataType.Upload)]
+        // Sadly, FileExtensions are currently not working:
+        //[FileExtensions(Extensions = "png,jpg,jpeg")]
+        public IFormFile Image { get; set; }
 
-		/// <summary>
-		///     Gets or sets the name.
-		/// </summary>
-		/// <value>The name.</value>
-		[Display(Name = "World Name")]
-		[Required]
-		public string Name { get; set; }
-		
-		/// <summary>
-		///     Gets or sets the map image.
-		/// </summary>
-		/// <value>The map image.</value>
-		[Display(Name = "World Map Image")]
-		[Required]
-		[DataType(DataType.Upload)]
-		// Sadly, FileExtensions are currently not working:
-		//[FileExtensions(Extensions = "png,jpg,jpeg")]
-		public IFormFile Image { get; set; }
+        /// <summary>
+        ///     Gets or sets a value indicating whether this map should be made public.
+        /// </summary>
+        /// <value><c>true</c> if this map should be made public; otherwise, <c>false</c>.</value>
+        [Display(Name = "This map should be made public.")]
+        public bool IsPublic { get; set; }
 
-		/// <summary>
-		///     Gets or sets the map secret.
-		/// </summary>
-		/// <value>The secret.</value>
-		[Display(Name = "Secret Key", Description = "You will need this key to share your map.")]
-		[Required]
-		public string Secret { get; set; }
+        /// <summary>
+        ///     Gets or sets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        [Display(Name = "World Name")]
+        [Required]
+        public string Name { get; set; }
 
-		/// <summary>
-		///     Gets or sets a value indicating whether [processing saving publishing rights granted for this site].
-		/// </summary>
-		/// <value><c>true</c> if [processing saving publishing rights granted for this site]; otherwise, <c>false</c>.</value>
-		[Display(Name =
-			"I am granting you (the site owner/maintainer) the right to process, save, and publish this map for display on this site.")]
-		[Required]
-		public bool ProcessingSavingPublishingRightsGrantedForThisSite { get; set; }
+        /// <summary>
+        ///     Gets or sets a value indicating whether [processing saving publishing rights granted for this site].
+        /// </summary>
+        /// <value><c>true</c> if [processing saving publishing rights granted for this site]; otherwise, <c>false</c>.</value>
+        [Display(Name =
+            "I am granting you (the site owner/maintainer) the right to process, save, and publish this map for display on this site.")]
+        [Required]
+        public bool ProcessingSavingPublishingRightsGrantedForThisSite { get; set; }
 
-		/// <summary>
-		///     Gets or sets a value indicating whether [this is my own creation published rightfully].
-		/// </summary>
-		/// <value><c>true</c> if [this is my own creation published rightfully]; otherwise, <c>false</c>.</value>
-		[Display(Name = "This map is of my own creation and I am not violating any copyright laws by publishing it.")]
-		[Required]
-		public bool ThisIsMyOwnCreationPublishedRightfully { get; set; }
+        /// <summary>
+        ///     Gets or sets a value indicating whether [repeat map in x].
+        /// </summary>
+        /// <value><c>true</c> if [repeat map in x]; otherwise, <c>false</c>.</value>
+        [Display(Name = "Repeat map horizontally")]
+        public bool RepeatMapInX { get; set; }
 
-		/// <summary>
-		///     Gets or sets a value indicating whether [this is not offensive or obviously illegal].
-		/// </summary>
-		/// <value><c>true</c> if [this is not offensive or obviously illegal]; otherwise, <c>false</c>.</value>
-		[Display(Name = "This map image does not present offensive nor obviously illegal content.")]
-		[Required]
-		public bool ThisIsNotOffensiveNorObviouslyIllegalContent { get; set; }
+        /// <summary>
+        ///     Gets or sets the map sharing key.
+        /// </summary>
+        /// <value>The sharing key.</value>
+        [Display(Name = "Share Key", Description = "You will need this key to share your map.")]
+        [Required]
+        public string Share { get; set; }
 
-		#endregion
+        /// <summary>
+        ///     Gets or sets a value indicating whether [this is my own creation published rightfully].
+        /// </summary>
+        /// <value><c>true</c> if [this is my own creation published rightfully]; otherwise, <c>false</c>.</value>
+        [Display(Name = "This map is of my own creation and I am not violating any copyright laws by publishing it.")]
+        [Required]
+        public bool ThisIsMyOwnCreationPublishedRightfully { get; set; }
 
-		#region Optional Properties
+        /// <summary>
+        ///     Gets or sets a value indicating whether [this is not offensive or obviously illegal].
+        /// </summary>
+        /// <value><c>true</c> if [this is not offensive or obviously illegal]; otherwise, <c>false</c>.</value>
+        [Display(Name = "This map image does not present offensive nor obviously illegal content.")]
+        [Required]
+        public bool ThisIsNotOffensiveNorObviouslyIllegalContent { get; set; }
 
-		/// <summary>
-		///     Gets or sets the copyright.
-		/// </summary>
-		/// <value>The copyright.</value>
-		[Display(Description = "You might want to provide copyright information for your creation.")]
-		public string Copyright { get; set; }
-
-		/// <summary>
-		///     Gets or sets a value indicating whether [repeat map in x].
-		/// </summary>
-		/// <value><c>true</c> if [repeat map in x]; otherwise, <c>false</c>.</value>
-		[Display(Name = "Repeat map horizontally")]
-		public bool RepeatMapInX { get; set; }
-
-		/// <summary>
-		///     Gets or sets a value indicating whether this map should be made public.
-		/// </summary>
-		/// <value><c>true</c> if this map should be made public; otherwise, <c>false</c>.</value>
-		[Display(Name = "This map should be made public.")]
-		public bool IsPublic { get; set; }
-
-		#endregion
-
-	}
+        #endregion
+    }
 }
