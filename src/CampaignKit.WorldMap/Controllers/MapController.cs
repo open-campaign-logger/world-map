@@ -24,6 +24,7 @@ using CampaignKit.WorldMap.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace CampaignKit.WorldMap.Controllers
 {
@@ -45,11 +46,6 @@ namespace CampaignKit.WorldMap.Controllers
         ///     The file path service
         /// </summary>
         private readonly IFilePathService _filePathService;
-
-        /// <summary>
-        ///     The application logging service.
-        /// </summary>
-        private readonly ILogger _loggerService;
 
         /// <summary>
         ///     The EntityFramework repository for Map data elements.
@@ -78,20 +74,17 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="progressService">The progress service.</param>
         /// <param name="filePathService">The file path service.</param>
         /// <param name="dbContext">The database context.</param>
-        /// <param name="loggerService">The logger service.</param>
         public MapController(IRandomDataService randomDataService,
             IMapRepository mapRepository,
             IProgressService progressService,
             IFilePathService filePathService,
-            WorldMapDBContext dbContext,
-            ILogger<MapController> loggerService)
+            WorldMapDBContext dbContext)
         {
             _randomDataService = randomDataService;
             _mapRepository = mapRepository;
             _progressService = progressService;
             _filePathService = filePathService;
             _dbContext = dbContext;
-            _loggerService = loggerService;
         }
 
         #endregion
@@ -140,7 +133,7 @@ namespace CampaignKit.WorldMap.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            _loggerService.Log(LogLevel.Debug, 0, "Enter GET Map/Create");
+            Log.Debug("Enter GET Map/Create");
 
             var model = new MapCreateViewModel { Share = _randomDataService.GetRandomText(8) };
             return View(model);
@@ -156,7 +149,7 @@ namespace CampaignKit.WorldMap.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MapCreateViewModel model)
         {
-            _loggerService.Log(LogLevel.Debug, 0, "Enter POST Map/Create");
+            Log.Debug("Enter POST Map/Create");
 
             if (!ModelState.IsValid)
                 return View();
@@ -448,7 +441,7 @@ namespace CampaignKit.WorldMap.Controllers
             var map = await _mapRepository.Find(model.MapId, User, string.Empty);
             if (map == null)
             {
-                _loggerService.LogError($"Map with id:{model.MapId} not found");
+                Log.Error($"Map with id:{model.MapId} not found");
                 return Json("Failed to update marker");
             }
 
