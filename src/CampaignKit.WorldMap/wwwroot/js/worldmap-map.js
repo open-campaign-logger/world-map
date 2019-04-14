@@ -40,7 +40,8 @@ var template = '<div id="popup_{id}" class="popup">\
 // This is used for testing purposes only.
 function loadMarkers(share) {
 
-    var requestUrl = `/Map/MarkerData/${mapId}`;
+    var requestUrl = rootUri;
+    requestUrl += `/Map/MarkerData/${mapId}`;
     if (share) {
         requestUrl += `?shareKey=${share}`;
     }
@@ -130,8 +131,12 @@ function saveMarkers() {
 
     // Post the data back to the controller
     console.log('Submitting form...');
+
+    var requestUrl = rootUri;
+    requestUrl += '/Map/MarkerData'
+
     $.ajax({
-        url: '/Map/MarkerData',
+        url: requestUrl,
         type: 'POST',
         contentType: 'application/json',
         dataType: 'json',
