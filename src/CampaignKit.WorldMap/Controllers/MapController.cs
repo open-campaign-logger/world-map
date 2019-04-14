@@ -23,7 +23,7 @@ using CampaignKit.WorldMap.ViewModels;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+
 using Serilog;
 
 namespace CampaignKit.WorldMap.Controllers

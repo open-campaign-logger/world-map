@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -31,10 +29,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
-using Serilog;
+
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace CampaignKit.WorldMap
@@ -47,7 +44,6 @@ namespace CampaignKit.WorldMap
         #region Fields
 
         private readonly IConfiguration _configuration;
-        private readonly ILogger<Startup> _logger;
 
         #endregion
 
@@ -66,15 +62,6 @@ namespace CampaignKit.WorldMap
                 .AddEnvironmentVariables();
 
             _configuration = builder.Build();
-
-            string logFile = "Logs/worldmap_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.File(logFile)
-                .CreateLogger();
-
-            Log.Information("Logging started!");
         }
 
         #endregion
@@ -97,7 +84,6 @@ namespace CampaignKit.WorldMap
         /// </summary>
         /// <param name="app">The application.</param>
         /// <param name="env">The env.</param>
-
 
         // ReSharper disable once UnusedMember.Global
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -138,7 +124,7 @@ namespace CampaignKit.WorldMap
             services.AddSingleton(_configuration);
 
             // Instantiate the database and add to the context
-            ConfigureDB(services);
+            ConfigureDb(services);
 
             // Add the MVC service
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -148,7 +134,7 @@ namespace CampaignKit.WorldMap
 
             // Add data services to context
             // Note: these have been changed from singleton to scoped services in order
-            //       to work with the dbcontext which is scoped.
+            //       to work with the db context which is scoped.
             services.AddScoped<IFilePathService, DefaultFilePathService>();
             services.AddScoped<IRandomDataService, DefaultRandomDataService>();
             services.AddScoped<IProgressService, DefaultProgressService>();
@@ -209,7 +195,7 @@ namespace CampaignKit.WorldMap
         ///     testing project.
         /// </summary>
         /// <param name="services">The services.</param>
-        protected virtual void ConfigureDB(IServiceCollection services)
+        protected virtual void ConfigureDb(IServiceCollection services)
         {
             // Instantiate the database and add to the context
             services.AddDbContext<WorldMapDBContext>

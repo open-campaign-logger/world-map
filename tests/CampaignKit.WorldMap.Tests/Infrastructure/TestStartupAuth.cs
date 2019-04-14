@@ -22,7 +22,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
     {
         #region Constructors
 
-        public TestStartupAuth(IHostingEnvironment env, ILoggerFactory loggerFactory) : base(env, loggerFactory)
+        public TestStartupAuth(IHostingEnvironment env) : base(env)
         {
         }
 

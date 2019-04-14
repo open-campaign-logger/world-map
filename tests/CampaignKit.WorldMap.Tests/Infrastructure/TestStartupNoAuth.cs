@@ -17,7 +17,6 @@ using CampaignKit.WorldMap.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
@@ -25,7 +24,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
     {
         #region Constructors
 
-        public TestStartupNoAuth(IHostingEnvironment env, ILoggerFactory loggerFactory) : base(env, loggerFactory)
+        public TestStartupNoAuth(IHostingEnvironment env) : base(env)
         {
         }
 
@@ -37,7 +36,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
         {
         }
 
-        protected override void ConfigureDB(IServiceCollection services)
+        protected override void ConfigureDb(IServiceCollection services)
         {
             // Create a new service provider.
             var serviceProvider = new ServiceCollection()

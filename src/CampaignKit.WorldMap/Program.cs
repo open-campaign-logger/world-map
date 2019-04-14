@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 
 using CampaignKit.WorldMap.Data;
@@ -20,14 +21,17 @@ using CampaignKit.WorldMap.Services;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+using Serilog;
 
 namespace CampaignKit.WorldMap
 {
     /// <summary>
     ///     Class Program.
     /// </summary>
-    public class Program
+    public static class Program
     {
         #region Methods
 
@@ -39,10 +43,13 @@ namespace CampaignKit.WorldMap
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
+        // ReSharper disable once MemberCanBePrivate.Global
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
-            return WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+            return WebHost
+                .CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseSerilog();
         }
 
         /// <summary>
@@ -51,30 +58,59 @@ namespace CampaignKit.WorldMap
         /// <param name="args">The arguments.</param>
         public static void Main(string[] args)
         {
-            // Build the web host
-            var host = CreateWebHostBuilder(args).Build();
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", false, true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
+                .AddEnvironmentVariables()
+                .Build();
 
-            // Seed the database if required
-            using (var scope = host.Services.CreateScope())
+            var logFile = "Logs/worldmap_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .ReadFrom.Configuration(configuration)
+                .Enrich.FromLogContext()
+                .WriteTo.File(logFile)
+                .CreateLogger();
+
+            try
             {
-                // Get the service provider
-                var services = scope.ServiceProvider;
+                Log.Information("Starting web host");
 
-                // Determine if database has been created
-                // WorldMap.db
-                var filePathService = services.GetService<IFilePathService>();
-                var sampleDB = Path.Combine(filePathService.AppDataPath, "Sample", "Sample.db");
-                var appDB = Path.Combine(filePathService.AppDataPath, "WorldMap.db");
-                if (!File.Exists(appDB)) File.Copy(sampleDB, appDB);
+                // Build the web host
+                var host = CreateWebHostBuilder(args).Build();
 
-                // Get the database provider and ensure that it is created and ready.
-                var dbContext = services.GetRequiredService<WorldMapDBContext>();
-                dbContext.Database.EnsureCreated();
-                dbContext.Database.GetDbConnection();
+                // Seed the database if required
+                using (var scope = host.Services.CreateScope())
+                {
+                    // Get the service provider
+                    var services = scope.ServiceProvider;
+
+                    // Determine if database has been created
+                    // WorldMap.db
+                    var filePathService = services.GetService<IFilePathService>();
+                    var sampleDb = Path.Combine(filePathService.AppDataPath, "Sample", "Sample.db");
+                    var appDb = Path.Combine(filePathService.AppDataPath, "WorldMap.db");
+                    if (!File.Exists(appDb)) File.Copy(sampleDb, appDb);
+
+                    // Get the database provider and ensure that it is created and ready.
+                    var dbContext = services.GetRequiredService<WorldMapDBContext>();
+                    dbContext.Database.EnsureCreated();
+                    dbContext.Database.GetDbConnection();
+                }
+
+                // Run the web host
+                host.Run();
             }
-
-            // Run the web host
-            host.Run();
+            catch (Exception e)
+            {
+                Log.Fatal(e, "Web host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         #endregion
