@@ -15,6 +15,7 @@
 using System.ComponentModel.DataAnnotations;
 
 using Microsoft.AspNetCore.Http;
+using CampaignKit.WorldMap.Attributes;
 
 namespace CampaignKit.WorldMap.ViewModels
 {
@@ -39,8 +40,7 @@ namespace CampaignKit.WorldMap.ViewModels
         [Display(Name = "World Map Image")]
         [Required]
         [DataType(DataType.Upload)]
-        // Sadly, FileExtensions are currently not working:
-        //[FileExtensions(Extensions = "png,jpg,jpeg")]
+		[MapFile(MaxLength = 10485760, Extensions = "png,jpg,jpeg,gif,bmp")]
         public IFormFile Image { get; set; }
 
         /// <summary>
