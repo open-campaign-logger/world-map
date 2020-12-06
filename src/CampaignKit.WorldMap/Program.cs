@@ -100,8 +100,7 @@ namespace CampaignKit.WorldMap
 
                     // Get the database provider and ensure that it is created and ready.
                     var dbContext = services.GetRequiredService<WorldMapDBContext>();
-                    dbContext.Database.EnsureCreated();
-                    dbContext.Database.GetDbConnection();
+                    dbContext.Database.Migrate();
                 }
 
                 // Run the web host

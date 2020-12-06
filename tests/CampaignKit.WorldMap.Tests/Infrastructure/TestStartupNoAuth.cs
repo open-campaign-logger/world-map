@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Data.Common;
 using CampaignKit.WorldMap.Data;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,14 +41,14 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
         {
             // Create a new service provider.
             var serviceProvider = new ServiceCollection()
-                .AddEntityFrameworkInMemoryDatabase()
+                .AddEntityFrameworkSqlite()
                 .BuildServiceProvider();
 
             // Add a database context (MappingContext) using an in-memory 
             // database for testing.
             services.AddDbContext<WorldMapDBContext>(options =>
             {
-                options.UseInMemoryDatabase("InMemoryDbForTesting");
+                options.UseSqlite(CreateInMemoryDatabase());
                 options.UseInternalServiceProvider(serviceProvider);
             });
 
@@ -62,7 +64,27 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 
             // Get a handle to the database service
             var databaseService = scopedServices.GetRequiredService<WorldMapDBContext>();
-            databaseService.Database.EnsureCreated();
+            databaseService.Database.Migrate();
+        }
+
+        /// <summary>
+        ///     Creates the in memory database.
+        /// </summary>
+        /// <returns>System.Data.Common.DbConnection.</returns>
+        private DbConnection CreateInMemoryDatabase()
+        {
+            var cxn = new SqliteConnection("Filename=:memory:");
+            cxn.Open();
+
+            //var cmd = cxn.CreateCommand();
+            //cmd.CommandText = @"
+            //    CREATE TABLE ""__EFMigrationsHistory"" (
+            //        ""MigrationId"" TEXT NOT NULL CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY,
+            //        ""ProductVersion"" TEXT NOT NULL
+            //    )";
+            //cmd.ExecuteNonQuery();
+
+            return cxn;
         }
 
         #endregion
