@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-
 using CampaignKit.WorldMap.Data;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Controllers
 {
@@ -28,35 +25,29 @@ namespace CampaignKit.WorldMap.Controllers
     ///     Main MVC controller for application.
     /// </summary>
     /// <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
+    [Route("")]
+    [Route("[controller]")]
     public class HomeController : Controller
     {
-        #region Fields
-
-        /// <summary>
-        ///     The application logging service.
-        /// </summary>
-        private readonly ILogger _loggerService;
-
-        /// <summary>
-        ///     The EntityFramework repository for Map data elements.
-        /// </summary>
-        private readonly IMapRepository _mapRepository;
-
-        #endregion
-
         #region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="HomeController" /> class.
         /// </summary>
         /// <param name="mapDataService">The map data service.</param>
-        /// <param name="logger">The logger.</param>
-        public HomeController(IMapRepository mapDataService,
-            ILogger<HomeController> logger)
+        public HomeController(IMapRepository mapDataService)
         {
             _mapRepository = mapDataService;
-            _loggerService = logger;
         }
+
+        #endregion
+
+        #region Fields
+
+        /// <summary>
+        ///     The EntityFramework repository for Map data elements.
+        /// </summary>
+        private readonly IMapRepository _mapRepository;
 
         #endregion
 
@@ -66,7 +57,8 @@ namespace CampaignKit.WorldMap.Controllers
         ///     GET: /
         /// </summary>
         /// <returns>Home view showing last three created maps.</returns>
-        [HttpGet]
+        [HttpGet("")]
+        [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
             // Retrieve a listing of maps for this user.  
@@ -90,7 +82,7 @@ namespace CampaignKit.WorldMap.Controllers
         ///     automatically.
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("JwtCookie")]
         [Authorize]
         public ActionResult JwtCookie()
         {
@@ -101,7 +93,7 @@ namespace CampaignKit.WorldMap.Controllers
         ///     GET: /Home/Legalities
         /// </summary>
         /// <returns>Application legalities view.</returns>
-        [HttpGet]
+        [HttpGet("Legalities")]
         public ActionResult Legalities()
         {
             return View();

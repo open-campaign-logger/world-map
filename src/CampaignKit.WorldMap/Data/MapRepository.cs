@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,16 +18,12 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
 using CampaignKit.WorldMap.Entities;
 using CampaignKit.WorldMap.Services;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.Primitives;
 
 namespace CampaignKit.WorldMap.Data
 {
@@ -98,6 +94,28 @@ namespace CampaignKit.WorldMap.Data
 
         #endregion
 
+        #region Constructors
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="filePathService">The file path service.</param>
+        /// <param name="loggerService">The logger service.</param>
+        /// <param name="userManagerService">The user manager service.</param>
+        public DefaultMapRepository(WorldMapDBContext dbContext,
+            IFilePathService filePathService,
+            ILogger<DefaultMapRepository> loggerService,
+            IUserManagerService userManagerService)
+        {
+            _dbContext = dbContext;
+            _filePathService = filePathService;
+            _loggerService = loggerService;
+            _userManagerService = userManagerService;
+        }
+
+        #endregion
+
         #region Fields
 
         /// <summary>
@@ -119,28 +137,6 @@ namespace CampaignKit.WorldMap.Data
         ///     The user manager service.
         /// </summary>
         private readonly IUserManagerService _userManagerService;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
-        /// </summary>
-        /// <param name="dbContext">The database context.</param>
-        /// <param name="filePathService">The file path service.</param>
-        /// <param name="loggerService">The logger service.</param>
-        /// <param name="userManagerService">The user manager service.</param>
-        public DefaultMapRepository(WorldMapDBContext dbContext,
-            IFilePathService filePathService,
-            ILogger<DefaultMapRepository> loggerService,
-            IUserManagerService userManagerService)
-        {
-            _dbContext = dbContext;
-            _filePathService = filePathService;
-            _loggerService = loggerService;
-            _userManagerService = userManagerService;
-        }
 
         #endregion
 

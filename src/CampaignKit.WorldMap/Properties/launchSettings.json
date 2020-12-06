@@ -19,10 +19,11 @@
     "CampaignKit.WorldMap": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "https://localhost:3000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:3000/"
+      "applicationUrl": "https://localhost:3000"
     }
   }
 }

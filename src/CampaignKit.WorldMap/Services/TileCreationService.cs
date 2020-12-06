@@ -1,4 +1,4 @@
-// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,19 +18,15 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Entities;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using SixLabors.Primitives;
 
 namespace CampaignKit.WorldMap.Services
 {
@@ -52,7 +48,7 @@ namespace CampaignKit.WorldMap.Services
         public TileCreationService(IServiceProvider serviceProvider, ILogger<TileCreationService> loggerService)
         {
             _loggerService = loggerService;
-            _serviceProvider = serviceProvider;
+            ServiceProvider = serviceProvider;
         }
 
         #endregion
@@ -79,8 +75,7 @@ namespace CampaignKit.WorldMap.Services
                 await Process();
 
                 await Task.Delay(5000, stoppingToken); //5 seconds delay
-            }
-            while (!stoppingToken.IsCancellationRequested);
+            } while (!stoppingToken.IsCancellationRequested);
         }
 
         /// <summary>
@@ -89,7 +84,7 @@ namespace CampaignKit.WorldMap.Services
         /// <returns></returns>
         protected async Task<bool> Process()
         {
-            using (var scope = _serviceProvider.CreateScope())
+            using (var scope = ServiceProvider.CreateScope())
             {
                 // Retrieve the db context from the container
                 var dbContext = scope.ServiceProvider.GetRequiredService<WorldMapDBContext>();
@@ -150,7 +145,8 @@ namespace CampaignKit.WorldMap.Services
                             foreach (var tile in tilesToProcess)
                             {
                                 var zoomLevelTileFilePath = Path.Combine(zoomLevelFolderPath, $"{tile.X}_{tile.Y}.png");
-                                tasks.Add(Task.Run(() => CreateZoomLevelTileFile(zoomLevelBaseImage.Clone(), tile, zoomLevelTileFilePath)));
+                                tasks.Add(Task.Run(() =>
+                                    CreateZoomLevelTileFile(zoomLevelBaseImage.Clone(), tile, zoomLevelTileFilePath)));
                             }
 
                             // Wait for all tile creation tasks to complete
@@ -173,7 +169,8 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="masterFilePath">The master file path.</param>
         /// <param name="zoomLevelBaseFilePath">The zoom level base file path.</param>
         /// <param name="tilePixelSize">Tile pixel size.</param>
-        private Image<Rgba32> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, string masterFilePath, string zoomLevelBaseFilePath, int tilePixelSize)
+        private Image<Rgba32> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, string masterFilePath,
+            string zoomLevelBaseFilePath, int tilePixelSize)
         {
             using (var masterBaseImage = Image.Load(masterFilePath))
             {
@@ -189,7 +186,7 @@ namespace CampaignKit.WorldMap.Services
                 masterBaseImage.Save(zoomLevelBaseFilePath);
             }
 
-            return Image.Load(zoomLevelBaseFilePath);
+            return Image.Load<Rgba32>(zoomLevelBaseFilePath);
         }
 
         /// <summary>
@@ -229,7 +226,7 @@ namespace CampaignKit.WorldMap.Services
         /// <value>
         ///     The service provider.
         /// </value>
-        private IServiceProvider _serviceProvider { get; }
+        private IServiceProvider ServiceProvider { get; }
 
         /// <summary>
         ///     The executing task
