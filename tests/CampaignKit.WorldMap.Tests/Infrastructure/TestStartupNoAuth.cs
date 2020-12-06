@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using CampaignKit.WorldMap.Data;
-
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +23,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
     {
         #region Constructors
 
-        public TestStartupNoAuth(IHostingEnvironment env) : base(env)
+        public TestStartupNoAuth(IWebHostEnvironment env) : base(env)
         {
         }
 
@@ -56,15 +55,14 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
 
             // Create a scope to obtain a reference to the database
             // and other services
-            using (var scope = sp.CreateScope())
-            {
-                // Get a handle to the service provider
-                var scopedServices = scope.ServiceProvider;
+            using var scope = sp.CreateScope();
 
-                // Get a handle to the database service
-                var databaseService = scopedServices.GetRequiredService<WorldMapDBContext>();
-                databaseService.Database.EnsureCreated();
-            }
+            // Get a handle to the service provider
+            var scopedServices = scope.ServiceProvider;
+
+            // Get a handle to the database service
+            var databaseService = scopedServices.GetRequiredService<WorldMapDBContext>();
+            databaseService.Database.EnsureCreated();
         }
 
         #endregion

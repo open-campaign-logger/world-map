@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
 
 using System;
 using System.IO;
-
 using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Services;
-
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace CampaignKit.WorldMap
@@ -43,13 +40,17 @@ namespace CampaignKit.WorldMap
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
+
         // ReSharper disable once MemberCanBePrivate.Global
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            return WebHost
+            return Host
                 .CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseSerilog();
+                .ConfigureWebHostDefaults(configure =>
+                    configure
+                        .UseSerilog()
+                        .UseStartup<Startup>()
+                );
         }
 
         /// <summary>
@@ -61,7 +62,9 @@ namespace CampaignKit.WorldMap
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", true)
+                .AddJsonFile(
+                    $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
+                    true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -72,6 +75,7 @@ namespace CampaignKit.WorldMap
                 .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
                 .WriteTo.File(logFile)
+                .WriteTo.Console()
                 .CreateLogger();
 
             try
@@ -79,7 +83,7 @@ namespace CampaignKit.WorldMap
                 Log.Information("Starting web host");
 
                 // Build the web host
-                var host = CreateWebHostBuilder(args).Build();
+                var host = CreateHostBuilder(args).Build();
 
                 // Seed the database if required
                 using (var scope = host.Services.CreateScope())

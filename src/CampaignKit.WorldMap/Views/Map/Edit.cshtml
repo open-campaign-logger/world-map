@@ -1,5 +1,5 @@
 ﻿<!--
-Copyright 2017-2019 Jochen Linnemann, Cory Gill
+Copyright 2017-2020 Jochen Linnemann, Cory Gill
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 @model MapEditViewModel
+@inject ModelExpressionProvider ModelExpressionProvider
 
 @{
     ViewBag.Title = "Editing " + Model.Name;
@@ -55,10 +56,10 @@ limitations under the License.
                         <div class="form-group">
                             <label class="control-label" asp-for="Copyright"></label>
                             <a tabindex="0" role="button" data-toggle="popover" data-placement="right" data-trigger="focus"
-                               title="@Html.DisplayNameFor(m => m.Copyright)" data-content="@Html.DescriptionFor(m => m.Copyright)">
+                               title="@Html.DisplayNameFor(m => m.Copyright)" data-content="@Html.DescriptionFor(ModelExpressionProvider, m => m.Copyright)">
                                 <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                             </a>
-                            <input class="form-control" asp-for="Copyright" title="@Html.DescriptionFor(m => m.Copyright)" />
+                            <input class="form-control" asp-for="Copyright" title="@Html.DescriptionFor(ModelExpressionProvider, m => m.Copyright)" />
                             <span class="text-danger" asp-validation-for="Copyright"></span>
                         </div>
                         <div class="form-group">
@@ -79,7 +80,7 @@ limitations under the License.
 
 @section scripts {
     <script>
-        $(function() {
+        $(function () {
             $('[data-toggle="popover"]').popover();
         });
     </script>

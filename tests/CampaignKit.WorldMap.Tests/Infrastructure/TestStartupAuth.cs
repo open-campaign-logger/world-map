@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
@@ -22,7 +21,7 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
     {
         #region Constructors
 
-        public TestStartupAuth(IHostingEnvironment env) : base(env)
+        public TestStartupAuth(IWebHostEnvironment env) : base(env)
         {
         }
 
@@ -34,7 +33,8 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
         {
             services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = "Test Scheme"; // has to match scheme in TestAuthenticationExtensions
+                options.DefaultAuthenticateScheme =
+                    "Test Scheme"; // has to match scheme in TestAuthenticationExtensions
                 options.DefaultChallengeScheme = "Test Scheme";
             }).AddTestAuth(o => { });
         }

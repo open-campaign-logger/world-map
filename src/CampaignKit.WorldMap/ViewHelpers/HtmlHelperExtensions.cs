@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
 
 using System;
 using System.Linq.Expressions;
-
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace CampaignKit.WorldMap.ViewHelpers
 {
@@ -33,15 +32,15 @@ namespace CampaignKit.WorldMap.ViewHelpers
         /// <typeparam name="TModel">The type of the t model.</typeparam>
         /// <typeparam name="TValue">The type of the t value.</typeparam>
         /// <param name="self">The self.</param>
+        /// <param name="provider">The provider.</param>
         /// <param name="expression">The expression.</param>
         /// <returns>System.String.</returns>
         public static string DescriptionFor<TModel, TValue>(
-            this IHtmlHelper<TModel> self, Expression<Func<TModel, TValue>> expression)
+            this IHtmlHelper<TModel> self, ModelExpressionProvider provider,
+            Expression<Func<TModel, TValue>> expression)
         {
-            var modelExplorer =
-                ExpressionMetadataProvider.FromLambdaExpression(expression, self.ViewData, self.MetadataProvider);
-
-            var metadata = modelExplorer.Metadata;
+            var modelExpression = provider.CreateModelExpression(self.ViewData, expression);
+            var metadata = modelExpression.Metadata;
 
             return metadata.Description;
         }

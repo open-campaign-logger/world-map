@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,15 +15,12 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
 using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Entities;
 using CampaignKit.WorldMap.Services;
 using CampaignKit.WorldMap.ViewModels;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using Serilog;
 
 namespace CampaignKit.WorldMap.Controllers
@@ -33,8 +30,34 @@ namespace CampaignKit.WorldMap.Controllers
     ///     Map MVC controller for application.
     /// </summary>
     /// <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
+    [Route("[controller]")]
     public class MapController : Controller
     {
+        #region Constructors
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MapController" /> class.
+        /// </summary>
+        /// <param name="randomDataService">The random data service.</param>
+        /// <param name="mapRepository">The map repository.</param>
+        /// <param name="progressService">The progress service.</param>
+        /// <param name="filePathService">The file path service.</param>
+        /// <param name="dbContext">The database context.</param>
+        public MapController(IRandomDataService randomDataService,
+            IMapRepository mapRepository,
+            IProgressService progressService,
+            IFilePathService filePathService,
+            WorldMapDBContext dbContext)
+        {
+            _randomDataService = randomDataService;
+            _mapRepository = mapRepository;
+            _progressService = progressService;
+            _filePathService = filePathService;
+            _dbContext = dbContext;
+        }
+
+        #endregion
+
         #region Fields
 
         /// <summary>
@@ -61,31 +84,6 @@ namespace CampaignKit.WorldMap.Controllers
         ///     The random data service
         /// </summary>
         private readonly IRandomDataService _randomDataService;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MapController" /> class.
-        /// </summary>
-        /// <param name="randomDataService">The random data service.</param>
-        /// <param name="mapRepository">The map repository.</param>
-        /// <param name="progressService">The progress service.</param>
-        /// <param name="filePathService">The file path service.</param>
-        /// <param name="dbContext">The database context.</param>
-        public MapController(IRandomDataService randomDataService,
-            IMapRepository mapRepository,
-            IProgressService progressService,
-            IFilePathService filePathService,
-            WorldMapDBContext dbContext)
-        {
-            _randomDataService = randomDataService;
-            _mapRepository = mapRepository;
-            _progressService = progressService;
-            _filePathService = filePathService;
-            _dbContext = dbContext;
-        }
 
         #endregion
 
@@ -129,7 +127,7 @@ namespace CampaignKit.WorldMap.Controllers
         ///     GET: /Map/Create
         /// </summary>
         /// <returns>Map creation view containing new randomly generated secret.</returns>
-        [HttpGet]
+        [HttpGet("Create")]
         [Authorize]
         public IActionResult Create()
         {
@@ -144,7 +142,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// </summary>
         /// <param name="model">The map model to create.</param>
         /// <returns>Map view with tile progress creation window displayed.</returns>
-        [HttpPost]
+        [HttpPost("Create")]
         [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MapCreateViewModel model)
@@ -198,7 +196,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Delete view displaying confirmation popup.</returns>
-        [HttpGet]
+        [HttpGet("Delete/{id?}")]
         [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
@@ -215,7 +213,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="id">The identifier.</param>
         /// <param name="_">The .</param>
         /// <returns>Redirect to home view.</returns>
-        [HttpPost]
+        [HttpPost("Delete/{id?}")]
         [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id, MapDeleteViewModel _)
@@ -244,7 +242,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Map edit view for the specified map.</returns>
-        [HttpGet]
+        [HttpGet("Edit/{id?}")]
         [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
@@ -274,7 +272,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="id">The identifier.</param>
         /// <param name="model">The model.</param>
         /// <returns>Map show view.</returns>
-        [HttpPost]
+        [HttpPost("Edit/{id?}")]
         [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, MapEditViewModel model)
@@ -309,7 +307,8 @@ namespace CampaignKit.WorldMap.Controllers
         ///     GET: /Map/
         /// </summary>
         /// <returns>Show all user maps.</returns>
-        [HttpGet]
+        [HttpGet("")]
+        [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
             var model = await _mapRepository.FindAll(User, true);
@@ -322,7 +321,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Tile creation progress for map in JSON format.</returns>
-        [HttpGet]
+        [HttpGet("Progress/{id?}")]
         [Authorize]
         public IActionResult Progress(int id)
         {
@@ -333,7 +332,7 @@ namespace CampaignKit.WorldMap.Controllers
         ///     GET: /Map/Sample
         /// </summary>
         /// <returns>Map sample view.</returns>
-        [HttpGet]
+        [HttpGet("Sample")]
         public async Task<IActionResult> Sample()
         {
             var map = await _mapRepository.Find(1, User, string.Empty);
@@ -362,7 +361,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="shareKey">The share key.</param>
         /// <param name="showProgress">if set to <c>true</c> [show progress].</param>
         /// <returns>The selected map.</returns>
-        [HttpGet]
+        [HttpGet("Show/{id?}")]
         public async Task<IActionResult> Show(int id, string shareKey = null, bool showProgress = false)
         {
             // Determine if user can view map
@@ -384,7 +383,8 @@ namespace CampaignKit.WorldMap.Controllers
                 UserId = map.UserId,
                 ShowProgress = showProgress,
                 ProgressUrl = Url.Action(nameof(Progress), new { Id = id }),
-                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Share = shareKey }, protocol, Request.Host.Value),
+                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Share = shareKey }, protocol,
+                    Request.Host.Value),
                 DeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
                 EditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
                 Id = id,
@@ -400,7 +400,7 @@ namespace CampaignKit.WorldMap.Controllers
 
         #endregion
 
-        #region  Marker Related Actions    
+        #region Marker Related Actions
 
         /// <summary>
         ///     GET: /Map/MarkerData/{id?}
@@ -408,7 +408,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="id">The map identifier.</param>
         /// <param name="shareKey">The map's shareKey.</param>
         /// <returns>The map's marker data in JSON format.</returns>
-        [HttpGet]
+        [HttpGet("MarkerData/{id?}")]
         public async Task<IActionResult> MarkerData(int id, string shareKey)
         {
             // Determine if user can view map
@@ -429,7 +429,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// </summary>
         /// <param name="model">Map marker data.</param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost("MarkerData/{MapId?}")]
         [Authorize]
         public async Task<IActionResult> MarkerData([FromBody] MarkerEditViewModel model)
         {

@@ -1,4 +1,4 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,23 +16,17 @@ using System;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-
 using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Services;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
 using Newtonsoft.Json;
-
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace CampaignKit.WorldMap
 {
@@ -41,20 +35,16 @@ namespace CampaignKit.WorldMap
     /// </summary>
     public class Startup
     {
-        #region Fields
-
-        private readonly IConfiguration _configuration;
-
-        #endregion
-
         #region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Startup" /> class.
         /// </summary>
         /// <param name="env">The env.</param>
-        public Startup(IHostingEnvironment env)
+        public Startup(IWebHostEnvironment env)
         {
+            _env = env;
+
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", true, true)
@@ -63,6 +53,13 @@ namespace CampaignKit.WorldMap
 
             _configuration = builder.Build();
         }
+
+        #endregion
+
+        #region Fields
+
+        private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _env;
 
         #endregion
 
@@ -83,10 +80,9 @@ namespace CampaignKit.WorldMap
         ///     Configures the specified application.
         /// </summary>
         /// <param name="app">The application.</param>
-        /// <param name="env">The env.</param>
 
         // ReSharper disable once UnusedMember.Global
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 
@@ -96,7 +92,7 @@ namespace CampaignKit.WorldMap
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings { Formatting = Formatting.Indented };
 
             // Reads the IsDevelopment configuration variable to determine if this is a development environment or not
-            if (env.IsDevelopment() || IsDevelopmentConfigured) app.UseDeveloperExceptionPage();
+            if (_env.IsDevelopment() || IsDevelopmentConfigured) app.UseDeveloperExceptionPage();
 
             // Enable all static file middleware (except directory browsing) for the current request path in the current directory.
             app.UseFileServer();
@@ -108,7 +104,9 @@ namespace CampaignKit.WorldMap
             app.UseAuthentication();
 
             // Adds MVC to the IApplicationBuilder request execution pipeline.
-            app.UseMvcWithDefaultRoute();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(configure => configure.MapControllers());
         }
 
         /// <summary>
@@ -127,7 +125,7 @@ namespace CampaignKit.WorldMap
             ConfigureDb(services);
 
             // Add the MVC service
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc();
 
             // Configure Authentication
             ConfigureAuth(services);
@@ -166,7 +164,8 @@ namespace CampaignKit.WorldMap
                         OnTokenValidated = context =>
                         {
                             // Create an asp.net identity object for the user
-                            var userName = context.Principal.FindFirstValue("preferred_username") ?? context.Principal.FindFirstValue("name");
+                            var userName = context.Principal.FindFirstValue("preferred_username") ??
+                                context.Principal.FindFirstValue("name");
                             var identity = new GenericIdentity(userName);
                             context.Principal.AddIdentity(identity);
 
