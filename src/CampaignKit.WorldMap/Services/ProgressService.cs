@@ -82,7 +82,7 @@ namespace CampaignKit.WorldMap.Services
         public double GetMapProgress(string mapId)
         {
             // Create a default return value
-            var progress = (double) 0;
+            var progress = (double)0;
 
             // Find tiles related to this map
             var tiles = (from t in _context.Tiles select t)
@@ -93,7 +93,7 @@ namespace CampaignKit.WorldMap.Services
 
             // Are there tiles defined for this map?
             if (total > 0)
-                progress = completed / (double) total;
+                progress = completed / (double)total;
             else
                 progress = 1;
 

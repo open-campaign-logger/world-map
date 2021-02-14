@@ -14,7 +14,7 @@
 
 using System.IO;
 
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace CampaignKit.WorldMap.Services
 {
@@ -65,11 +65,11 @@ namespace CampaignKit.WorldMap.Services
         ///     Initializes a new instance of the <see cref="DefaultFilePathService" /> class.
         /// </summary>
         /// <param name="env">The env.</param>
-        public DefaultFilePathService(IHostingEnvironment env)
+        public DefaultFilePathService(IHostEnvironment env)
         {
             AppDataPath = Path.Combine(env.ContentRootPath, "App_Data");
             SeedDataPath = Path.Combine(AppDataPath, "Sample");
-            PhysicalWorldBasePath = Path.Combine(env.WebRootPath, "world");
+            PhysicalWorldBasePath = Path.Combine(env.ContentRootPath, "world");
             VirtualWorldBasePath = "~/world";
         }
 

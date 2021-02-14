@@ -18,12 +18,15 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using CampaignKit.WorldMap.Data;
 using CampaignKit.WorldMap.Entities;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -124,7 +127,7 @@ namespace CampaignKit.WorldMap.Services
                             var tilePixelSize = tiles[0].TileSize;
 
                             // Calculate the number of tiles required for this zoom level
-                            var numberOfTilesPerDimension = (int) Math.Pow(2, zoomLevel);
+                            var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
 
                             // Create zoom level directory if required
                             if (!Directory.Exists(zoomLevelFolderPath)) Directory.CreateDirectory(zoomLevelFolderPath);

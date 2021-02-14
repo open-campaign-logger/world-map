@@ -40,7 +40,7 @@ namespace CampaignKit.WorldMap.ViewModels
         [Display(Name = "World Map Image")]
         [Required]
         [DataType(DataType.Upload)]
-		[MapFile(MaxLength = 10485760, Extensions = "png,jpg,jpeg,gif,bmp")]
+        [MapFile(MaxLength = 10485760, Extensions = "png,jpg,jpeg,gif,bmp")]
         public IFormFile Image { get; set; }
 
         /// <summary>

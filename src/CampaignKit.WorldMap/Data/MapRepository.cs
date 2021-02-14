@@ -18,10 +18,13 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+
 using CampaignKit.WorldMap.Entities;
 using CampaignKit.WorldMap.Services;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
@@ -322,10 +325,10 @@ namespace CampaignKit.WorldMap.Data
                 var height = masterImage.Height;
 
                 var largestSize = Math.Max(width, height);
-                var maxZoomLevel = Math.Log((double) largestSize / TilePixelSize, 2);
+                var maxZoomLevel = Math.Log((double)largestSize / TilePixelSize, 2);
 
-                var adjustedMaxZoomLevel = (int) Math.Max(0, Math.Floor(maxZoomLevel));
-                var adjustedLargestSize = (int) Math.Round(Math.Pow(2, adjustedMaxZoomLevel) * TilePixelSize);
+                var adjustedMaxZoomLevel = (int)Math.Max(0, Math.Floor(maxZoomLevel));
+                var adjustedLargestSize = (int)Math.Round(Math.Pow(2, adjustedMaxZoomLevel) * TilePixelSize);
 
                 if (width != height || largestSize != adjustedLargestSize)
                     masterImage = masterImage.Clone(context => context.Resize(new ResizeOptions
@@ -354,22 +357,22 @@ namespace CampaignKit.WorldMap.Data
             for (var zoomLevel = 0; zoomLevel <= map.MaxZoomLevel; zoomLevel++)
             {
                 // Calculate the number of tiles required for this zoom level
-                var numberOfTilesPerDimension = (int) Math.Pow(2, zoomLevel);
+                var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
 
                 for (var x = 0; x < numberOfTilesPerDimension; x++)
-                for (var y = 0; y < numberOfTilesPerDimension; y++)
-                {
-                    var tile = new Tile
+                    for (var y = 0; y < numberOfTilesPerDimension; y++)
                     {
-                        MapId = map.MapId,
-                        ZoomLevel = zoomLevel,
-                        CreationTimestamp = DateTime.UtcNow,
-                        TileSize = TilePixelSize,
-                        X = x,
-                        Y = y
-                    };
-                    map.Tiles.Add(tile);
-                }
+                        var tile = new Tile
+                        {
+                            MapId = map.MapId,
+                            ZoomLevel = zoomLevel,
+                            CreationTimestamp = DateTime.UtcNow,
+                            TileSize = TilePixelSize,
+                            X = x,
+                            Y = y
+                        };
+                        map.Tiles.Add(tile);
+                    }
             }
 
             // ************************************

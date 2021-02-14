@@ -5,7 +5,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 # Development Environment
 
 ## .Net SDK
-- [.Net Core 3.1 SDK](https://dotnet.microsoft.com/download/dotnet-core/3.1)
+- [.Net 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
 
 ## Visual Studio
 - [VS2019 Community](https://visualstudio.microsoft.com/downloads/)
@@ -14,7 +14,6 @@ Service for managing world maps and associate them with Campaign Logger log entr
   - .Net Core cross-platform development
 
 ## Visual Studio Extensions
-- [StyleCop](https://marketplace.visualstudio.com/items?itemName=ChrisDahlberg.StyleCop)
 - [Markdown Editor](https://marketplace.visualstudio.com/items?itemName=ChrisDahlberg.StyleCop)
 - [GhostDoc](https://marketplace.visualstudio.com/items?itemName=sergeb.GhostDoc)
 - [GitFlow](https://marketplace.visualstudio.com/items?itemName=vs-publisher-57624.GitFlowforVisualStudio2019)
