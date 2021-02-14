@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
+﻿// <copyright file="DefaultMapRepository.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,79 +12,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-
-using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
+// </copyright>
 
 namespace CampaignKit.WorldMap.Data
 {
-    /// <summary>
-    ///     EntityFramework interface for <c>Map</c> data elements.
-    /// </summary>
-    public interface IMapRepository
-    {
-        #region Methods
-
-        /// <summary>Determines if user has rights to edit the map.</summary>
-        /// <param name="id">The map identifier.</param>
-        /// <param name="user">The authenticated user.</param>
-        /// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
-        Task<bool> CanEdit(int id, ClaimsPrincipal user);
-
-        /// <summary>Determines if user has rights to view the map.</summary>
-        /// <param name="id">The map identifier.</param>
-        /// <param name="user">The authenticated user.</param>
-        /// <param name="shareKey">The map's secret key.</param>
-        /// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
-        Task<bool> CanView(int id, ClaimsPrincipal user, string shareKey);
-
-        /// <summary> Creates the specified map. </summary>
-        /// <param name="map">The map entity to create.</param>
-        /// <param name="stream">Map image data stream.</param>
-        /// <param name="user">The authenticated user.</param>
-        /// <returns><c>id</c> if successful, <c>0</c> otherwise</returns>
-        Task<int> Create(Map map, Stream stream, ClaimsPrincipal user);
-
-        /// <summary>Deletes the specified map and all child entities.</summary>
-        /// <param name="id">The map identifier.</param>
-        /// <param name="user">The authenticated user.</param>
-        /// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
-        Task<bool> Delete(int id, ClaimsPrincipal user);
-
-        /// <summary>Finds the map associated with the identifier.</summary>
-        /// <param name="id">The map identifier.</param>
-        /// <param name="user">The authenticated user.</param>
-        /// <param name="shareKey">Map secret to be used by friends of map author.</param>
-        /// <returns><c>Map</c> if successful, <c>null</c> otherwise</returns>
-        Task<Map> Find(int id, ClaimsPrincipal user, string shareKey);
-
-        /// <summary>Finds all maps.</summary>
-        /// <param name="user">The authenticated user.</param>
-        /// <param name="includePublic">Specify whether public maps should also be returned.</param>
-        /// <returns>IEnumerable&lt;Map&gt;.</returns>
-        Task<IEnumerable<Map>> FindAll(ClaimsPrincipal user, bool includePublic);
-
-        /// <summary> Saves changes to the specified map.</summary>
-        /// <param name="map">The map entity to save.</param>
-        /// <param name="user">The authenticated user.</param>
-        /// <returns><c>id</c> if successful, <c>false</c> otherwise</returns>
-        Task<bool> Save(Map map, ClaimsPrincipal user);
-
-        #endregion
-    }
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
+    using CampaignKit.WorldMap.Entities;
+    using CampaignKit.WorldMap.Services;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Logging;
+    using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.Processing;
 
     /// <summary>
     ///     Default implementation of the EntityFramework repository for Map data elements.
@@ -91,13 +35,27 @@ namespace CampaignKit.WorldMap.Data
     /// <seealso cref="IMapRepository" />
     public class DefaultMapRepository : IMapRepository
     {
-        #region Static Fields
-
         private const int TilePixelSize = 250;
 
-        #endregion
+        /// <summary>
+        ///     The database context.
+        /// </summary>
+        private readonly WorldMapDBContext dbContext;
 
-        #region Constructors
+        /// <summary>
+        ///     The file path service.
+        /// </summary>
+        private readonly IFilePathService filePathService;
+
+        /// <summary>
+        ///     The application logging service.
+        /// </summary>
+        private readonly ILogger loggerService;
+
+        /// <summary>
+        ///     The user manager service.
+        /// </summary>
+        private readonly IUserManagerService userManagerService;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
@@ -106,46 +64,17 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="filePathService">The file path service.</param>
         /// <param name="loggerService">The logger service.</param>
         /// <param name="userManagerService">The user manager service.</param>
-        public DefaultMapRepository(WorldMapDBContext dbContext,
+        public DefaultMapRepository(
+            WorldMapDBContext dbContext,
             IFilePathService filePathService,
             ILogger<DefaultMapRepository> loggerService,
             IUserManagerService userManagerService)
         {
-            _dbContext = dbContext;
-            _filePathService = filePathService;
-            _loggerService = loggerService;
-            _userManagerService = userManagerService;
+            this.dbContext = dbContext;
+            this.filePathService = filePathService;
+            this.loggerService = loggerService;
+            this.userManagerService = userManagerService;
         }
-
-        #endregion
-
-        #region Fields
-
-        /// <summary>
-        ///     The database context
-        /// </summary>
-        private readonly WorldMapDBContext _dbContext;
-
-        /// <summary>
-        ///     The file path service
-        /// </summary>
-        private readonly IFilePathService _filePathService;
-
-        /// <summary>
-        ///     The application logging service.
-        /// </summary>
-        private readonly ILogger _loggerService;
-
-        /// <summary>
-        ///     The user manager service.
-        /// </summary>
-        private readonly IUserManagerService _userManagerService;
-
-        #endregion
-
-        #region IMapDataService Members
-
-        #region Public Methods
 
         /// <summary>
         ///     Deletes the specified map and all child entities.
@@ -155,39 +84,42 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="id">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
         /// <returns>
-        ///     <c>true</c> if successful, <c>false</c> otherwise
+        ///     <c>true</c> if successful, <c>false</c> otherwise.
         /// </returns>
         public async Task<bool> Delete(int id, ClaimsPrincipal user)
         {
             // Ensure user is authenticated
-            var userid = _userManagerService.GetUserId(user);
+            var userid = this.userManagerService.GetUserId(user);
             if (userid == null)
             {
-                _loggerService.LogError("Database operation prohibited for non-authenticated user");
+                this.loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return false;
             }
 
             // Determine if this map exists
-            var map = await _dbContext.Maps.FindAsync(id);
+            var map = await this.dbContext.Maps.FindAsync(id);
             if (map == null)
             {
-                _loggerService.LogError($"Map with id:{id} not found");
+                this.loggerService.LogError($"Map with id:{id} not found");
                 return false;
             }
 
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                _loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
+                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
                 return false;
             }
 
             // Remove the map from the context.
-            _dbContext.Maps.Remove(map);
-            await _dbContext.SaveChangesAsync();
+            this.dbContext.Maps.Remove(map);
+            await this.dbContext.SaveChangesAsync();
 
             // Delete map directory and files
-            if (Directory.Exists(map.WorldFolderPath)) Directory.Delete(map.WorldFolderPath, true);
+            if (Directory.Exists(map.WorldFolderPath))
+            {
+                Directory.Delete(map.WorldFolderPath, true);
+            }
 
             // Return result
             return true;
@@ -202,28 +134,28 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="user">The authenticated user.</param>
         /// <param name="shareKey">Map secret to be used by friends of map author.</param>
         /// <returns>
-        ///     <c>Map</c> if successful, <c>null</c> otherwise
+        ///     <c>Map</c> if successful, <c>null</c> otherwise.
         /// </returns>
         public async Task<Map> Find(int id, ClaimsPrincipal user, string shareKey)
         {
             // Retrieve the map entry and any associated markers.
-            var map = await _dbContext.Maps
+            var map = await this.dbContext.Maps
                 .FirstOrDefaultAsync(m => m.MapId == id);
 
             // Ensure map has been found
             if (map == null)
             {
-                _loggerService.LogError($"Map with id:{id} not found");
+                this.loggerService.LogError($"Map with id:{id} not found");
                 return null;
             }
 
             // If the map is not public ensure user has rights to it
             if (!map.IsPublic)
             {
-                var userid = _userManagerService.GetUserId(user);
+                var userid = this.userManagerService.GetUserId(user);
                 if (!map.UserId.Equals(userid) && !map.ShareKey.Equals(shareKey))
                 {
-                    _loggerService.LogError($"User not authorized to access map with id:{id}.");
+                    this.loggerService.LogError($"User not authorized to access map with id:{id}.");
                     return null;
                 }
             }
@@ -241,22 +173,24 @@ namespace CampaignKit.WorldMap.Data
         /// <returns>IEnumerable&lt;Map&gt;.</returns>
         public async Task<IEnumerable<Map>> FindAll(ClaimsPrincipal user, bool includePublic)
         {
-            var userid = _userManagerService.GetUserId(user);
+            var userid = this.userManagerService.GetUserId(user);
 
             // Return public and owned maps to authenticated users
             if (userid != null)
             {
                 if (includePublic)
-                    return await _dbContext.Maps
+                {
+                    return await this.dbContext.Maps
                         .Where(m => m.IsPublic || m.UserId.Equals(userid))
                         .ToListAsync();
+                }
 
-                return await _dbContext.Maps
+                return await this.dbContext.Maps
                     .Where(m => m.UserId.Equals(userid))
                     .ToListAsync();
             }
 
-            return await _dbContext.Maps
+            return await this.dbContext.Maps
                 .Where(m => m.IsPublic)
                 .ToListAsync();
         }
@@ -268,7 +202,7 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="stream">Map image data stream.</param>
         /// <param name="user">The authenticated user.</param>
         /// <returns>
-        ///     <c>id</c> if successful, <c>0</c> otherwise
+        ///     <c>id</c> if successful, <c>0</c> otherwise.
         /// </returns>
         public async Task<int> Create(Map map, Stream stream, ClaimsPrincipal user)
         {
@@ -276,13 +210,16 @@ namespace CampaignKit.WorldMap.Data
             //   Precondition Tests
             // **********************
             // Image data not provided?
-            if (stream == null) return 0;
+            if (stream == null)
+            {
+                return 0;
+            }
 
             // User must be authenticated
-            var userid = _userManagerService.GetUserId(user);
+            var userid = this.userManagerService.GetUserId(user);
             if (userid == null)
             {
-                _loggerService.LogError("Database operation prohibited for non-authenticated user");
+                this.loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return 0;
             }
 
@@ -292,14 +229,18 @@ namespace CampaignKit.WorldMap.Data
             map.CreationTimestamp = DateTime.UtcNow;
             map.UpdateTimestamp = map.CreationTimestamp;
             map.UserId = userid;
-            _dbContext.Add(map);
-            await _dbContext.SaveChangesAsync();
+            this.dbContext.Add(map);
+            await this.dbContext.SaveChangesAsync();
 
             // **********************
-            //   Create Map Folder 
+            //   Create Map Folder
             // **********************
-            var worldFolderPath = Path.Combine(_filePathService.PhysicalWorldBasePath, $"{map.MapId}");
-            if (Directory.Exists(worldFolderPath)) Directory.Delete(worldFolderPath, true);
+            var worldFolderPath = Path.Combine(this.filePathService.PhysicalWorldBasePath, $"{map.MapId}");
+            if (Directory.Exists(worldFolderPath))
+            {
+                Directory.Delete(worldFolderPath, true);
+            }
+
             Directory.CreateDirectory(worldFolderPath);
 
             // ****************************
@@ -313,7 +254,7 @@ namespace CampaignKit.WorldMap.Data
             }
 
             // ************************************
-            //      Create Master Image File 
+            //      Create Master Image File
             // ************************************
             // Create master image file
             var masterFilePath = Path.Combine(worldFolderPath, "master-file.png");
@@ -331,19 +272,21 @@ namespace CampaignKit.WorldMap.Data
                 var adjustedLargestSize = (int)Math.Round(Math.Pow(2, adjustedMaxZoomLevel) * TilePixelSize);
 
                 if (width != height || largestSize != adjustedLargestSize)
+                {
                     masterImage = masterImage.Clone(context => context.Resize(new ResizeOptions
                     {
                         Mode = ResizeMode.Pad,
                         Position = AnchorPositionMode.Center,
-                        Size = new Size(width = adjustedLargestSize, height = adjustedLargestSize)
+                        Size = new Size(width = adjustedLargestSize, height = adjustedLargestSize),
                     }));
+                }
 
                 masterImage.SaveAsPng(masterFileStream);
 
                 map.MaxZoomLevel = adjustedMaxZoomLevel;
                 map.AdjustedSize = adjustedLargestSize;
 
-                map.ThumbnailPath = $"{_filePathService.VirtualWorldBasePath}/{map.MapId}/0/zoom-level.png";
+                map.ThumbnailPath = $"{this.filePathService.VirtualWorldBasePath}/{map.MapId}/0/zoom-level.png";
             }
 
             // ****************************************
@@ -360,6 +303,7 @@ namespace CampaignKit.WorldMap.Data
                 var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
 
                 for (var x = 0; x < numberOfTilesPerDimension; x++)
+                {
                     for (var y = 0; y < numberOfTilesPerDimension; y++)
                     {
                         var tile = new Tile
@@ -369,18 +313,19 @@ namespace CampaignKit.WorldMap.Data
                             CreationTimestamp = DateTime.UtcNow,
                             TileSize = TilePixelSize,
                             X = x,
-                            Y = y
+                            Y = y,
                         };
                         map.Tiles.Add(tile);
                     }
+                }
             }
 
             // ************************************
             //   Update Map Entity
             // ************************************
             map.WorldFolderPath = worldFolderPath;
-            _dbContext.Update(map);
-            await _dbContext.SaveChangesAsync();
+            this.dbContext.Update(map);
+            await this.dbContext.SaveChangesAsync();
 
             return map.MapId;
         }
@@ -391,27 +336,27 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="map">The map entity to save.</param>
         /// <param name="user">The authenticated user.</param>
         /// <returns>
-        ///     <c>id</c> if successful, <c>false</c> otherwise
+        ///     <c>id</c> if successful, <c>false</c> otherwise.
         /// </returns>
         public async Task<bool> Save(Map map, ClaimsPrincipal user)
         {
             // Ensure user is authenticated
-            var userid = _userManagerService.GetUserId(user);
+            var userid = this.userManagerService.GetUserId(user);
             if (userid == null)
             {
-                _loggerService.LogError("Database operation prohibited for non-authenticated user");
+                this.loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return false;
             }
 
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                _loggerService.LogError($"User {userid} does not have rights to delete map with id:{map.MapId}.");
+                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{map.MapId}.");
                 return false;
             }
 
-            _dbContext.Update(map);
-            await _dbContext.SaveChangesAsync();
+            this.dbContext.Update(map);
+            await this.dbContext.SaveChangesAsync();
             return true;
         }
 
@@ -421,33 +366,33 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="id">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
         /// <returns>
-        ///     <c>id</c> if successful, <c>false</c> otherwise
+        ///     <c>id</c> if successful, <c>false</c> otherwise.
         /// </returns>
         public async Task<bool> CanEdit(int id, ClaimsPrincipal user)
         {
             // Ensure user is authenticated
-            var userid = _userManagerService.GetUserId(user);
+            var userid = this.userManagerService.GetUserId(user);
             if (userid == null)
             {
-                _loggerService.LogError("Database operation prohibited for non-authenticated user");
+                this.loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return false;
             }
 
             // Retrieve the map entry and any associated markers.
-            var map = await _dbContext.Maps
+            var map = await this.dbContext.Maps
                 .FirstOrDefaultAsync(m => m.MapId == id);
 
             // Ensure map has been found
             if (map == null)
             {
-                _loggerService.LogError($"Map with id:{id} not found");
+                this.loggerService.LogError($"Map with id:{id} not found");
                 return false;
             }
 
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                _loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
+                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
                 return false;
             }
 
@@ -458,42 +403,44 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="id">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
         /// <param name="shareKey">The map's secret key.</param>
-        /// <returns><c>true</c> if successful, <c>false</c> otherwise</returns>
+        /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
         public async Task<bool> CanView(int id, ClaimsPrincipal user, string shareKey)
         {
             // Retrieve the map entry and any associated markers.
-            var map = await _dbContext.Maps
+            var map = await this.dbContext.Maps
                 .FirstOrDefaultAsync(m => m.MapId == id);
 
             // Ensure map has been found
             if (map == null)
             {
-                _loggerService.LogError($"Map with id:{id} not found");
+                this.loggerService.LogError($"Map with id:{id} not found");
                 return false;
             }
 
             // Determine if this is a public map
-            if (map.IsPublic) return true;
+            if (map.IsPublic)
+            {
+                return true;
+            }
 
             // Determine if provided secret matches
             var isSecretProvided = !string.IsNullOrEmpty(shareKey);
-            if (isSecretProvided && map.ShareKey.Equals(shareKey)) return true;
+            if (isSecretProvided && map.ShareKey.Equals(shareKey))
+            {
+                return true;
+            }
 
             // Determine if user is authenticated
-            var userid = _userManagerService.GetUserId(user);
+            var userid = this.userManagerService.GetUserId(user);
 
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                _loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
+                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
                 return false;
             }
 
             return true;
         }
-
-        #endregion Public Methods
-
-        #endregion
     }
 }

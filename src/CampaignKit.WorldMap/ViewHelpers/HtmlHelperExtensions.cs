@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
+﻿// <copyright file="HtmlHelperExtensions.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,22 +12,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-using System.Linq.Expressions;
-
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+// </copyright>
 
 namespace CampaignKit.WorldMap.ViewHelpers
 {
+    using System;
+    using System.Linq.Expressions;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+    using Microsoft.AspNetCore.Mvc.ViewFeatures;
+
     /// <summary>
     ///     Class HtmlHelperExtensions.
     /// </summary>
     public static class HtmlHelperExtensions
     {
-        #region Methods
-
         /// <summary>
         ///     Descriptions for.
         /// </summary>
@@ -37,15 +36,12 @@ namespace CampaignKit.WorldMap.ViewHelpers
         /// <param name="expression">The expression.</param>
         /// <returns>System.String.</returns>
         public static string DescriptionFor<TModel, TValue>(
-            this IHtmlHelper<TModel> self, ModelExpressionProvider provider,
-            Expression<Func<TModel, TValue>> expression)
+            this IHtmlHelper<TModel> self, ModelExpressionProvider provider, Expression<Func<TModel, TValue>> expression)
         {
             var modelExpression = provider.CreateModelExpression(self.ViewData, expression);
             var metadata = modelExpression.Metadata;
 
             return metadata.Description;
         }
-
-        #endregion
     }
 }

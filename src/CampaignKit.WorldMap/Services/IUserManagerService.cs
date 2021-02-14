@@ -1,4 +1,4 @@
-﻿// <copyright file="MapDeleteViewModel.cs" company="Jochen Linnemann - IT-Service">
+﻿// <copyright file="IUserManagerService.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +14,20 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.ViewModels
+namespace CampaignKit.WorldMap.Services
 {
-    using Microsoft.AspNetCore.Mvc;
+    using System.Security.Claims;
 
     /// <summary>
-    ///     Class MapDeleteViewModel.
+    ///     Interface IUserManagerService.
     /// </summary>
-    public class MapDeleteViewModel
+    public interface IUserManagerService
     {
         /// <summary>
-        ///     Gets or sets the Map identifier.
+        ///     Derives the user's userId from the list of their claims.
         /// </summary>
-        /// <value>The map identifier.</value>
-        [HiddenInput]
-        public int Id { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        public string Name { get; set; }
+        /// <param name="user">The authorized user.</param>
+        /// <returns>UserId (String) if found otherwise Null.</returns>
+        string GetUserId(ClaimsPrincipal user);
     }
 }

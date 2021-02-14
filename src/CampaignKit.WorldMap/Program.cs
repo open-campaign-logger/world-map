@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
+﻿// <copyright file="Program.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,40 +12,34 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-using System.IO;
-
-using CampaignKit.WorldMap.Data;
-using CampaignKit.WorldMap.Services;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
-using Serilog;
+// </copyright>
 
 namespace CampaignKit.WorldMap
 {
+    using System;
+    using System.IO;
+    using CampaignKit.WorldMap.Data;
+    using CampaignKit.WorldMap.Services;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Serilog;
+
     /// <summary>
     ///     Class Program.
     /// </summary>
     public static class Program
     {
-        #region Methods
-
         /// <summary>
         ///     Creates the core web host.
         ///     see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
         ///     see:
-        ///     https://github.com/aspnet/Docs/blob/master/aspnetcore/test/integration-tests/samples/2.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs
+        ///     https://github.com/aspnet/Docs/blob/master/aspnetcore/test/integration-tests/samples/2.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs.
         /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-
-        // ReSharper disable once MemberCanBePrivate.Global
+        /// <param name="args">Startup arguments.</param>
+        /// <returns>Default builder object.</returns>
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host
@@ -52,8 +47,7 @@ namespace CampaignKit.WorldMap
                 .ConfigureWebHostDefaults(configure =>
                     configure
                         .UseSerilog()
-                        .UseStartup<Startup>()
-                );
+                        .UseStartup<Startup>());
         }
 
         /// <summary>
@@ -99,7 +93,10 @@ namespace CampaignKit.WorldMap
                     var filePathService = services.GetService<IFilePathService>();
                     var sampleDb = Path.Combine(filePathService.AppDataPath, "Sample", "Sample.db");
                     var appDb = Path.Combine(filePathService.AppDataPath, "WorldMap.db");
-                    if (!File.Exists(appDb)) File.Copy(sampleDb, appDb);
+                    if (!File.Exists(appDb))
+                    {
+                        File.Copy(sampleDb, appDb);
+                    }
 
                     // Get the database provider and ensure that it is created and ready.
                     var dbContext = services.GetRequiredService<WorldMapDBContext>();
@@ -118,7 +115,5 @@ namespace CampaignKit.WorldMap
                 Log.CloseAndFlush();
             }
         }
-
-        #endregion
     }
 }

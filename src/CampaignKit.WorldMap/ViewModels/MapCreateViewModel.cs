@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="MapCreateViewModel.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,21 +12,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System.ComponentModel.DataAnnotations;
-
-using Microsoft.AspNetCore.Http;
-using CampaignKit.WorldMap.Attributes;
+// </copyright>
 
 namespace CampaignKit.WorldMap.ViewModels
 {
+    using System.ComponentModel.DataAnnotations;
+    using CampaignKit.WorldMap.Attributes;
+    using Microsoft.AspNetCore.Http;
+
     /// <summary>
     ///     Class MapCreateViewModel.
     /// </summary>
     public class MapCreateViewModel
     {
-        #region Properties
-
         /// <summary>
         ///     Gets or sets the copyright.
         /// </summary>
@@ -97,7 +96,5 @@ namespace CampaignKit.WorldMap.ViewModels
         [Display(Name = "This map image does not present offensive nor obviously illegal content.")]
         [Required]
         public bool ThisIsNotOffensiveNorObviouslyIllegalContent { get; set; }
-
-        #endregion
     }
 }

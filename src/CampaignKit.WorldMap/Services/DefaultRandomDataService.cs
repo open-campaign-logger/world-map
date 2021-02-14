@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="DefaultRandomDataService.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,28 +12,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-using System.Text;
+// </copyright>
 
 namespace CampaignKit.WorldMap.Services
 {
-    /// <summary>
-    ///     Interface IRandomDataService
-    /// </summary>
-    public interface IRandomDataService
-    {
-        #region Methods
-
-        /// <summary>
-        ///     Gets the random text.
-        /// </summary>
-        /// <param name="numberOfCharacters">The number of characters.</param>
-        /// <returns>System.String.</returns>
-        string GetRandomText(int numberOfCharacters);
-
-        #endregion
-    }
+    using System;
+    using System.Text;
 
     /// <inheritdoc />
     /// <summary>
@@ -41,17 +26,7 @@ namespace CampaignKit.WorldMap.Services
     /// <seealso cref="T:CampaignKit.WorldMap.Services.IRandomDataService" />
     public class DefaultRandomDataService : IRandomDataService
     {
-        #region Fields
-
-        private readonly Random _rand = new Random();
-
-        #endregion
-
-        #region Implementations
-
-        #region IRandomDataService Members
-
-        #region Public Methods
+        private readonly Random rand = new Random();
 
         /// <inheritdoc />
         /// <summary>
@@ -67,17 +42,11 @@ namespace CampaignKit.WorldMap.Services
             var sb = new StringBuilder();
             for (var i = 0; i < numberOfCharacters; i++)
             {
-                var next = _rand.Next(characters.Length);
+                var next = this.rand.Next(characters.Length);
                 sb.Append(characters[next]);
             }
 
             return sb.ToString();
         }
-
-        #endregion Public Methods
-
-        #endregion
-
-        #endregion
     }
 }

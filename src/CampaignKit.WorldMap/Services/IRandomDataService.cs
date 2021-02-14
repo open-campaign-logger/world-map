@@ -1,4 +1,4 @@
-﻿// <copyright file="MapDeleteViewModel.cs" company="Jochen Linnemann - IT-Service">
+﻿// <copyright file="IRandomDataService.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +14,18 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.ViewModels
+namespace CampaignKit.WorldMap.Services
 {
-    using Microsoft.AspNetCore.Mvc;
-
     /// <summary>
-    ///     Class MapDeleteViewModel.
+    ///     Interface IRandomDataService.
     /// </summary>
-    public class MapDeleteViewModel
+    public interface IRandomDataService
     {
         /// <summary>
-        ///     Gets or sets the Map identifier.
+        ///     Gets the random text.
         /// </summary>
-        /// <value>The map identifier.</value>
-        [HiddenInput]
-        public int Id { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        public string Name { get; set; }
+        /// <param name="numberOfCharacters">The number of characters.</param>
+        /// <returns>System.String.</returns>
+        string GetRandomText(int numberOfCharacters);
     }
 }

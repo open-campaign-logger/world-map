@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="MapShowViewModel.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 namespace CampaignKit.WorldMap.ViewModels
 {
@@ -19,8 +21,6 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class MapShowViewModel
     {
-        #region Properties
-
         /// <summary>
         ///     Gets or sets a value indicating whether the user can edit.
         /// </summary>
@@ -30,13 +30,13 @@ namespace CampaignKit.WorldMap.ViewModels
         public bool CanEdit { get; set; }
 
         /// <summary>
-        ///     Gets the map base delete URL.
+        ///     Gets or sets the map base delete URL.
         /// </summary>
         /// <value>The map base delete URL.</value>
         public string DeleteUrl { get; set; }
 
         /// <summary>
-        ///     Gets the map base edit URL.
+        ///     Gets or sets the map base edit URL.
         /// </summary>
         /// <value>The map base edit URL.</value>
         public string EditUrl { get; set; }
@@ -60,13 +60,13 @@ namespace CampaignKit.WorldMap.ViewModels
         public string ProgressUrl { get; set; }
 
         /// <summary>
-        ///     Gets the map share key.
+        ///     Gets or sets the map share key.
         /// </summary>
         /// <value>The share key.</value>
         public string Share { get; set; }
 
         /// <summary>
-        ///     Gets a value indicating whether [show progress].
+        ///     Gets or sets a value indicating whether [show progress].
         /// </summary>
         /// <value><c>true</c> if [show progress]; otherwise, <c>false</c>.</value>
         public bool ShowProgress { get; set; }
@@ -78,11 +78,9 @@ namespace CampaignKit.WorldMap.ViewModels
         public string ShowUrl { get; set; }
 
         /// <summary>
-        ///     The userid of the map owner.
+        ///     Gets or sets the userid of the map owner.
         /// </summary>
         /// <value>The user id.</value>
         public string UserId { get; set; }
-
-        #endregion
     }
 }

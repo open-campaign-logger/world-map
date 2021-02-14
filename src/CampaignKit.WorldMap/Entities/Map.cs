@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="Map.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,19 +12,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
+// </copyright>
 
 namespace CampaignKit.WorldMap.Entities
 {
-    /// <summary>Map Entity</summary>
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.ComponentModel.DataAnnotations.Schema;
+
+    /// <summary>Map Entity.</summary>
     public class Map
     {
-        #region Properties
-
         /// <summary>
         ///     Gets or sets the size of the adjusted.
         /// </summary>
@@ -132,7 +132,5 @@ namespace CampaignKit.WorldMap.Entities
         /// </summary>
         /// <value>The world folder path.</value>
         public string WorldFolderPath { get; set; }
-
-        #endregion
     }
 }

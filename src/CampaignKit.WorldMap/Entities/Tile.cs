@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="Tile.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,29 +12,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+// </copyright>
 
 namespace CampaignKit.WorldMap.Entities
 {
+    using System;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+
     /// <summary>
     ///     Tile entity.
     /// </summary>
     public class Tile
     {
-        #region Properties
-
         /// <summary>
-        ///     Gets or sets the tile completion timestamp
+        ///     Gets or sets the tile completion timestamp.
         /// </summary>
         /// <value>Time that the tile creation process completed.</value>
         [Column(TypeName = "DateTime")]
         public DateTime CompletionTimestamp { get; set; }
 
         /// <summary>
-        ///     Gets or sets the tile creation timestamp
+        ///     Gets or sets the tile creation timestamp.
         /// </summary>
         /// <value>Time that the tile creation process started.</value>
         [Column(TypeName = "DateTime")]
@@ -69,16 +69,16 @@ namespace CampaignKit.WorldMap.Entities
         public int TileSize { get; set; }
 
         /// <summary>
-        ///     Gets or set the tile's x coordinate.
+        ///     Gets or sets or set the tile's x coordinate.
         /// </summary>
-        /// <value>The tile's x coordinate</value>
+        /// <value>The tile's x coordinate.</value>
         [Required]
         public int X { get; set; }
 
         /// <summary>
-        ///     Gets or set the tile's y coordinate.
+        ///     Gets or sets or set the tile's y coordinate.
         /// </summary>
-        /// <value>The tile's y coordinate</value>
+        /// <value>The tile's y coordinate.</value>
         [Required]
         public int Y { get; set; }
 
@@ -88,7 +88,5 @@ namespace CampaignKit.WorldMap.Entities
         /// <value>The tile's zoom level value.</value>
         [Required]
         public int ZoomLevel { get; set; }
-
-        #endregion
     }
 }

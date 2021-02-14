@@ -1,4 +1,4 @@
-﻿// <copyright file="MapDeleteViewModel.cs" company="Jochen Linnemann - IT-Service">
+﻿// <copyright file="IProgressService.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +14,26 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.ViewModels
+namespace CampaignKit.WorldMap.Services
 {
-    using Microsoft.AspNetCore.Mvc;
+    using System;
+    using System.Linq;
+
+    using CampaignKit.WorldMap.Data;
+
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
-    ///     Class MapDeleteViewModel.
+    ///     Interface IProgressService.
     /// </summary>
-    public class MapDeleteViewModel
+    public interface IProgressService
     {
         /// <summary>
-        ///     Gets or sets the Map identifier.
+        ///     Gets the map creation progress.
+        ///     0.0 = 0% .. 1.0 = 100%.
         /// </summary>
-        /// <value>The map identifier.</value>
-        [HiddenInput]
-        public int Id { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        public string Name { get; set; }
+        /// <param name="mapId">The map identifier.</param>
+        /// <returns>System.Double.</returns>
+        double GetMapProgress(string mapId);
     }
 }

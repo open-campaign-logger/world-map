@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="DefaultUserManagerService.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,28 +12,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System.Linq;
-using System.Security.Claims;
+// </copyright>
 
 namespace CampaignKit.WorldMap.Services
 {
-    /// <summary>
-    ///     Interface IUserManagerService
-    /// </summary>
-    public interface IUserManagerService
-    {
-        #region Methods
-
-        /// <summary>
-        ///     Derives the user's userId from the list of their claims.
-        /// </summary>
-        /// <param name="user">The authorized user.</param>
-        /// <returns>UserId (String) if found otherwise Null.</returns>
-        string GetUserId(ClaimsPrincipal user);
-
-        #endregion
-    }
+    using System.Linq;
+    using System.Security.Claims;
 
     /// <inheritdoc />
     /// <summary>
@@ -41,8 +26,6 @@ namespace CampaignKit.WorldMap.Services
     /// <seealso cref="T:CampaignKit.WorldMap.Services.IUserManagerService" />
     public class DefaultUserManagerService : IUserManagerService
     {
-        #region Implementations
-
         /// <summary>
         ///     Derives the user's userId from the list of their claims.
         /// </summary>
@@ -51,13 +34,16 @@ namespace CampaignKit.WorldMap.Services
         public string GetUserId(ClaimsPrincipal user)
         {
             if (user == null)
+            {
                 return null;
+            }
+
             if (user.Claims.Count(c => c.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")) == 0)
+            {
                 return null;
+            }
 
             return user.Claims.First(c => c.Type.Equals("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")).Value;
         }
-
-        #endregion
     }
 }
