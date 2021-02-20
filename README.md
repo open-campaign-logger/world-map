@@ -17,15 +17,6 @@ Service for managing world maps and associate them with Campaign Logger log entr
   - ASP.NET and web development workload
   - .Net Core cross-platform development
 
-## Connection Strings
-- [Working with User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=windows)
-  - Start Developer PowerShell
-  - `cd <repo directory>\world-map\src\CampaignKit.WorldMap`
-  - `dotnet user-secrets init`
-  - `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Data Source=App_Data/WorldMap.db"`
-  - `dotnet user-secrets set "ConnectionStrings:AzureBlobStorage" "UseDevelopmentStorage=true"`
-  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorage" "UseDevelopmentStorage=true"`
-
 ## Visual Studio Extensions
 - [Markdown Editor](https://marketplace.visualstudio.com/items?itemName=ChrisDahlberg.StyleCop)
 - [GhostDoc](https://marketplace.visualstudio.com/items?itemName=sergeb.GhostDoc)
@@ -33,15 +24,24 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - [GitHub](https://marketplace.visualstudio.com/items?itemName=GitHub.GitHubExtensionforVisualStudio)
 
 ## Local Development
-- [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
+- The Azure Storage Emulator is used by the application to simulate reading/writing from Azure storage in the local environment.  See: [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
+- Connection strings in `appsettings.Development.json` can be overwritten locally for testing against other sources.  Use the .Net Core User Secrets manager to make these overrides. See: [Working with User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=windows).
+- To setup connection string overrides locally:
+  - Open **Tools > NuGet Package Manager > NuGet Package Manager Console**
+  - `cd src\CampaignKit.WorldMap`
+  - `dotnet user-secrets init`
+  - `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureBlobStorage" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorage" "<YOUR CUSTOM CONNECTION STRING>"`
 
-## npm/gulp Reference Material
+# Reference Material
+## npm/gulp
 
 - Using gulp and npm in VisualStudio: https://blog.bitscry.com/2018/03/13/using-npm-and-gulp-in-visual-studio-2017/
 	- note: install Node.js which will install npm 
 	- Working with npm behind a proxy: https://superuser.com/questions/347476/how-to-install-npm-behind-authentication-proxy-on-windows
 
-## OpenID Connect Reference Material
+## OpenID Connect
 
 - OpenID Connect JavaScript Client library: https://github.com/IdentityModel/oidc-client-js
 - Using JWT and Asp.Net Core Cookies: https://amanagrawal.blog/2017/09/18/jwt-token-authentication-with-cookies-in-asp-net-core/
@@ -50,7 +50,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - IdentityServer4 JavaScript Client Quickstart - http://docs.identityserver.io/en/latest/quickstarts/6_javascript_client.html
 - Configuring App to Recognize JWT authorization tokens - https://developer.okta.com/blog/2018/03/23/token-authentication-aspnetcore-complete-guide
 
-## Testing Reference Material
+## Testing
 
 - Testing: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-2.2
 - Integration Testing: https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2
@@ -60,7 +60,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - Sharing test context between tests: https://xunit.github.io/docs/shared-context
 - Supporting AntiForgeryTokens: https://www.matheus.ro/2018/09/03/integration-tests-in-asp-net-core-controllers/
 
-## Security Material
+## Security
 
 - Running .Net Core 2.1 With Self-Signed Cert: https://www.hanselman.com/blog/DevelopingLocallyWithASPNETCoreUnderHTTPSSSLAndSelfSignedCerts.aspx
 - Configure HTTPS in ASP.Net Core 2.1: https://asp.net-hacker.rocks/2018/07/09/aspnetcore-ssl.html
