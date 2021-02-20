@@ -14,14 +14,19 @@ Service for managing world maps and associate them with Campaign Logger log entr
 ## Visual Studio
 - [VS2019 Community](https://visualstudio.microsoft.com/downloads/)
 - Workloads
-  - ASP.NET and web development workload
+  - ASP.NET and web development
   - .Net Core cross-platform development
+  - Node.js development
 
 ## Visual Studio Extensions
 - [Markdown Editor](https://marketplace.visualstudio.com/items?itemName=ChrisDahlberg.StyleCop)
 - [GhostDoc](https://marketplace.visualstudio.com/items?itemName=sergeb.GhostDoc)
 - [GitFlow](https://marketplace.visualstudio.com/items?itemName=vs-publisher-57624.GitFlowforVisualStudio2019)
 - [GitHub](https://marketplace.visualstudio.com/items?itemName=GitHub.GitHubExtensionforVisualStudio)
+
+## Node and NPM
+- [NodeJS](https://nodejs.org/en/download/)
+
 
 ## Local Development
 - The Azure Storage Emulator is used by the application to simulate reading/writing from Azure storage in the local environment.  See: [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
@@ -35,11 +40,6 @@ Service for managing world maps and associate them with Campaign Logger log entr
   - `dotnet user-secrets set "ConnectionStrings:AzureTableStorage" "<YOUR CUSTOM CONNECTION STRING>"`
 
 # Reference Material
-## npm/gulp
-
-- Using gulp and npm in VisualStudio: https://blog.bitscry.com/2018/03/13/using-npm-and-gulp-in-visual-studio-2017/
-	- note: install Node.js which will install npm 
-	- Working with npm behind a proxy: https://superuser.com/questions/347476/how-to-install-npm-behind-authentication-proxy-on-windows
 
 ## OpenID Connect
 
