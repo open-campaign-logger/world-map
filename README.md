@@ -23,6 +23,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - [GhostDoc](https://marketplace.visualstudio.com/items?itemName=sergeb.GhostDoc)
 - [GitFlow](https://marketplace.visualstudio.com/items?itemName=vs-publisher-57624.GitFlowforVisualStudio2019)
 - [GitHub](https://marketplace.visualstudio.com/items?itemName=GitHub.GitHubExtensionforVisualStudio)
+- [Web Compiler](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.WebCompiler)
 
 ## Node and NPM
 - [NodeJS](https://nodejs.org/en/download/)
