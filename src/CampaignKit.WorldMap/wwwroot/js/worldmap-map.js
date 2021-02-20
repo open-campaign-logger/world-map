@@ -333,7 +333,7 @@ function initMap(pMapId, pMapUserId, pMapShare, pWorldPath, pMaxZoomLevel, pNoWr
     // Create the map box
     map = L.map('map').setView([0, 0], 2);
 
-    L.tileLayer(pWorldPath + '/{z}/{x}_{y}.png',
+    L.tileLayer(pWorldPath + '/{z}_{x}_{y}.png',
         {
             attribution: 'Campaign Logger',
             maxZoom: pMaxZoomLevel,

@@ -149,7 +149,8 @@ namespace CampaignKit.WorldMap
                     };
                 });
 
-            // Add data services to context
+            // Add services to context
+            //
             // Note: these have been changed from singleton to scoped services in order
             //       to work with the db context which is scoped.
             services.AddScoped<IFilePathService, DefaultFilePathService>();

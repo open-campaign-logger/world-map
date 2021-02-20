@@ -20,15 +20,18 @@ namespace CampaignKit.WorldMap.Services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
     using CampaignKit.WorldMap.Data;
     using CampaignKit.WorldMap.Entities;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.Advanced;
     using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
 
@@ -46,9 +49,24 @@ namespace CampaignKit.WorldMap.Services
         private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
 
         /// <summary>
-        ///     The application logging service.
+        /// The application configuration.
+        /// </summary>
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// The application logging service.
         /// </summary>
         private readonly ILogger loggerService;
+
+        /// <summary>
+        /// The service provider.
+        /// </summary>
+        private readonly IServiceProvider serviceProvider;
+
+        /// <summary>
+        /// The BLOB storage service.
+        /// </summary>
+        private readonly IBlobStorageService blobStorageService;
 
         /// <summary>
         ///     The executing task.
@@ -58,24 +76,20 @@ namespace CampaignKit.WorldMap.Services
         /// <summary>
         ///     Initializes a new instance of the <see cref="TileCreationService" /> class.
         /// </summary>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="loggerService">The application logger service.</param>
         /// <param name="serviceProvider">The service provider.</param>
-        /// <param name="loggerService">The logger service.</param>
-        public TileCreationService(IServiceProvider serviceProvider, ILogger<TileCreationService> loggerService)
+        /// <param name="blobStorageService">The blob storage service.</param>
+        public TileCreationService(IConfiguration configuration, ILogger<TileCreationService> loggerService, IServiceProvider serviceProvider, IBlobStorageService blobStorageService)
         {
+            this.configuration = configuration;
             this.loggerService = loggerService;
-            this.ServiceProvider = serviceProvider;
+            this.serviceProvider = serviceProvider;
+            this.blobStorageService = blobStorageService;
         }
 
         /// <summary>
-        ///     Gets the service provider.
-        /// </summary>
-        /// <value>
-        ///     The service provider.
-        /// </value>
-        private IServiceProvider ServiceProvider { get; }
-
-        /// <summary>
-        ///     Triggered when the application host is ready to start the service.
+        /// Triggered when the application host is ready to start the service.
         /// </summary>
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -96,10 +110,10 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
-        ///     Triggered when the application host is performing a graceful shutdown.
+        /// Triggered when the application host is performing a graceful shutdown.
         /// </summary>
         /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             // Stop called without start
@@ -123,18 +137,11 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
-        ///     This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The
-        ///     implementation should return a task that represents
-        ///     the lifetime of the long running operation(s) being performed.
+        /// This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The implementation should return a task that represents
+        /// the lifetime of the long running operation(s) being performed.
         /// </summary>
-        /// <param name="stoppingToken">
-        ///     Triggered when
-        ///     <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is
-        ///     called.
-        /// </param>
-        /// <returns>
-        ///     A <see cref="T:System.Threading.Tasks.Task" /> that represents the long running operations.
-        /// </returns>
+        /// <param name="stoppingToken">Triggered when <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is called.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             do
@@ -152,16 +159,16 @@ namespace CampaignKit.WorldMap.Services
         /// <returns>True when processing is completed.</returns>
         protected async Task<bool> Process()
         {
-            using (var scope = this.ServiceProvider.CreateScope())
+            using (var scope = this.serviceProvider.CreateScope())
             {
                 // Retrieve the db context from the container
                 var dbContext = scope.ServiceProvider.GetRequiredService<WorldMapDBContext>();
-                var filePathService = scope.ServiceProvider.GetRequiredService<IFilePathService>();
 
                 // Open the db connection
                 dbContext.Database.OpenConnection();
 
                 // Query the tiles table to see if there are any unprocessed tiles.
+                this.loggerService.LogDebug("Determining if there are map tiles to process.");
                 var tiles = (from t in dbContext.Tiles select t)
                     .Where(t => t.CompletionTimestamp == DateTime.MinValue)
                     .OrderBy(t => t.MapId).ThenBy(t => t.ZoomLevel)
@@ -169,22 +176,22 @@ namespace CampaignKit.WorldMap.Services
 
                 if (tiles.Count > 0)
                 {
-                    this.loggerService.LogDebug($"{tiles.Count} Tiles found.");
+                    this.loggerService.LogDebug("{0} tiles waiting to be processed.", tiles.Count);
 
                     // Process each map with unprocessed tiles
                     var mapList = tiles.Select(o => o.MapId).Distinct();
                     foreach (var map in mapList)
                     {
+                        this.loggerService.LogDebug("Processing tiles for map: {0}.", map);
+
+                        // Calculate Folder Paths for the Map
+                        var containerName = $"{map}";
+                        var masterBlob = await this.blobStorageService.ReadBlobAsync(containerName, "master-file.png");
+
                         // Process each map zoom level with unprocessed tiles
                         var zoomList = tiles.Where(t => t.MapId == map).Select(o => o.ZoomLevel).Distinct();
                         foreach (var zoomLevel in zoomList)
                         {
-                            // Calculate Folder Paths
-                            var worldFolderPath = Path.Combine(filePathService.PhysicalWorldBasePath, $"{map}");
-                            var masterFilePath = Path.Combine(worldFolderPath, "master-file.png");
-                            var zoomLevelFolderPath = Path.Combine(worldFolderPath, $"{zoomLevel}");
-                            var zoomLevelBaseFilePath = Path.Combine(zoomLevelFolderPath, "zoom-level.png");
-
                             // Select Tiles for Processing
                             var tilesToProcess = tiles.Where(t => t.MapId == map).Where(t => t.ZoomLevel == zoomLevel);
 
@@ -194,18 +201,13 @@ namespace CampaignKit.WorldMap.Services
                             // Calculate the number of tiles required for this zoom level
                             var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
 
-                            // Create zoom level directory if required
-                            if (!Directory.Exists(zoomLevelFolderPath))
-                            {
-                                Directory.CreateDirectory(zoomLevelFolderPath);
-                            }
-
                             // Create zoom level base file (sync)
+                            this.loggerService.LogDebug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
                             var zoomLevelBaseImage
                                 = this.CreateZoomLevelBaseFile(
                                     numberOfTilesPerDimension,
-                                    masterFilePath,
-                                    zoomLevelBaseFilePath,
+                                    masterBlob,
+                                    zoomLevel,
                                     tilePixelSize);
 
                             // Create collection for tile creation tasks
@@ -215,9 +217,9 @@ namespace CampaignKit.WorldMap.Services
                             // Cycle through the tiles selected for the current map and zoom and process them
                             foreach (var tile in tilesToProcess)
                             {
-                                var zoomLevelTileFilePath = Path.Combine(zoomLevelFolderPath, $"{tile.X}_{tile.Y}.png");
-                                tasks.Add(Task.Run(() =>
-                                    this.CreateZoomLevelTileFile(zoomLevelBaseImage.Clone(), tile, zoomLevelTileFilePath)));
+                                var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
+                                this.loggerService.LogDebug("Creating zoom level tile: {0}.", blobName);
+                                tasks.Add(this.CreateZoomLevelTileFile(zoomLevelBaseImage.Clone(), tile, containerName, blobName));
                             }
 
                             // Wait for all tile creation tasks to complete
@@ -234,15 +236,15 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
-        ///     Creates the zoom level base file.
+        /// Creates the zoom level base file.
         /// </summary>
         /// <param name="numberOfTilesPerDimension">The number of tiles per dimension.</param>
-        /// <param name="masterFilePath">The master file path.</param>
-        /// <param name="zoomLevelBaseFilePath">The zoom level base file path.</param>
+        /// <param name="masterBlob">The master image.</param>
+        /// <param name="zoomLevel">The zoom level.</param>
         /// <param name="tilePixelSize">Tile pixel size.</param>
-        private Image<Rgba32> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, string masterFilePath, string zoomLevelBaseFilePath, int tilePixelSize)
+        private Image<Rgba32> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize)
         {
-            using (var masterBaseImage = Image.Load(masterFilePath))
+            using (var masterBaseImage = Image.Load(masterBlob))
             {
                 var size = numberOfTilesPerDimension * tilePixelSize;
 
@@ -253,32 +255,27 @@ namespace CampaignKit.WorldMap.Services
                     Size = new Size(size, size),
                 }));
 
-                masterBaseImage.Save(zoomLevelBaseFilePath);
+                return masterBaseImage;
             }
-
-            return Image.Load<Rgba32>(zoomLevelBaseFilePath);
         }
 
         /// <summary>
-        ///     Creates the zoom level tile file.
+        /// Creates the zoom level tile file.
         /// </summary>
-        /// <param name="baseImage">The base image.</param>
-        /// <param name="tile">The tile.</param>
-        /// <param name="zoomLevelTileFilePath">The zoom level tile file path.</param>
+        /// <param name="baseImage">The base image for the zoom level.</param>
+        /// <param name="tile">The tile to be created.</param>
+        /// <param name="containerName">The blob container name.</param>
+        /// <param name="blobName">The name of the blob.</param>
         /// <returns>True when complete.</returns>
-        private bool CreateZoomLevelTileFile(Image<Rgba32> baseImage, Tile tile, string zoomLevelTileFilePath)
+        private async Task<bool> CreateZoomLevelTileFile(Image<Rgba32> baseImage, Tile tile, string containerName, string blobName)
         {
-            if (!File.Exists(zoomLevelTileFilePath))
-            {
-                baseImage.Mutate(context => context.Crop(
-                    new Rectangle(tile.X * tile.TileSize, tile.Y * tile.TileSize, tile.TileSize, tile.TileSize)));
-
-                baseImage.Save(zoomLevelTileFilePath);
-
-                tile.CompletionTimestamp = DateTime.UtcNow;
-            }
-
-            return true;
+            baseImage.Mutate(context => context.Crop(
+                new Rectangle(tile.X * tile.TileSize, tile.Y * tile.TileSize, tile.TileSize, tile.TileSize)));
+            var memoryGroup = baseImage.GetPixelMemoryGroup().ToArray()[0];
+            var blob = MemoryMarshal.AsBytes(memoryGroup.Span).ToArray();
+            var result = await this.blobStorageService.CreateBlobAsync(containerName, blobName, blob);
+            tile.CompletionTimestamp = DateTime.UtcNow;
+            return result;
         }
     }
 }

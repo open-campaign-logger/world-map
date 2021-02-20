@@ -68,7 +68,8 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 await blobServiceClient.CreateBlobContainerAsync(containerName, Azure.Storage.Blobs.Models.PublicAccessType.Blob);
-            } catch (Azure.RequestFailedException ex)
+            }
+            catch (Azure.RequestFailedException ex)
             {
                 this.loggerService.LogError("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
                 return false;
@@ -110,5 +111,35 @@ namespace CampaignKit.WorldMap.Services
             return true;
         }
 
+        /// <summary>
+        /// Retrieves the Azure Blob asynchronously.
+        /// </summary>
+        /// <param name="containerName">Name of the Azure Blob container.</param>
+        /// <param name="blobName">Name of the blob to create in the Azure Blob container.</param>
+        /// <returns>
+        /// Byte array containing the blob data.
+        /// </returns>
+        public async Task<byte[]> ReadBlobAsync(string containerName, string blobName)
+        {
+            // Create a BlobServiceClient object which will be used to create a container client
+            BlobServiceClient blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
+
+            // Create the container and return a container client object
+            try
+            {
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+                var blobClient = blobContainerClient.GetBlobClient(blobName);
+                using (var ms = new MemoryStream())
+                {
+                    await blobClient.DownloadToAsync(ms);
+                    return ms.ToArray();
+                }
+            }
+            catch (Azure.RequestFailedException ex)
+            {
+                this.loggerService.LogError("Unable to read Azure blob: {0}/{1}.  Error message: {2}.", containerName, blobName, ex.Message);
+                return null;
+            }
+        }
     }
 }
