@@ -19,6 +19,8 @@ namespace CampaignKit.WorldMap.Services
     using System;
     using System.Linq;
     using CampaignKit.WorldMap.Data;
+
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
@@ -28,20 +30,32 @@ namespace CampaignKit.WorldMap.Services
     /// <seealso cref="T:CampaignKit.WorldMap.Services.IProgressService" />
     public class DefaultProgressService : IProgressService
     {
-        private readonly WorldMapDBContext context;
-        private readonly ILogger logger;
+        private readonly WorldMapDBContext dbContext;
+
+        /// <summary>
+        /// The application configuration.
+        /// </summary>
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// The application logging service.
+        /// </summary>
+        private readonly ILogger loggerService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultProgressService"/> class.
         /// </summary>
-        /// <param name="context">The WorldMapDBContext.</param>
-        /// <param name="logger">The ILogger instance.</param>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="loggerService">The application logger service.</param>
+        /// <param name="dbContext">The WorldMapDBContext.</param>
         public DefaultProgressService(
-            WorldMapDBContext context,
-            ILogger<TileCreationService> logger)
+            IConfiguration configuration,
+            ILogger<DefaultProgressService> loggerService,
+            WorldMapDBContext dbContext)
         {
-            this.context = context;
-            this.logger = logger;
+            this.configuration = configuration;
+            this.loggerService = loggerService;
+            this.dbContext = dbContext;
         }
 
         /// <summary>
@@ -56,7 +70,7 @@ namespace CampaignKit.WorldMap.Services
             var progress = 0D;
 
             // Find tiles related to this map
-            var tiles = (from t in this.context.Tiles select t)
+            var tiles = (from t in this.dbContext.Tiles select t)
                 .Where(t => t.MapId == Convert.ToInt32(mapId))
                 .ToList();
             var total = tiles.Count();

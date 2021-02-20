@@ -19,7 +19,8 @@ namespace CampaignKit.WorldMap.Services
     using System.IO;
 
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     /// <summary>
@@ -29,11 +30,25 @@ namespace CampaignKit.WorldMap.Services
     public class DefaultFilePathService : IFilePathService
     {
         /// <summary>
+        /// The application configuration.
+        /// </summary>
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// The application logging service.
+        /// </summary>
+        private readonly ILogger loggerService;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultFilePathService" /> class.
         /// </summary>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="loggerService">The application logger service.</param>
         /// <param name="env">The env.</param>
-        public DefaultFilePathService(IWebHostEnvironment env)
+        public DefaultFilePathService(IConfiguration configuration, ILogger<DefaultFilePathService> loggerService, IWebHostEnvironment env)
         {
+            this.configuration = configuration;
+            this.loggerService = loggerService;
             this.AppDataPath = Path.Combine(env.ContentRootPath, "App_Data");
             this.SeedDataPath = Path.Combine(this.AppDataPath, "Sample");
             this.PhysicalWorldBasePath = Path.Combine(env.WebRootPath, "world");

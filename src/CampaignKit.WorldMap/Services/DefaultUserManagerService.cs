@@ -18,6 +18,8 @@ namespace CampaignKit.WorldMap.Services
 {
     using System.Linq;
     using System.Security.Claims;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     /// <summary>
@@ -26,6 +28,27 @@ namespace CampaignKit.WorldMap.Services
     /// <seealso cref="T:CampaignKit.WorldMap.Services.IUserManagerService" />
     public class DefaultUserManagerService : IUserManagerService
     {
+        /// <summary>
+        /// The application configuration.
+        /// </summary>
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// The application logging service.
+        /// </summary>
+        private readonly ILogger loggerService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultUserManagerService"/> class.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="loggerService">The application logger service.</param>
+        public DefaultUserManagerService(IConfiguration configuration, ILogger<DefaultUserManagerService> loggerService)
+        {
+            this.configuration = configuration;
+            this.loggerService = loggerService;
+        }
+
         /// <summary>
         ///     Derives the user's userId from the list of their claims.
         /// </summary>

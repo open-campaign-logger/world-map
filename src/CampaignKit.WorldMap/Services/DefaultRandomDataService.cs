@@ -18,6 +18,8 @@ namespace CampaignKit.WorldMap.Services
 {
     using System;
     using System.Text;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     /// <summary>
@@ -26,7 +28,31 @@ namespace CampaignKit.WorldMap.Services
     /// <seealso cref="T:CampaignKit.WorldMap.Services.IRandomDataService" />
     public class DefaultRandomDataService : IRandomDataService
     {
+        /// <summary>
+        /// The pseudo-random number generator.
+        /// </summary>
         private readonly Random rand = new Random();
+
+        /// <summary>
+        /// The application configuration.
+        /// </summary>
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// The application logging service.
+        /// </summary>
+        private readonly ILogger loggerService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultRandomDataService"/> class.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="loggerService">The application logger service.</param>
+        public DefaultRandomDataService(IConfiguration configuration, ILogger<DefaultRandomDataService> loggerService)
+        {
+            this.configuration = configuration;
+            this.loggerService = loggerService;
+        }
 
         /// <inheritdoc />
         /// <summary>
