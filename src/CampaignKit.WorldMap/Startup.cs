@@ -32,43 +32,36 @@ namespace CampaignKit.WorldMap
     using Microsoft.Extensions.Hosting;
     using Newtonsoft.Json;
 
+    using Serilog;
+
     /// <summary>
     ///     Class Startup.
     /// </summary>
     public class Startup
     {
-        private readonly IConfiguration configuration;
-        private readonly IWebHostEnvironment env;
-
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Startup" /> class.
+        /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
-        /// <param name="env">The env.</param>
-        public Startup(IWebHostEnvironment env)
+        /// <param name="configuration">The configuration.</param>
+        public Startup(IConfiguration configuration)
         {
-            this.env = env;
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
-                .AddEnvironmentVariables();
-
-            this.configuration = builder.Build();
+            this.Configuration = configuration;
         }
 
         /// <summary>
-        ///     Gets a value indicating whether this instance is development configured.
+        /// Gets the configuration.
         /// </summary>
-        /// <value><c>true</c> if this instance is development configured; otherwise, <c>false</c>.</value>
-        public bool IsDevelopmentConfigured =>
-            string.Equals(this.configuration["IsDevelopment"], bool.TrueString, StringComparison.OrdinalIgnoreCase);
+        /// <value>
+        /// The configuration.
+        /// </value>
+        public IConfiguration Configuration { get; }
 
         /// <summary>
-        ///     Configures the specified application.
+        /// Configures the specified application.
         /// </summary>
         /// <param name="app">The application.</param>
-        public void Configure(IApplicationBuilder app)
+        /// <param name="env">The env.</param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
             app.UseHttpsRedirection();
@@ -77,7 +70,7 @@ namespace CampaignKit.WorldMap
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings { Formatting = Formatting.Indented };
 
             // Reads the IsDevelopment configuration variable to determine if this is a development environment or not
-            if (this.env.IsDevelopment() || this.IsDevelopmentConfigured)
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -106,40 +99,23 @@ namespace CampaignKit.WorldMap
             // This method gets called by the runtime. Use this method to add services to the container.
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
 
-            // Add the configuration to the context
-            services.AddSingleton(this.configuration);
+            // Instantiate logging
+            var logFile = "Logs/worldmap_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .ReadFrom.Configuration(this.Configuration)
+                .Enrich.FromLogContext()
+                .WriteTo.File(logFile)
+                .WriteTo.Console()
+                .CreateLogger();
 
             // Instantiate the database and add to the context
-            this.ConfigureDb(services);
+            services.AddDbContext<WorldMapDBContext>(
+                options => options.UseSqlite(this.Configuration.GetConnectionString("DefaultConnection")));
 
             // Add the MVC service
             services.AddMvc();
 
-            // Configure Authentication
-            this.ConfigureAuth(services);
-
-            // Add data services to context
-            // Note: these have been changed from singleton to scoped services in order
-            //       to work with the db context which is scoped.
-            services.AddScoped<IFilePathService, DefaultFilePathService>();
-            services.AddScoped<IRandomDataService, DefaultRandomDataService>();
-            services.AddScoped<IProgressService, DefaultProgressService>();
-            services.AddScoped<IMapRepository, DefaultMapRepository>();
-            services.AddScoped<IUserManagerService, DefaultUserManagerService>();
-
-            // Add background services
-            services.AddSingleton<IHostedService, TileCreationService>();
-        }
-
-        /// <summary>
-        ///     Configures the authentication.
-        ///     This virtual method is used to encapsulate authentication
-        ///     configuration information in a way that can be easily overridden
-        ///     in the unit testing project.
-        /// </summary>
-        /// <param name="services">The services.</param>
-        protected virtual void ConfigureAuth(IServiceCollection services)
-        {
             // Configure services to expect a Campaign-Identity access_token in the
             // Authorization header using the JWT Bearer scheme.
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -172,20 +148,18 @@ namespace CampaignKit.WorldMap
                         },
                     };
                 });
-        }
 
-        /// <summary>
-        ///     Configures the database provider.
-        ///     This virtual method is used to encapsulate database configuration
-        ///     information in a way that can be easily overridden in the unit
-        ///     testing project.
-        /// </summary>
-        /// <param name="services">The services.</param>
-        protected virtual void ConfigureDb(IServiceCollection services)
-        {
-            // Instantiate the database and add to the context
-            services.AddDbContext<WorldMapDBContext>(
-                options => options.UseSqlite(this.configuration.GetConnectionString("DefaultConnection")));
+            // Add data services to context
+            // Note: these have been changed from singleton to scoped services in order
+            //       to work with the db context which is scoped.
+            services.AddScoped<IFilePathService, DefaultFilePathService>();
+            services.AddScoped<IRandomDataService, DefaultRandomDataService>();
+            services.AddScoped<IProgressService, DefaultProgressService>();
+            services.AddScoped<IMapRepository, DefaultMapRepository>();
+            services.AddScoped<IUserManagerService, DefaultUserManagerService>();
+
+            // Add background services
+            services.AddSingleton<IHostedService, TileCreationService>();
         }
     }
 }

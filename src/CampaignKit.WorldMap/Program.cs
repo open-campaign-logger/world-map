@@ -16,104 +16,59 @@
 
 namespace CampaignKit.WorldMap
 {
-    using System;
-    using System.IO;
-    using CampaignKit.WorldMap.Data;
-    using CampaignKit.WorldMap.Services;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+
     using Serilog;
 
     /// <summary>
-    ///     Class Program.
+    /// Main application executable.
     /// </summary>
-    public static class Program
+    public class Program
     {
         /// <summary>
-        ///     Creates the core web host.
-        ///     see: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2
-        ///     see:
-        ///     https://github.com/aspnet/Docs/blob/master/aspnetcore/test/integration-tests/samples/2.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs.
+        /// Defines the entry point of the application.
         /// </summary>
-        /// <param name="args">Startup arguments.</param>
-        /// <returns>Default builder object.</returns>
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        /// <param name="args">Command line application arguments.</param>
+        public static void Main(string[] args)
         {
-            return Host
-                .CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(configure =>
-                    configure
-                        .UseSerilog()
-                        .UseStartup<Startup>());
+            CreateHostBuilder(args).Build().Run();
         }
 
         /// <summary>
-        ///     Defines the entry point of the application.
+        /// Creates the host builder.
         /// </summary>
         /// <param name="args">The arguments.</param>
-        public static void Main(string[] args)
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile(
-                    $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
-                    true)
-                .AddEnvironmentVariables()
-                .Build();
-
-            var logFile = "Logs/worldmap_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
-
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .ReadFrom.Configuration(configuration)
-                .Enrich.FromLogContext()
-                .WriteTo.File(logFile)
-                .WriteTo.Console()
-                .CreateLogger();
-
-            try
-            {
-                Log.Information("Starting web host");
-
-                // Build the web host
-                var host = CreateHostBuilder(args).Build();
-
-                // Seed the database if required
-                using (var scope = host.Services.CreateScope())
+        /// <returns>Program initialization utility.</returns>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, builder) =>
                 {
-                    // Get the service provider
-                    var services = scope.ServiceProvider;
+                    builder.Sources.Clear();
 
-                    // Determine if database has been created
-                    // WorldMap.db
-                    var filePathService = services.GetService<IFilePathService>();
-                    var sampleDb = Path.Combine(filePathService.AppDataPath, "Sample", "Sample.db");
-                    var appDb = Path.Combine(filePathService.AppDataPath, "WorldMap.db");
-                    if (!File.Exists(appDb))
+                    var env = hostingContext.HostingEnvironment;
+
+                    builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
+                    builder.AddEnvironmentVariables();
+
+                    if (args != null)
                     {
-                        File.Copy(sampleDb, appDb);
+                        builder.AddCommandLine(args);
                     }
 
-                    // Get the database provider and ensure that it is created and ready.
-                    var dbContext = services.GetRequiredService<WorldMapDBContext>();
-                    dbContext.Database.Migrate();
-                }
-
-                // Run the web host
-                host.Run();
-            }
-            catch (Exception e)
-            {
-                Log.Fatal(e, "Web host terminated unexpectedly");
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-        }
+                    if (hostingContext.HostingEnvironment.IsDevelopment())
+                    {
+                        builder.AddUserSecrets<Program>();
+                    }
+                })
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder
+                    .UseSerilog()
+                    .UseStartup<Startup>();
+                });
     }
 }

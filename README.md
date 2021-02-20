@@ -4,8 +4,12 @@ Service for managing world maps and associate them with Campaign Logger log entr
 
 # Development Environment
 
-## .Net SDK
+## SDKs
 - [.Net 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
+
+## Azure Tools
+- [Microsoft Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
+- [Microsoft Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
 
 ## Visual Studio
 - [VS2019 Community](https://visualstudio.microsoft.com/downloads/)
@@ -13,11 +17,23 @@ Service for managing world maps and associate them with Campaign Logger log entr
   - ASP.NET and web development workload
   - .Net Core cross-platform development
 
+## Connection Strings
+- [Working with User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=windows)
+  - Start Developer PowerShell
+  - `cd <repo directory>\world-map\src\CampaignKit.WorldMap`
+  - `dotnet user-secrets init`
+  - `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Data Source=App_Data/WorldMap.db"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureBlobStorage" "UseDevelopmentStorage=true"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorage" "UseDevelopmentStorage=true"`
+
 ## Visual Studio Extensions
 - [Markdown Editor](https://marketplace.visualstudio.com/items?itemName=ChrisDahlberg.StyleCop)
 - [GhostDoc](https://marketplace.visualstudio.com/items?itemName=sergeb.GhostDoc)
 - [GitFlow](https://marketplace.visualstudio.com/items?itemName=vs-publisher-57624.GitFlowforVisualStudio2019)
 - [GitHub](https://marketplace.visualstudio.com/items?itemName=GitHub.GitHubExtensionforVisualStudio)
+
+## Local Development
+- [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
 
 ## npm/gulp Reference Material
 
