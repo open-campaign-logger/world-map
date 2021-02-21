@@ -289,11 +289,11 @@ namespace CampaignKit.WorldMap.Data
 
             // ****************************
             //      Update Map Entity
-            // ****************************            
+            // ****************************
             // Save png master file.
             map.MaxZoomLevel = adjustedMaxZoomLevel;
             map.AdjustedSize = adjustedLargestSize;
-            map.ThumbnailPath = "";
+            map.ThumbnailPath = string.Empty;
 
             // ****************************************
             //        Create Tile Entities
@@ -329,7 +329,7 @@ namespace CampaignKit.WorldMap.Data
             // ************************************
             //   Update Map Entity
             // ************************************
-            map.WorldFolderPath = "";
+            map.WorldFolderPath = string.Empty;
             this.dbContext.Update(map);
             await this.dbContext.SaveChangesAsync();
 

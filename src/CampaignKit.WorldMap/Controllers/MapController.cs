@@ -342,7 +342,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             this.ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            this.ViewBag.WorldPath = "";
+            this.ViewBag.WorldPath = string.Empty;
             this.ViewBag.NoWrap = !map.RepeatMapInX;
 
             return this.View(model);
@@ -388,7 +388,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             this.ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            this.ViewBag.WorldPath = "";
+            this.ViewBag.WorldPath = string.Empty;
             this.ViewBag.NoWrap = !map.RepeatMapInX;
 
             return this.View(model);

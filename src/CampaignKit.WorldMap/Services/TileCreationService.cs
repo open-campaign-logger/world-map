@@ -18,6 +18,7 @@ namespace CampaignKit.WorldMap.Services
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
@@ -202,8 +203,8 @@ namespace CampaignKit.WorldMap.Services
 
                             // Create zoom level base file (sync)
                             this.loggerService.LogDebug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
-                            var zoomLevelBaseImage
-                                = this.CreateZoomLevelBaseFile(
+                            var zoomLevelBlob
+                                = await this.CreateZoomLevelBaseFile(
                                     numberOfTilesPerDimension,
                                     masterBlob,
                                     zoomLevel,
@@ -218,7 +219,7 @@ namespace CampaignKit.WorldMap.Services
                             {
                                 var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
                                 this.loggerService.LogDebug("Creating zoom level tile: {0}.", blobName);
-                                tasks.Add(this.CreateZoomLevelTileFile(zoomLevelBaseImage.Clone(), tile, containerName, blobName));
+                                tasks.Add(Task.Run(() => this.CreateZoomLevelTileFile(zoomLevelBlob, tile, containerName, blobName)));
                             }
 
                             // Wait for all tile creation tasks to complete
@@ -241,7 +242,8 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="masterBlob">The master image.</param>
         /// <param name="zoomLevel">The zoom level.</param>
         /// <param name="tilePixelSize">Tile pixel size.</param>
-        private Image<Rgba32> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize)
+        /// <returns>byte[] of zoom level base file.</returns>
+        private async Task<byte[]> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize)
         {
             using (var masterBaseImage = Image.Load(masterBlob))
             {
@@ -254,27 +256,34 @@ namespace CampaignKit.WorldMap.Services
                     Size = new Size(size, size),
                 }));
 
-                return masterBaseImage;
+                using (var ms = new MemoryStream())
+                {
+                    await masterBaseImage.SaveAsPngAsync(ms);
+                    return ms.ToArray();
+                }
             }
         }
 
         /// <summary>
         /// Creates the zoom level tile file.
         /// </summary>
-        /// <param name="baseImage">The base image for the zoom level.</param>
+        /// <param name="zoomLevelBlob">The zoome level image.</param>
         /// <param name="tile">The tile to be created.</param>
         /// <param name="containerName">The blob container name.</param>
         /// <param name="blobName">The name of the blob.</param>
         /// <returns>True when complete.</returns>
-        private async Task<bool> CreateZoomLevelTileFile(Image<Rgba32> baseImage, Tile tile, string containerName, string blobName)
+        private bool CreateZoomLevelTileFile(byte[] zoomLevelBlob, Tile tile, string containerName, string blobName)
         {
-            baseImage.Mutate(context => context.Crop(
+            using (var zoomLevelImage = Image.Load(zoomLevelBlob))
+            {
+                zoomLevelImage.Mutate(context => context.Crop(
                 new Rectangle(tile.X * tile.TileSize, tile.Y * tile.TileSize, tile.TileSize, tile.TileSize)));
-            var memoryGroup = baseImage.GetPixelMemoryGroup().ToArray()[0];
-            var blob = MemoryMarshal.AsBytes(memoryGroup.Span).ToArray();
-            var result = await this.blobStorageService.CreateBlobAsync(containerName, blobName, blob);
-            tile.CompletionTimestamp = DateTime.UtcNow;
-            return result;
+                var memoryGroup = zoomLevelImage.GetPixelMemoryGroup().ToArray()[0];
+                var blob = MemoryMarshal.AsBytes(memoryGroup.Span).ToArray();
+                this.blobStorageService.CreateBlobAsync(containerName, blobName, blob).Wait();
+                tile.CompletionTimestamp = DateTime.UtcNow;
+                return true;
+            }
         }
     }
 }
