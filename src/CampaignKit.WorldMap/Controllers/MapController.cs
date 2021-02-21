@@ -25,7 +25,8 @@ namespace CampaignKit.WorldMap.Controllers
     using CampaignKit.WorldMap.ViewModels;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using Serilog;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     /// <summary>
@@ -39,6 +40,16 @@ namespace CampaignKit.WorldMap.Controllers
         ///     The database context.
         /// </summary>
         private readonly WorldMapDBContext dbContext;
+
+        /// <summary>
+        /// The application configuration.
+        /// </summary>
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// The application logging service.
+        /// </summary>
+        private readonly ILogger loggerService;
 
         /// <summary>
         ///     The EntityFramework repository for Map data elements.
@@ -58,16 +69,22 @@ namespace CampaignKit.WorldMap.Controllers
         /// <summary>
         ///     Initializes a new instance of the <see cref="MapController" /> class.
         /// </summary>
+        /// <param name="configuration">The application configuration.</param>
+        /// <param name="loggerService">The logger service.</param>
         /// <param name="randomDataService">The random data service.</param>
         /// <param name="mapRepository">The map repository.</param>
         /// <param name="progressService">The progress service.</param>
         /// <param name="dbContext">The database context.</param>
         public MapController(
+            IConfiguration configuration,
+            ILogger<MapController> loggerService,
             IRandomDataService randomDataService,
             IMapRepository mapRepository,
             IProgressService progressService,
             WorldMapDBContext dbContext)
         {
+            this.configuration = configuration;
+            this.loggerService = loggerService;
             this.randomDataService = randomDataService;
             this.mapRepository = mapRepository;
             this.progressService = progressService;
@@ -82,7 +99,7 @@ namespace CampaignKit.WorldMap.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            Log.Debug("Enter GET Map/Create");
+            this.loggerService.LogDebug("Enter GET Map/Create");
 
             var model = new MapCreateViewModel { Share = this.randomDataService.GetRandomText(8) };
             return this.View(model);
@@ -98,7 +115,7 @@ namespace CampaignKit.WorldMap.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MapCreateViewModel model)
         {
-            Log.Debug("Enter POST Map/Create");
+            this.loggerService.LogDebug("Enter POST Map/Create");
 
             if (!this.ModelState.IsValid)
             {
@@ -342,7 +359,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             this.ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            this.ViewBag.WorldPath = string.Empty;
+            this.ViewBag.WorldPath = $"{this.configuration.GetValue<string>("AzureBlobBaseURL")}/sample";
             this.ViewBag.NoWrap = !map.RepeatMapInX;
 
             return this.View(model);
@@ -388,7 +405,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             this.ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            this.ViewBag.WorldPath = string.Empty;
+            this.ViewBag.WorldPath = $"{this.configuration.GetValue<string>("AzureBlobBaseURL")}/map{map.MapId}";
             this.ViewBag.NoWrap = !map.RepeatMapInX;
 
             return this.View(model);
@@ -443,7 +460,7 @@ namespace CampaignKit.WorldMap.Controllers
             var map = await this.mapRepository.Find(model.MapId, this.User, string.Empty);
             if (map == null)
             {
-                Log.Error($"Map with id:{model.MapId} not found");
+                this.loggerService.LogDebug($"Map with id:{model.MapId} not found");
                 return this.Json("Failed to update marker");
             }
 

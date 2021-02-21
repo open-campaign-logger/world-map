@@ -284,9 +284,11 @@ namespace CampaignKit.WorldMap.Services
             {
                 zoomLevelImage.Mutate(context => context.Crop(
                 new Rectangle(tile.X * tile.TileSize, tile.Y * tile.TileSize, tile.TileSize, tile.TileSize)));
-                var memoryGroup = zoomLevelImage.GetPixelMemoryGroup().ToArray()[0];
-                var blob = MemoryMarshal.AsBytes(memoryGroup.Span).ToArray();
-                await this.blobStorageService.CreateBlobAsync(containerName, blobName, blob);
+                using (var ms = new MemoryStream())
+                {
+                    await zoomLevelImage.SaveAsPngAsync(ms);
+                    await this.blobStorageService.CreateBlobAsync(containerName, blobName, ms.ToArray());
+                }
                 tile.CompletionTimestamp = DateTime.UtcNow;
                 return true;
             }
