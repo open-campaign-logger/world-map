@@ -293,7 +293,8 @@ namespace CampaignKit.WorldMap.Data
             // Save png master file.
             map.MaxZoomLevel = adjustedMaxZoomLevel;
             map.AdjustedSize = adjustedLargestSize;
-            map.ThumbnailPath = string.Empty;
+            map.WorldFolderPath = $"{this.configuration.GetValue<string>("AzureBlobBaseURL")}/map{map.MapId}";
+            map.ThumbnailPath = $"{map.WorldFolderPath}/0_zoom-level.png";
 
             // ****************************************
             //        Create Tile Entities
@@ -329,7 +330,6 @@ namespace CampaignKit.WorldMap.Data
             // ************************************
             //   Update Map Entity
             // ************************************
-            map.WorldFolderPath = string.Empty;
             this.dbContext.Update(map);
             await this.dbContext.SaveChangesAsync();
 
