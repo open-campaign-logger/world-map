@@ -32,6 +32,13 @@ namespace CampaignKit.WorldMap.Services
         public Task<bool> CreateContainerAsync(string containerName);
 
         /// <summary>
+        /// Deletes the Azure Blob container asynchronously.
+        /// </summary>
+        /// <param name="containerName">Unique name of the Azure blob container.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public Task<bool> DeleteContainerAsync(string containerName);
+
+        /// <summary>
         /// Creates the Azure Blob asynchronously.
         /// </summary>
         /// <param name="containerName">Name of the Azure Blob container.</param>

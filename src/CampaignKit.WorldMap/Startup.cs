@@ -153,13 +153,14 @@ namespace CampaignKit.WorldMap
             //
             // Note: these have been changed from singleton to scoped services in order
             //       to work with the db context which is scoped.
-            services.AddScoped<IFilePathService, DefaultFilePathService>();
+            
             services.AddScoped<IRandomDataService, DefaultRandomDataService>();
             services.AddScoped<IProgressService, DefaultProgressService>();
             services.AddScoped<IMapRepository, DefaultMapRepository>();
             services.AddScoped<IUserManagerService, DefaultUserManagerService>();
 
             // Add background services
+            services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             services.AddSingleton<IHostedService, TileCreationService>();
         }
     }

@@ -41,11 +41,6 @@ namespace CampaignKit.WorldMap.Controllers
         private readonly WorldMapDBContext dbContext;
 
         /// <summary>
-        ///     The file path service.
-        /// </summary>
-        private readonly IFilePathService filePathService;
-
-        /// <summary>
         ///     The EntityFramework repository for Map data elements.
         /// </summary>
         private readonly IMapRepository mapRepository;
@@ -66,19 +61,16 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="randomDataService">The random data service.</param>
         /// <param name="mapRepository">The map repository.</param>
         /// <param name="progressService">The progress service.</param>
-        /// <param name="filePathService">The file path service.</param>
         /// <param name="dbContext">The database context.</param>
         public MapController(
             IRandomDataService randomDataService,
             IMapRepository mapRepository,
             IProgressService progressService,
-            IFilePathService filePathService,
             WorldMapDBContext dbContext)
         {
             this.randomDataService = randomDataService;
             this.mapRepository = mapRepository;
             this.progressService = progressService;
-            this.filePathService = filePathService;
             this.dbContext = dbContext;
         }
 
@@ -350,7 +342,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             this.ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            this.ViewBag.WorldPath = this.Url.Content($"{this.filePathService.VirtualWorldBasePath}/1");
+            this.ViewBag.WorldPath = "";
             this.ViewBag.NoWrap = !map.RepeatMapInX;
 
             return this.View(model);
@@ -396,7 +388,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             this.ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            this.ViewBag.WorldPath = this.Url.Content($"{this.filePathService.VirtualWorldBasePath}/{id}");
+            this.ViewBag.WorldPath = "";
             this.ViewBag.NoWrap = !map.RepeatMapInX;
 
             return this.View(model);

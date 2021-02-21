@@ -25,8 +25,10 @@ namespace CampaignKit.WorldMap.Data
     using CampaignKit.WorldMap.Entities;
     using CampaignKit.WorldMap.Services;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.Formats.Png;
     using SixLabors.ImageSharp.Processing;
 
     /// <summary>
@@ -43,12 +45,12 @@ namespace CampaignKit.WorldMap.Data
         private readonly WorldMapDBContext dbContext;
 
         /// <summary>
-        ///     The file path service.
+        /// The application configuration.
         /// </summary>
-        private readonly IFilePathService filePathService;
+        private readonly IConfiguration configuration;
 
         /// <summary>
-        ///     The application logging service.
+        /// The application logging service.
         /// </summary>
         private readonly ILogger loggerService;
 
@@ -58,22 +60,30 @@ namespace CampaignKit.WorldMap.Data
         private readonly IUserManagerService userManagerService;
 
         /// <summary>
+        /// The BLOB storage service.
+        /// </summary>
+        private readonly IBlobStorageService blobStorageService;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
         /// </summary>
-        /// <param name="dbContext">The database context.</param>
-        /// <param name="filePathService">The file path service.</param>
+        /// <param name="configuration">The application configuration.</param>
         /// <param name="loggerService">The logger service.</param>
+        /// <param name="dbContext">The database context.</param>
         /// <param name="userManagerService">The user manager service.</param>
+        /// <param name="blobStorageService">The blob storage service.</param>
         public DefaultMapRepository(
-            WorldMapDBContext dbContext,
-            IFilePathService filePathService,
+            IConfiguration configuration,
             ILogger<DefaultMapRepository> loggerService,
-            IUserManagerService userManagerService)
+            WorldMapDBContext dbContext,
+            IUserManagerService userManagerService,
+            IBlobStorageService blobStorageService)
         {
-            this.dbContext = dbContext;
-            this.filePathService = filePathService;
+            this.configuration = configuration;
             this.loggerService = loggerService;
+            this.dbContext = dbContext;
             this.userManagerService = userManagerService;
+            this.blobStorageService = blobStorageService;
         }
 
         /// <summary>
@@ -116,10 +126,7 @@ namespace CampaignKit.WorldMap.Data
             await this.dbContext.SaveChangesAsync();
 
             // Delete map directory and files
-            if (Directory.Exists(map.WorldFolderPath))
-            {
-                Directory.Delete(map.WorldFolderPath, true);
-            }
+            await this.blobStorageService.DeleteContainerAsync($"{map.MapId}");
 
             // Return result
             return true;
@@ -235,62 +242,61 @@ namespace CampaignKit.WorldMap.Data
             // **********************
             //   Create Map Folder
             // **********************
-            var worldFolderPath = Path.Combine(this.filePathService.PhysicalWorldBasePath, $"{map.MapId}");
-            if (Directory.Exists(worldFolderPath))
-            {
-                Directory.Delete(worldFolderPath, true);
-            }
-
-            Directory.CreateDirectory(worldFolderPath);
+            var containerName = $"map{map.MapId}";
+            await this.blobStorageService.CreateContainerAsync(containerName);
 
             // ****************************
             //   Save Original Image File
             // ****************************
-            var originalFilePath = Path.Combine(worldFolderPath, $"original-file{map.FileExtension}");
-            using (stream)
-            using (var originalFileStream = new FileStream(originalFilePath, FileMode.CreateNew))
+            byte[] originalImageBlob, masterImageBlob;
+            using (var ms = new MemoryStream())
             {
-                stream.CopyTo(originalFileStream);
+                // Save original file.
+                stream.CopyTo(ms);
+                originalImageBlob = ms.ToArray();
+                await this.blobStorageService.CreateBlobAsync(containerName, $"original-file{map.FileExtension}", originalImageBlob);
             }
 
-            // ************************************
-            //      Create Master Image File
-            // ************************************
-            // Create master image file
-            var masterFilePath = Path.Combine(worldFolderPath, "master-file.png");
-            using (var originalFileStream = new FileStream(originalFilePath, FileMode.Open))
-            using (var masterFileStream = new FileStream(masterFilePath, FileMode.CreateNew))
+            // ****************************
+            //  Save PNG Master Image File
+            // ****************************
+            var masterImage = Image.Load(originalImageBlob);
+            var width = masterImage.Width;
+            var height = masterImage.Height;
+
+            var largestSize = Math.Max(width, height);
+            var maxZoomLevel = Math.Log((double)largestSize / TilePixelSize, 2);
+
+            var adjustedMaxZoomLevel = (int)Math.Max(0, Math.Floor(maxZoomLevel));
+            var adjustedLargestSize = (int)Math.Round(Math.Pow(2, adjustedMaxZoomLevel) * TilePixelSize);
+
+            if (width != height || largestSize != adjustedLargestSize)
             {
-                var masterImage = Image.Load(Configuration.Default, originalFileStream);
-                var width = masterImage.Width;
-                var height = masterImage.Height;
-
-                var largestSize = Math.Max(width, height);
-                var maxZoomLevel = Math.Log((double)largestSize / TilePixelSize, 2);
-
-                var adjustedMaxZoomLevel = (int)Math.Max(0, Math.Floor(maxZoomLevel));
-                var adjustedLargestSize = (int)Math.Round(Math.Pow(2, adjustedMaxZoomLevel) * TilePixelSize);
-
-                if (width != height || largestSize != adjustedLargestSize)
+                masterImage = masterImage.Clone(context => context.Resize(new ResizeOptions
                 {
-                    masterImage = masterImage.Clone(context => context.Resize(new ResizeOptions
-                    {
-                        Mode = ResizeMode.Pad,
-                        Position = AnchorPositionMode.Center,
-                        Size = new Size(width = adjustedLargestSize, height = adjustedLargestSize),
-                    }));
-                }
-
-                masterImage.SaveAsPng(masterFileStream);
-
-                map.MaxZoomLevel = adjustedMaxZoomLevel;
-                map.AdjustedSize = adjustedLargestSize;
-
-                map.ThumbnailPath = $"{this.filePathService.VirtualWorldBasePath}/{map.MapId}/0/zoom-level.png";
+                    Mode = ResizeMode.Pad,
+                    Position = AnchorPositionMode.Center,
+                    Size = new Size(width = adjustedLargestSize, height = adjustedLargestSize),
+                }));
             }
+
+            using (var ms = new MemoryStream())
+            {
+                masterImage.Save(ms, new PngEncoder());
+                masterImageBlob = ms.ToArray();
+                await this.blobStorageService.CreateBlobAsync(containerName, "master-file.png", masterImageBlob);
+            }
+
+            // ****************************
+            //      Update Map Entity
+            // ****************************            
+            // Save png master file.
+            map.MaxZoomLevel = adjustedMaxZoomLevel;
+            map.AdjustedSize = adjustedLargestSize;
+            map.ThumbnailPath = "";
 
             // ****************************************
-            //        Create Tile Image Files
+            //        Create Tile Entities
             // ****************************************
 
             // Calculate number of zoom levels and steps required
@@ -323,7 +329,7 @@ namespace CampaignKit.WorldMap.Data
             // ************************************
             //   Update Map Entity
             // ************************************
-            map.WorldFolderPath = worldFolderPath;
+            map.WorldFolderPath = "";
             this.dbContext.Update(map);
             await this.dbContext.SaveChangesAsync();
 

@@ -141,5 +141,32 @@ namespace CampaignKit.WorldMap.Services
                 return null;
             }
         }
+
+        /// <summary>
+        /// Deletes the Azure Blob container asynchronously.
+        /// </summary>
+        /// <param name="containerName">Unique name of the Azure blob container.</param>
+        /// <returns>
+        /// True if successful, false otherwise.
+        /// </returns>
+        public async Task<bool> DeleteContainerAsync(string containerName)
+        {
+            // Create a BlobServiceClient object which will be used to create a container client
+            var blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+            // Create the container and return a container client object
+            try
+            {
+                await blobContainerClient.DeleteIfExistsAsync();
+            }
+            catch (Azure.RequestFailedException ex)
+            {
+                this.loggerService.LogError("Unable to delete Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

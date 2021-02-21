@@ -18,7 +18,6 @@ namespace CampaignKit.WorldMap.Services
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Threading;
@@ -185,7 +184,7 @@ namespace CampaignKit.WorldMap.Services
                         this.loggerService.LogDebug("Processing tiles for map: {0}.", map);
 
                         // Calculate Folder Paths for the Map
-                        var containerName = $"{map}";
+                        var containerName = $"map{map}";
                         var masterBlob = await this.blobStorageService.ReadBlobAsync(containerName, "master-file.png");
 
                         // Process each map zoom level with unprocessed tiles
