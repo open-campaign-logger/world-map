@@ -289,6 +289,7 @@ namespace CampaignKit.WorldMap.Services
                     await zoomLevelImage.SaveAsPngAsync(ms);
                     await this.blobStorageService.CreateBlobAsync(containerName, blobName, ms.ToArray());
                 }
+
                 tile.CompletionTimestamp = DateTime.UtcNow;
                 return true;
             }

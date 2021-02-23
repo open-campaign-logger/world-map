@@ -16,7 +16,6 @@
 
 namespace CampaignKit.WorldMap.Services
 {
-    using System.IO;
     using System.Threading.Tasks;
 
     /// <summary>

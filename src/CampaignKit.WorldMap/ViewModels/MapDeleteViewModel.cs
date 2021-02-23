@@ -28,7 +28,7 @@ namespace CampaignKit.WorldMap.ViewModels
         /// </summary>
         /// <value>The map identifier.</value>
         [HiddenInput]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         ///     Gets or sets the name.

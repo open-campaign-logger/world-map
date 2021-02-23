@@ -37,11 +37,6 @@ namespace CampaignKit.WorldMap.Controllers
     public class MapController : Controller
     {
         /// <summary>
-        ///     The database context.
-        /// </summary>
-        private readonly WorldMapDBContext dbContext;
-
-        /// <summary>
         /// The application configuration.
         /// </summary>
         private readonly IConfiguration configuration;
@@ -74,21 +69,18 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="randomDataService">The random data service.</param>
         /// <param name="mapRepository">The map repository.</param>
         /// <param name="progressService">The progress service.</param>
-        /// <param name="dbContext">The database context.</param>
         public MapController(
             IConfiguration configuration,
             ILogger<MapController> loggerService,
             IRandomDataService randomDataService,
             IMapRepository mapRepository,
-            IProgressService progressService,
-            WorldMapDBContext dbContext)
+            IProgressService progressService)
         {
             this.configuration = configuration;
             this.loggerService = loggerService;
             this.randomDataService = randomDataService;
             this.mapRepository = mapRepository;
             this.progressService = progressService;
-            this.dbContext = dbContext;
         }
 
         /// <summary>
@@ -163,7 +155,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             var id = await this.mapRepository.Create(map, model.Image.OpenReadStream(), this.User);
-            if (id == 0)
+            if (id is null)
             {
                 this.ModelState.AddModelError(
                     string.Empty,
@@ -180,13 +172,13 @@ namespace CampaignKit.WorldMap.Controllers
         /// <summary>
         ///     GET: /Map/Delete/{id?}.
         /// </summary>
-        /// <param name="id">The identifier.</param>
+        /// <param name="mapId">The identifier.</param>
         /// <returns>Delete view displaying confirmation popup.</returns>
         [HttpGet("Delete/{id?}")]
         [Authorize]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string mapId)
         {
-            var model = await this.mapRepository.Find(id, this.User, string.Empty);
+            var model = await this.mapRepository.Find(mapId, this.User, string.Empty);
 
             return model == null
                 ? this.DeleteErrorView()
@@ -196,20 +188,20 @@ namespace CampaignKit.WorldMap.Controllers
         /// <summary>
         ///     POST: /Map/Delete/{id?}.
         /// </summary>
-        /// <param name="id">The identifier.</param>
+        /// <param name="mapId">The identifier.</param>
         /// <param name="model">Unused.</param>
         /// <returns>Redirect to home view.</returns>
         [HttpPost("Delete/{id?}")]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, MapDeleteViewModel model)
+        public async Task<IActionResult> Delete(string mapId, MapDeleteViewModel model)
         {
             if (!this.ModelState.IsValid)
             {
                 return this.View();
             }
 
-            var map = await this.mapRepository.Delete(id, this.User);
+            var map = await this.mapRepository.Delete(mapId, this.User);
 
             if (!map)
             {
@@ -219,7 +211,7 @@ namespace CampaignKit.WorldMap.Controllers
             }
             else
             {
-                await this.mapRepository.Delete(id, this.User);
+                await this.mapRepository.Delete(mapId, this.User);
                 return this.RedirectToAction(nameof(this.Index));
             }
 
@@ -229,21 +221,21 @@ namespace CampaignKit.WorldMap.Controllers
         /// <summary>
         ///     GET: /Map/Edit/{id?}.
         /// </summary>
-        /// <param name="id">The identifier.</param>
+        /// <param name="mapId">The identifier.</param>
         /// <returns>Map edit view for the specified map.</returns>
         [HttpGet("Edit/{id?}")]
         [Authorize]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(string mapId)
         {
             // Determine if user has rights to edit this map
-            var canEdit = await this.mapRepository.CanEdit(id, this.User);
+            var canEdit = await this.mapRepository.CanEdit(mapId, this.User);
             if (!canEdit)
             {
                 return this.EditErrorView();
             }
 
             // Load model
-            var map = await this.mapRepository.Find(id, this.User, string.Empty);
+            var map = await this.mapRepository.Find(mapId, this.User, string.Empty);
             if (map == null)
             {
                 return this.EditErrorView();
@@ -257,20 +249,20 @@ namespace CampaignKit.WorldMap.Controllers
                 Copyright = map.Copyright,
                 RepeatMapInX = map.RepeatMapInX,
                 MakeMapPublic = map.IsPublic,
-                ShowUrl = this.Url.Action(nameof(this.Show), "Map", new { Id = id, map.ShareKey }, protocol, this.Request.Host.Value),
+                ShowUrl = this.Url.Action(nameof(this.Show), "Map", new { Id = mapId, map.ShareKey }, protocol, this.Request.Host.Value),
             });
         }
 
         /// <summary>
         ///     POST: /Map/Edit/{id?}.
         /// </summary>
-        /// <param name="id">The identifier.</param>
+        /// <param name="mapId">The identifier.</param>
         /// <param name="model">The model.</param>
         /// <returns>Map show view.</returns>
         [HttpPost("Edit/{id?}")]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, MapEditViewModel model)
+        public async Task<IActionResult> Edit(string mapId, MapEditViewModel model)
         {
             // Determine if provided data is valid
             if (!this.ModelState.IsValid)
@@ -279,14 +271,14 @@ namespace CampaignKit.WorldMap.Controllers
             }
 
             // Determine if user has rights to edit this map
-            var canEdit = await this.mapRepository.CanEdit(id, this.User);
+            var canEdit = await this.mapRepository.CanEdit(mapId, this.User);
             if (!canEdit)
             {
                 return this.EditErrorView();
             }
 
             // Load model
-            var map = await this.mapRepository.Find(id, this.User, string.Empty);
+            var map = await this.mapRepository.Find(mapId, this.User, string.Empty);
             if (map == null)
             {
                 return this.EditErrorView();
@@ -344,7 +336,7 @@ namespace CampaignKit.WorldMap.Controllers
         [HttpGet("Sample")]
         public async Task<IActionResult> Sample()
         {
-            var map = await this.mapRepository.Find(1, this.User, string.Empty);
+            var map = await this.mapRepository.Find("sample", this.User, string.Empty);
 
             if (map == null)
             {
@@ -368,25 +360,25 @@ namespace CampaignKit.WorldMap.Controllers
         /// <summary>
         ///     GET: /Map/Show/{id?}.
         /// </summary>
-        /// <param name="id">The identifier.</param>
+        /// <param name="mapId">The identifier.</param>
         /// <param name="shareKey">The share key.</param>
         /// <param name="showProgress">if set to <c>true</c> [show progress].</param>
         /// <returns>The selected map.</returns>
         [HttpGet("Show/{id?}")]
-        public async Task<IActionResult> Show(int id, string shareKey = null, bool showProgress = false)
+        public async Task<IActionResult> Show(string mapId, string shareKey = null, bool showProgress = false)
         {
             // Determine if user can view map
-            var canView = await this.mapRepository.CanView(id, this.User, shareKey);
+            var canView = await this.mapRepository.CanView(mapId, this.User, shareKey);
             if (!canView)
             {
                 return this.ShowErrorView();
             }
 
             // Determine if user can edit map
-            var canEdit = await this.mapRepository.CanEdit(id, this.User);
+            var canEdit = await this.mapRepository.CanEdit(mapId, this.User);
 
             // Retrieve the map
-            var map = await this.mapRepository.Find(id, this.User, shareKey);
+            var map = await this.mapRepository.Find(mapId, this.User, shareKey);
 
             // Create a view model
             var protocol = this.Request.IsHttps ? "https" : "http";
@@ -396,11 +388,11 @@ namespace CampaignKit.WorldMap.Controllers
                 Share = shareKey,
                 UserId = map.UserId,
                 ShowProgress = showProgress,
-                ProgressUrl = this.Url.Action(nameof(this.Progress), new { Id = id }),
-                ShowUrl = this.Url.Action(nameof(this.Show), "Map", new { Id = id, Share = shareKey }, protocol, this.Request.Host.Value),
-                DeleteUrl = this.Url.Action(nameof(this.Delete), "Map", new { Id = id }, protocol, this.Request.Host.Value),
-                EditUrl = this.Url.Action(nameof(this.Edit), "Map", new { Id = id }, protocol, this.Request.Host.Value),
-                Id = id,
+                ProgressUrl = this.Url.Action(nameof(this.Progress), new { Id = mapId }),
+                ShowUrl = this.Url.Action(nameof(this.Show), "Map", new { Id = mapId, Share = shareKey }, protocol, this.Request.Host.Value),
+                DeleteUrl = this.Url.Action(nameof(this.Delete), "Map", new { Id = mapId }, protocol, this.Request.Host.Value),
+                EditUrl = this.Url.Action(nameof(this.Edit), "Map", new { Id = mapId }, protocol, this.Request.Host.Value),
+                Id = mapId,
                 CanEdit = canEdit,
             };
 
@@ -414,21 +406,21 @@ namespace CampaignKit.WorldMap.Controllers
         /// <summary>
         ///     GET: /Map/MarkerData/{id?}.
         /// </summary>
-        /// <param name="id">The map identifier.</param>
+        /// <param name="mapId">The map identifier.</param>
         /// <param name="shareKey">The map's shareKey.</param>
         /// <returns>The map's marker data in JSON format.</returns>
         [HttpGet("MarkerData/{id?}")]
-        public async Task<IActionResult> MarkerData(int id, string shareKey)
+        public async Task<IActionResult> MarkerData(string mapId, string shareKey)
         {
             // Determine if user can view map
-            var canView = await this.mapRepository.CanView(id, this.User, shareKey);
+            var canView = await this.mapRepository.CanView(mapId, this.User, shareKey);
             if (!canView)
             {
                 return this.ShowErrorView();
             }
 
             // Retrieve the map
-            var map = await this.mapRepository.Find(id, this.User, shareKey);
+            var map = await this.mapRepository.Find(mapId, this.User, shareKey);
 
             // Create response data
             var markerData = map.MarkerData;
@@ -467,7 +459,7 @@ namespace CampaignKit.WorldMap.Controllers
             // Update the map
             map.MarkerData = model.MarkerData;
 
-            await this.dbContext.SaveChangesAsync();
+            await this.mapRepository.Save(map, this.User);
 
             return this.Json("Success");
         }

@@ -26,7 +26,6 @@ namespace CampaignKit.WorldMap
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
@@ -109,10 +108,6 @@ namespace CampaignKit.WorldMap
                 .WriteTo.Console()
                 .CreateLogger();
 
-            // Instantiate the database and add to the context
-            services.AddDbContext<WorldMapDBContext>(
-                options => options.UseSqlite(this.Configuration.GetConnectionString("DefaultConnection")));
-
             // Add the MVC service
             services.AddMvc();
 
@@ -150,16 +145,14 @@ namespace CampaignKit.WorldMap
                 });
 
             // Add services to context
-            //
-            // Note: these have been changed from singleton to scoped services in order
-            //       to work with the db context which is scoped.
-            services.AddScoped<IRandomDataService, DefaultRandomDataService>();
-            services.AddScoped<IProgressService, DefaultProgressService>();
-            services.AddScoped<IMapRepository, DefaultMapRepository>();
-            services.AddScoped<IUserManagerService, DefaultUserManagerService>();
+            services.AddSingleton<IRandomDataService, DefaultRandomDataService>();
+            services.AddSingleton<IProgressService, DefaultProgressService>();
+            services.AddSingleton<IMapRepository, DefaultMapRepository>();
+            services.AddSingleton<IUserManagerService, DefaultUserManagerService>();
+            services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
+            services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
 
             // Add background services
-            services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             services.AddSingleton<IHostedService, TileCreationService>();
         }
     }

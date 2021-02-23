@@ -20,15 +20,34 @@ namespace CampaignKit.WorldMap.Entities
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations.Schema;
+    using Microsoft.Azure.Cosmos.Table;
 
     /// <summary>Map Entity.</summary>
-    public class Map
+    public class Map : TableEntity
     {
         /// <summary>
-        ///     Gets or sets the size of the adjusted.
+        /// Gets or sets the id of the user this map belongs to.
+        ///
+        /// Azure Table Storage PartitionKey.
+        ///
         /// </summary>
-        /// <value>The size of the adjusted.</value>
-        public int AdjustedSize { get; set; }
+        /// <value>The user id.</value>
+        public string UserId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the identifier.
+        ///
+        /// Azure Table Storage: RowKey.
+        ///
+        /// </summary>
+        /// <value>The identifier.</value>
+        public string MapId { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the name.
+        /// </summary>
+        /// <value>The name.</value>
+        public string Name { get; set; }
 
         /// <summary>
         ///     Gets or sets the type of the content.
@@ -37,23 +56,22 @@ namespace CampaignKit.WorldMap.Entities
         public string ContentType { get; set; }
 
         /// <summary>
-        ///     Gets or sets the copyright.
-        /// </summary>
-        /// <value>The copyright.</value>
-        public string Copyright { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the creation timestamp.
-        /// </summary>
-        /// <value>The creation timestamp.</value>
-        [Column(TypeName = "datetime")]
-        public DateTime CreationTimestamp { get; set; }
-
-        /// <summary>
         ///     Gets or sets the file extension.
         /// </summary>
         /// <value>The file extension.</value>
         public string FileExtension { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the size of the adjusted.
+        /// </summary>
+        /// <value>The size of the adjusted.</value>
+        public int AdjustedSize { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the copyright.
+        /// </summary>
+        /// <value>The copyright.</value>
+        public string Copyright { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this instance is public.
@@ -62,12 +80,6 @@ namespace CampaignKit.WorldMap.Entities
         ///     <c>true</c> if this instance is public; otherwise, <c>false</c>.
         /// </value>
         public bool IsPublic { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the identifier.
-        /// </summary>
-        /// <value>The identifier.</value>
-        public int MapId { get; set; }
 
         /// <summary>
         ///     Gets or sets the marker data for this map.
@@ -80,12 +92,6 @@ namespace CampaignKit.WorldMap.Entities
         /// </summary>
         /// <value>The maximum zoom level.</value>
         public int MaxZoomLevel { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        public string Name { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether [repeat map in x].
@@ -103,34 +109,33 @@ namespace CampaignKit.WorldMap.Entities
         public string ShareKey { get; set; }
 
         /// <summary>
+        ///     Gets or sets the world folder path.
+        /// </summary>
+        /// <value>The world folder path.</value>
+        public string WorldFolderPath { get; set; }
+
+        /// <summary>
         ///     Gets or sets the map's thumbnail path.
         /// </summary>
         /// <value>The map's thumbnail path.</value>
         public string ThumbnailPath { get; set; }
 
         /// <summary>
-        ///     Gets or sets the tile collection for this map.
+        ///     Gets or sets the creation timestamp.
         /// </summary>
-        /// <value>A collection of child tile entities.</value>
-        public ICollection<Tile> Tiles { get; set; }
+        /// <value>The creation timestamp.</value>
+        public DateTime CreationTimestamp { get; set; }
 
         /// <summary>
         ///     Gets or sets the update timestamp.
         /// </summary>
         /// <value>The update timestamp.</value>
-        [Column(TypeName = "datetime")]
         public DateTime UpdateTimestamp { get; set; }
 
         /// <summary>
-        ///     Gets or sets the id of the user this map belongs to.
+        ///     Gets or sets the tile collection for this map.
         /// </summary>
-        /// <value>The user id.</value>
-        public string UserId { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the world folder path.
-        /// </summary>
-        /// <value>The world folder path.</value>
-        public string WorldFolderPath { get; set; }
+        /// <value>A collection of child tile entities.</value>
+        public ICollection<Tile> Tiles { get; set; }
     }
 }

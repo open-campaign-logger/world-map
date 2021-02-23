@@ -19,12 +19,10 @@ namespace CampaignKit.WorldMap.Data
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
     using CampaignKit.WorldMap.Entities;
     using CampaignKit.WorldMap.Services;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using SixLabors.ImageSharp;
@@ -38,11 +36,6 @@ namespace CampaignKit.WorldMap.Data
     public class DefaultMapRepository : IMapRepository
     {
         private const int TilePixelSize = 250;
-
-        /// <summary>
-        ///     The database context.
-        /// </summary>
-        private readonly WorldMapDBContext dbContext;
 
         /// <summary>
         /// The application configuration.
@@ -65,94 +58,90 @@ namespace CampaignKit.WorldMap.Data
         private readonly IBlobStorageService blobStorageService;
 
         /// <summary>
+        /// The table storage service.
+        /// </summary>
+        private readonly ITableStorageService tableStorageService;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
         /// <param name="loggerService">The logger service.</param>
-        /// <param name="dbContext">The database context.</param>
+        /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="userManagerService">The user manager service.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
         public DefaultMapRepository(
             IConfiguration configuration,
             ILogger<DefaultMapRepository> loggerService,
-            WorldMapDBContext dbContext,
+            ITableStorageService tableStorageService,
             IUserManagerService userManagerService,
             IBlobStorageService blobStorageService)
         {
             this.configuration = configuration;
             this.loggerService = loggerService;
-            this.dbContext = dbContext;
+            this.tableStorageService = tableStorageService;
             this.userManagerService = userManagerService;
             this.blobStorageService = blobStorageService;
         }
 
         /// <summary>
-        ///     Deletes the specified map and all child entities.
+        /// Deletes the specified map and all child entities.
         ///     Ensures that the authenticated user is owner of the map
         ///     before any database operation is performed.
         /// </summary>
-        /// <param name="id">The map identifier.</param>
+        /// <param name="mapId">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
         /// <returns>
         ///     <c>true</c> if successful, <c>false</c> otherwise.
         /// </returns>
-        public async Task<bool> Delete(int id, ClaimsPrincipal user)
+        public async Task<bool> Delete(string mapId, ClaimsPrincipal user)
         {
             // Ensure user is authenticated
-            var userid = this.userManagerService.GetUserId(user);
-            if (userid == null)
+            var userId = this.userManagerService.GetUserId(user);
+            if (userId == null)
             {
                 this.loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return false;
             }
 
             // Determine if this map exists
-            var map = await this.dbContext.Maps.FindAsync(id);
+            var map = await this.tableStorageService.GetMapRecordAsync(mapId);
             if (map == null)
             {
-                this.loggerService.LogError($"Map with id:{id} not found");
-                return false;
-            }
-
-            // Determine if the user has rights to delete the map
-            if (!map.UserId.Equals(userid))
-            {
-                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
+                this.loggerService.LogError($"Map with id:{mapId} not found");
                 return false;
             }
 
             // Remove the map from the context.
-            this.dbContext.Maps.Remove(map);
-            await this.dbContext.SaveChangesAsync();
+            await this.tableStorageService.DeleteMapRecordAsync(map);
 
             // Delete map directory and files
-            await this.blobStorageService.DeleteContainerAsync($"{map.MapId}");
+            await this.blobStorageService.DeleteContainerAsync(map.MapId);
 
             // Return result
             return true;
         }
 
         /// <summary>
-        ///     Find a map based on its identifier.
-        ///     If the map is private then the user must be owner of map or the
-        ///     correct secret must be provided.
+        /// Find a map based on its identifier.
+        /// If the map is private then the user must be owner of map or the
+        /// correct secret must be provided.
         /// </summary>
-        /// <param name="id">The map identifier.</param>
+        /// <param name="mapId">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
         /// <param name="shareKey">Map secret to be used by friends of map author.</param>
         /// <returns>
         ///     <c>Map</c> if successful, <c>null</c> otherwise.
         /// </returns>
-        public async Task<Map> Find(int id, ClaimsPrincipal user, string shareKey)
+        public async Task<Map> Find(string mapId, ClaimsPrincipal user, string shareKey)
         {
             // Retrieve the map entry and any associated markers.
-            var map = await this.dbContext.Maps
-                .FirstOrDefaultAsync(m => m.MapId == id);
+            var map = await this.tableStorageService.GetMapRecordAsync(mapId);
 
             // Ensure map has been found
             if (map == null)
             {
-                this.loggerService.LogError($"Map with id:{id} not found");
+                this.loggerService.LogError($"Map with id:{mapId} not found");
                 return null;
             }
 
@@ -162,7 +151,7 @@ namespace CampaignKit.WorldMap.Data
                 var userid = this.userManagerService.GetUserId(user);
                 if (!map.UserId.Equals(userid) && !map.ShareKey.Equals(shareKey))
                 {
-                    this.loggerService.LogError($"User not authorized to access map with id:{id}.");
+                    this.loggerService.LogError($"User not authorized to access map with id:{mapId}.");
                     return null;
                 }
             }
@@ -180,26 +169,8 @@ namespace CampaignKit.WorldMap.Data
         /// <returns>IEnumerable&lt;Map&gt;.</returns>
         public async Task<IEnumerable<Map>> FindAll(ClaimsPrincipal user, bool includePublic)
         {
-            var userid = this.userManagerService.GetUserId(user);
-
-            // Return public and owned maps to authenticated users
-            if (userid != null)
-            {
-                if (includePublic)
-                {
-                    return await this.dbContext.Maps
-                        .Where(m => m.IsPublic || m.UserId.Equals(userid))
-                        .ToListAsync();
-                }
-
-                return await this.dbContext.Maps
-                    .Where(m => m.UserId.Equals(userid))
-                    .ToListAsync();
-            }
-
-            return await this.dbContext.Maps
-                .Where(m => m.IsPublic)
-                .ToListAsync();
+            var userId = this.userManagerService.GetUserId(user);
+            return await this.tableStorageService.GetMapRecordsForUserAsync(userId, includePublic);
         }
 
         /// <summary>
@@ -211,7 +182,7 @@ namespace CampaignKit.WorldMap.Data
         /// <returns>
         ///     <c>id</c> if successful, <c>0</c> otherwise.
         /// </returns>
-        public async Task<int> Create(Map map, Stream stream, ClaimsPrincipal user)
+        public async Task<string> Create(Map map, Stream stream, ClaimsPrincipal user)
         {
             // **********************
             //   Precondition Tests
@@ -219,7 +190,7 @@ namespace CampaignKit.WorldMap.Data
             // Image data not provided?
             if (stream == null)
             {
-                return 0;
+                return null;
             }
 
             // User must be authenticated
@@ -227,7 +198,7 @@ namespace CampaignKit.WorldMap.Data
             if (userid == null)
             {
                 this.loggerService.LogError("Database operation prohibited for non-authenticated user");
-                return 0;
+                return null;
             }
 
             // ************************************
@@ -236,8 +207,7 @@ namespace CampaignKit.WorldMap.Data
             map.CreationTimestamp = DateTime.UtcNow;
             map.UpdateTimestamp = map.CreationTimestamp;
             map.UserId = userid;
-            this.dbContext.Add(map);
-            await this.dbContext.SaveChangesAsync();
+            await this.tableStorageService.CreateMapRecordAsync(map);
 
             // **********************
             //   Create Map Folder
@@ -330,9 +300,7 @@ namespace CampaignKit.WorldMap.Data
             // ************************************
             //   Update Map Entity
             // ************************************
-            this.dbContext.Update(map);
-            await this.dbContext.SaveChangesAsync();
-
+            await this.tableStorageService.UpdateMapRecordAsync(map);
             return map.MapId;
         }
 
@@ -361,20 +329,19 @@ namespace CampaignKit.WorldMap.Data
                 return false;
             }
 
-            this.dbContext.Update(map);
-            await this.dbContext.SaveChangesAsync();
+            await this.tableStorageService.UpdateMapRecordAsync(map);
             return true;
         }
 
         /// <summary>
         ///     Determines if user owns the map.
         /// </summary>
-        /// <param name="id">The map identifier.</param>
+        /// <param name="mapId">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
         /// <returns>
         ///     <c>id</c> if successful, <c>false</c> otherwise.
         /// </returns>
-        public async Task<bool> CanEdit(int id, ClaimsPrincipal user)
+        public async Task<bool> CanEdit(string mapId, ClaimsPrincipal user)
         {
             // Ensure user is authenticated
             var userid = this.userManagerService.GetUserId(user);
@@ -385,20 +352,19 @@ namespace CampaignKit.WorldMap.Data
             }
 
             // Retrieve the map entry and any associated markers.
-            var map = await this.dbContext.Maps
-                .FirstOrDefaultAsync(m => m.MapId == id);
+            var map = await this.tableStorageService.GetMapRecordAsync(mapId);
 
             // Ensure map has been found
             if (map == null)
             {
-                this.loggerService.LogError($"Map with id:{id} not found");
+                this.loggerService.LogError($"Map with id:{mapId} not found");
                 return false;
             }
 
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
+                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{mapId}.");
                 return false;
             }
 
@@ -406,20 +372,19 @@ namespace CampaignKit.WorldMap.Data
         }
 
         /// <summary>Determines if user has rights to view the map.</summary>
-        /// <param name="id">The map identifier.</param>
+        /// <param name="mapId">The map identifier.</param>
         /// <param name="user">The authenticated user.</param>
         /// <param name="shareKey">The map's secret key.</param>
         /// <returns><c>true</c> if successful, <c>false</c> otherwise.</returns>
-        public async Task<bool> CanView(int id, ClaimsPrincipal user, string shareKey)
+        public async Task<bool> CanView(string mapId, ClaimsPrincipal user, string shareKey)
         {
             // Retrieve the map entry and any associated markers.
-            var map = await this.dbContext.Maps
-                .FirstOrDefaultAsync(m => m.MapId == id);
+            var map = await this.tableStorageService.GetMapRecordAsync(mapId);
 
             // Ensure map has been found
             if (map == null)
             {
-                this.loggerService.LogError($"Map with id:{id} not found");
+                this.loggerService.LogError($"Map with id:{mapId} not found");
                 return false;
             }
 
@@ -442,7 +407,7 @@ namespace CampaignKit.WorldMap.Data
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{id}.");
+                this.loggerService.LogError($"User {userid} does not have rights to delete map with id:{mapId}.");
                 return false;
             }
 

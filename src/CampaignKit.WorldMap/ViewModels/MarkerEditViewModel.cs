@@ -25,7 +25,7 @@ namespace CampaignKit.WorldMap.ViewModels
         ///     Gets or sets the identifier.
         /// </summary>
         /// <value>The identifier.</value>
-        public int MapId { get; set; }
+        public string MapId { get; set; }
 
         /// <summary>
         ///     Gets or sets map marker data in JSON format.
