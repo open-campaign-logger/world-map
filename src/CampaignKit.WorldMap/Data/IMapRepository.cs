@@ -72,5 +72,11 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="user">The authenticated user.</param>
         /// <returns><c>id</c> if successful, <c>false</c> otherwise.</returns>
         Task<bool> Save(Map map, ClaimsPrincipal user);
+
+        /// <summary>
+        /// Initializes the repository if required.
+        /// </summary>
+        /// <returns>True if successful, false otherwise.</returns>
+        Task<bool> InitRepository();
     }
 }

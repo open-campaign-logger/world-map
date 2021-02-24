@@ -43,24 +43,25 @@ Service for managing world maps and associate them with Campaign Logger log entr
 
 ## OpenID Connect
 
-- OpenID Connect JavaScript Client library: https://github.com/IdentityModel/oidc-client-js
-- Using JWT and Asp.Net Core Cookies: https://amanagrawal.blog/2017/09/18/jwt-token-authentication-with-cookies-in-asp-net-core/
-- IdentityServer4 Examples: https://github.com/IdentityServer/IdentityServer4.Samples
-- IdentityServer4 QuickStart - Adding User Authentication with OpenID Connect: http://docs.identityserver.io/en/latest/quickstarts/3_interactive_login.html
-- IdentityServer4 JavaScript Client Quickstart - http://docs.identityserver.io/en/latest/quickstarts/6_javascript_client.html
-- Configuring App to Recognize JWT authorization tokens - https://developer.okta.com/blog/2018/03/23/token-authentication-aspnetcore-complete-guide
+- [OpenID Connect JavaScript Client library](https://github.com/IdentityModel/oidc-client-js)
+- [Using JWT and Asp.Net Core Cookies](https://amanagrawal.blog/2017/09/18/jwt-token-authentication-with-cookies-in-asp-net-core/)
+- [IdentityServer4 Examples](https://github.com/IdentityServer/IdentityServer4.Samples)
+- [IdentityServer4 QuickStart - Adding User Authentication with OpenID Connect](http://docs.identityserver.io/en/latest/quickstarts/3_interactive_login.html)
+- [IdentityServer4 JavaScript Client Quickstart](http://docs.identityserver.io/en/latest/quickstarts/6_javascript_client.html)
+- [Configuring App to Recognize JWT authorization tokens](https://developer.okta.com/blog/2018/03/23/token-authentication-aspnetcore-complete-guide)
 
 ## Testing
 
-- Testing: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-2.2
-- Integration Testing: https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2
-- Integration Testing: https://fullstackmark.com/post/20/painless-integration-testing-with-aspnet-core-web-api
-- Integration Testing with OpenID Connect: https://github.com/stottle-uk/IntegrationTestingWithIdentityServer
-- Mocking authentication in integration tests: https://github.com/jackowild/aspnetcore-bypassing-authentication/tree/master/MockingAuthApi
-- Sharing test context between tests: https://xunit.github.io/docs/shared-context
-- Supporting AntiForgeryTokens: https://www.matheus.ro/2018/09/03/integration-tests-in-asp-net-core-controllers/
+- [Testing in ASP.Net Core](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-2.2)
+- [Integration Testing ASP.Net Core](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2)
+- [Integration Testing ASP.Net Core Web API](https://fullstackmark.com/post/20/painless-integration-testing-with-aspnet-core-web-api)
+- [Integration Testing with OpenID Connect](https://github.com/stottle-uk/IntegrationTestingWithIdentityServer)
+- [Mocking authentication in integration tests](https://github.com/jackowild/aspnetcore-bypassing-authentication/tree/master/MockingAuthApi)
+- [Sharing test context between tests](https://xunit.github.io/docs/shared-context)
+- [Supporting AntiForgeryTokens](https://www.matheus.ro/2018/09/03/integration-tests-in-asp-net-core-controllers/)
 
-## Security
+## Azure
 
-- Running .Net Core 2.1 With Self-Signed Cert: https://www.hanselman.com/blog/DevelopingLocallyWithASPNETCoreUnderHTTPSSSLAndSelfSignedCerts.aspx
-- Configure HTTPS in ASP.Net Core 2.1: https://asp.net-hacker.rocks/2018/07/09/aspnetcore-ssl.html
+- [Azure Storage Blobs - Quickstart](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-dotnet)
+- [Azure Tables Client Libraries](https://devblogs.microsoft.com/azure-sdk/azure-tables-client-libraries/)
+- [Azure Storage Tables - Quickstart](https://docs.microsoft.com/en-us/azure/cosmos-db/create-table-dotnet)

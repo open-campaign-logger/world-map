@@ -146,11 +146,12 @@ namespace CampaignKit.WorldMap
 
             // Add services to context
             services.AddSingleton<IRandomDataService, DefaultRandomDataService>();
+            services.AddSingleton<IFilePathService, DefaultFilePathService>();
             services.AddSingleton<IProgressService, DefaultProgressService>();
-            services.AddSingleton<IMapRepository, DefaultMapRepository>();
             services.AddSingleton<IUserManagerService, DefaultUserManagerService>();
             services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
+            services.AddSingleton<IMapRepository, DefaultMapRepository>();
 
             // Add background services
             services.AddSingleton<IHostedService, TileCreationService>();

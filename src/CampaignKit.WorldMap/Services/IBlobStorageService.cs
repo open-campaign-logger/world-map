@@ -53,5 +53,11 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="blobName">Name of the blob to create in the Azure Blob container.</param>
         /// <returns>Byte array containing the blob data.</returns>
         public Task<byte[]> ReadBlobAsync(string containerName, string blobName);
+
+        /// <summary>
+        /// Initializes the storage if required.
+        /// </summary>
+        /// <returns>True if successful, false otherwise.</returns>
+        Task<bool> InitStorage();
     }
 }

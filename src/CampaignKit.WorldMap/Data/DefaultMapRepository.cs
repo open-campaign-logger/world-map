@@ -413,5 +413,18 @@ namespace CampaignKit.WorldMap.Data
 
             return true;
         }
+
+        /// <summary>
+        /// Initializes the repository if required.
+        /// </summary>
+        /// <returns>
+        /// True if successful, false otherwise.
+        /// </returns>
+        public async Task<bool> InitRepository()
+        {
+            var result1 = await this.blobStorageService.InitStorage();
+            var result2 = await this.tableStorageService.InitStorage();
+            return result1 && result2;
+        }
     }
 }

@@ -16,9 +16,15 @@
 
 namespace CampaignKit.WorldMap
 {
+    using System;
+
+    using CampaignKit.WorldMap.Data;
+
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
 
     using Serilog;
 
@@ -33,7 +39,31 @@ namespace CampaignKit.WorldMap
         /// <param name="args">Command line application arguments.</param>
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+            InitializeRepository(host);
+            host.Run();
+        }
+
+        /// <summary>
+        /// Initializes the repository if required.
+        /// </summary>
+        /// <param name="host">The host.</param>
+        private static void InitializeRepository(IHost host)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var repositoryService = services.GetRequiredService<IMapRepository>();
+                    repositoryService.InitRepository().Wait();
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred initializing the repository: {0}", ex.Message);
+                }
+            }
         }
 
         /// <summary>

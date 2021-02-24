@@ -168,5 +168,35 @@ namespace CampaignKit.WorldMap.Services
 
             return true;
         }
+
+        /// <summary>
+        /// Initializes the storage if required.
+        /// </summary>
+        /// <returns>
+        /// True if successful, false otherwise.
+        /// </returns>
+        public async Task<bool> InitStorage()
+        {
+            // Create a BlobServiceClient object which will be used to create a container client
+            BlobServiceClient blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
+
+            // Create the container and return a container client object
+            try
+            {
+                var containerClient = blobServiceClient.GetBlobContainerClient("mapSample");
+                var exists = await containerClient.ExistsAsync();
+                if (!exists)
+                {
+                    await this.CreateContainerAsync("mapSample");
+                }
+            }
+            catch (Azure.RequestFailedException ex)
+            {
+                this.loggerService.LogError("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

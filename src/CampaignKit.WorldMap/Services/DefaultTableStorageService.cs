@@ -76,13 +76,12 @@ namespace CampaignKit.WorldMap.Services
             var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
             var tableName = "worldmapmaps";
             var table = tableClient.GetTableReference(tableName);
+
+            // Create the table if required.
             if (await table.CreateIfNotExistsAsync())
             {
                 this.loggerService.LogDebug("Created Table named: {0}", tableName);
             }
-
-            // https://docs.microsoft.com/en-us/azure/cosmos-db/create-table-dotnet
-            // https://github.com/Azure-Samples/azure-cosmos-table-dotnet-core-getting-started
 
         }
 
