@@ -28,13 +28,13 @@ namespace CampaignKit.WorldMap.Entities
     public class Tile : TableEntity
     {
         /// <summary>
-        /// Gets or sets the id of the user this map belongs to.
+        /// Gets or sets the parent identifier.
         ///
         /// Azure Table Storage PartitionKey.
         ///
         /// </summary>
-        /// <value>The user id.</value>
-        public string UserId { get; set; }
+        /// <value>The parent identifier.</value>
+        public string MapId { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier.
@@ -44,12 +44,6 @@ namespace CampaignKit.WorldMap.Entities
         /// </summary>
         /// <value>The identifier.</value>
         public string TileId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the parent identifier.
-        /// </summary>
-        /// <value>The parent identifier.</value>
-        public string MapId { get; set; }
 
         /// <summary>
         ///     Gets or sets the size of the tile in bytes.

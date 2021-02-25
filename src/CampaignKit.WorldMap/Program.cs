@@ -45,28 +45,6 @@ namespace CampaignKit.WorldMap
         }
 
         /// <summary>
-        /// Initializes the repository if required.
-        /// </summary>
-        /// <param name="host">The host.</param>
-        private static void InitializeRepository(IHost host)
-        {
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var repositoryService = services.GetRequiredService<IMapRepository>();
-                    repositoryService.InitRepository().Wait();
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred initializing the repository: {0}", ex.Message);
-                }
-            }
-        }
-
-        /// <summary>
         /// Creates the host builder.
         /// </summary>
         /// <param name="args">The arguments.</param>
@@ -100,5 +78,27 @@ namespace CampaignKit.WorldMap
                     .UseSerilog()
                     .UseStartup<Startup>();
                 });
+
+        /// <summary>
+        /// Initializes the repository if required.
+        /// </summary>
+        /// <param name="host">The host.</param>
+        private static void InitializeRepository(IHost host)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var repositoryService = services.GetRequiredService<IMapRepository>();
+                    repositoryService.InitRepository().Wait();
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred initializing the repository: {0}", ex.Message);
+                }
+            }
+        }
     }
 }

@@ -67,7 +67,7 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <param name="tile">The tile.</param>
         /// <returns>True if the operation succeeds, false otherwise.</returns>
-        public Task<bool> DeleteTileRecordAsync(Map map);
+        public Task<bool> DeleteTileRecordAsync(Tile tile);
 
         /// <summary>
         /// Gets a map record and any associated tile records asynchronously.
@@ -98,9 +98,10 @@ namespace CampaignKit.WorldMap.Services
         public Task<List<Tile>> GetUnprocessedTileRecordsAsync();
 
         /// <summary>
-        /// Initializes the storage if required.
+        /// Initializes Azure tables if required.
         /// </summary>
-        /// <returns>True if successful, false otherwise.</returns>
-        Task<bool> InitStorage();
+        /// <returns>True if succeeds, false otherwise.</returns>
+        public Task<bool> InitTablesAsync();
+
     }
 }

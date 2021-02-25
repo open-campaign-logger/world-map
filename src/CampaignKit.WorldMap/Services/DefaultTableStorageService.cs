@@ -58,31 +58,47 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <param name="map">The map.</param>
         /// <returns>
-        /// The auto-generated mapid for the new map record.
+        /// The auto-generated mapid for the new map record, null if the operation fails.
         /// </returns>
         public async Task<string> CreateMapRecordAsync(Map map)
         {
             // Setup the partition key
             map.PartitionKey = map.UserId;
 
-            // Setup the row key
-            var rowKey = Guid.NewGuid().ToString();
-            map.MapId = rowKey;
-            map.RowKey = map.MapId;
-
-            // Initialize connection to Azure table storage
-            var storageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
-            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
-            var tableName = "worldmapmaps";
-            var table = tableClient.GetTableReference(tableName);
-
-            // Create the table if required.
-            if (await table.CreateIfNotExistsAsync())
+            // Create a mapId if one not provided.
+            if (string.IsNullOrEmpty(map.MapId))
             {
-                this.loggerService.LogDebug("Created Table named: {0}", tableName);
+                map.MapId = Guid.NewGuid().ToString();
             }
 
+            // Setup the row key
+            map.RowKey = map.MapId;
+
+            try
+            {
+                // Initialize connection to Azure table storage
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
+                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
+
+                // Connect to the worldmapmaps table.
+                var cloudTableName = "worldmapmaps";
+                var cloudTable = cloudTableClient.GetTableReference(cloudTableName);
+
+                // Create an insert operation
+                var insertOperation = TableOperation.Insert(map);
+
+                // Execute the operation
+                var operationResult = await cloudTable.ExecuteAsync(insertOperation);
+                var insertedEntity = operationResult.Result as Map;
+
+                return insertedEntity.MapId;
+            }
+            catch (StorageException ex)
+            {
+                this.loggerService.LogError("Unable to create map entity: {0}", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>
@@ -90,10 +106,41 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <param name="tile">The map tile.</param>
         /// <returns>
-        /// The auto-generated tileid for the new map tile record.
+        /// The auto-generated tileid for the new map tile record, null if the operation fails.
         /// </returns>
-        public Task<string> CreateTileRecordAsync(Tile tile)
+        public async Task<string> CreateTileRecordAsync(Tile tile)
         {
+            // Setup the partition key
+            tile.PartitionKey = tile.MapId;
+
+            // Setup the row key
+            tile.RowKey = Guid.NewGuid().ToString();
+
+            try
+            {
+                // Initialize connection to Azure table storage
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
+                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
+
+                // Connect to the worlmaptiles table.
+                var cloudTableName = "worldmaptiles";
+                var cloudTable = cloudTableClient.GetTableReference(cloudTableName);
+
+                // Create an insert operation
+                var operation = TableOperation.Insert(tile);
+
+                // Execute the operation
+                var operationResult = await cloudTable.ExecuteAsync(operation);
+                var insertedEntity = operationResult.Result as Tile;
+
+                return insertedEntity.TileId;
+            }
+            catch (StorageException ex)
+            {
+                this.loggerService.LogError("Unable to create tile entity: {0}", ex.Message);
+                return null;
+            }
         }
 
         /// <summary>
@@ -103,19 +150,80 @@ namespace CampaignKit.WorldMap.Services
         /// <returns>
         /// True if the operation succeeds, false otherwise.
         /// </returns>
-        public Task<bool> DeleteMapRecordAsync(Map map)
+        public async Task<bool> DeleteMapRecordAsync(Map map)
         {
+            try
+            {
+                // Initialize connection to Azure table storage
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
+                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
+
+                // Connect to the worlmaptiles table.
+                var cloudTableName = "worldmaptiles";
+                var cloudTable = cloudTableClient.GetTableReference(cloudTableName);
+
+                // Query the tile records associated with the map.
+                var query = from tile in cloudTable.CreateQuery<Tile>()
+                            where tile.PartitionKey == map.MapId
+                            select tile;
+
+                // Delete the tile records.
+                foreach (var tile in query)
+                {
+                    // Create a delete operation
+                    var tileOperation = TableOperation.Delete(tile);
+                    var tileOperationResult = await cloudTable.ExecuteAsync(tileOperation);
+                }
+
+                // Connect to the worlmapmaps table.
+                cloudTableName = "worldmapmaps";
+                cloudTable = cloudTableClient.GetTableReference(cloudTableName);
+
+                // Delete the map record.
+                var mapOperation = TableOperation.Delete(map);
+                var mapOperationResult = await cloudTable.ExecuteAsync(mapOperation);
+
+                return true;
+            }
+            catch (StorageException ex)
+            {
+                this.loggerService.LogError("Unable to create tile entity: {0}", ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
         /// Deletes a tile record asynchronously.
         /// </summary>
-        /// <param name="map"></param>
+        /// <param name="tile">The tile.</param>
         /// <returns>
         /// True if the operation succeeds, false otherwise.
         /// </returns>
-        public Task<bool> DeleteTileRecordAsync(Map map)
+        public async Task<bool> DeleteTileRecordAsync(Tile tile)
         {
+            try
+            {
+                // Initialize connection to Azure table storage
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
+                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
+
+                // Connect to the worlmaptiles table.
+                var cloudTableName = "worldmaptiles";
+                var cloudTable = cloudTableClient.GetTableReference(cloudTableName);
+
+                // Create a delete operation
+                var tileOperation = TableOperation.Delete(tile);
+                var tileOperationResult = await cloudTable.ExecuteAsync(tileOperation);
+
+                return true;
+            }
+            catch (StorageException ex)
+            {
+                this.loggerService.LogError("Unable to create tile entity: {0}", ex.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -127,6 +235,7 @@ namespace CampaignKit.WorldMap.Services
         /// </returns>
         public Task<Map> GetMapRecordAsync(string mapId)
         {
+            return null;
         }
 
         /// <summary>
@@ -139,6 +248,7 @@ namespace CampaignKit.WorldMap.Services
         /// </returns>
         public Task<List<Map>> GetMapRecordsForUserAsync(string userId, bool includePublic)
         {
+            return null;
         }
 
         /// <summary>
@@ -150,6 +260,7 @@ namespace CampaignKit.WorldMap.Services
         /// </returns>
         public Task<Map> GetTileRecordAsync(string tileId)
         {
+            return null;
         }
 
         /// <summary>
@@ -160,6 +271,7 @@ namespace CampaignKit.WorldMap.Services
         /// </returns>
         public Task<List<Tile>> GetUnprocessedTileRecordsAsync()
         {
+            return null;
         }
 
         /// <summary>
@@ -171,6 +283,7 @@ namespace CampaignKit.WorldMap.Services
         /// </returns>
         public Task<bool> UpdateMapRecordAsync(Map map)
         {
+            return false;
         }
 
         /// <summary>
@@ -182,6 +295,43 @@ namespace CampaignKit.WorldMap.Services
         /// </returns>
         public Task<bool> UpdateTileRecordAsync(Tile tile)
         {
+            return false;
+        }
+
+        /// <summary>
+        /// Initializes Azure tables if required.
+        /// </summary>
+        /// <returns>
+        /// True if succeeds, false otherwise.
+        /// </returns>
+        public async Task<bool> InitTablesAsync()
+        {
+            // Initialize connection to Azure table storage
+            var storageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
+
+            // Verify worldmapmaps table exists
+            var tableName = "worldmapmaps";
+            var table = tableClient.GetTableReference(tableName);
+
+            // Create the table if required.
+            if (await table.CreateIfNotExistsAsync())
+            {
+                this.loggerService.LogDebug("Created Table named: {0}", tableName);
+            }
+
+            // Verify worldmaptiles table exists
+            tableName = "worldmaptiles";
+            table = tableClient.GetTableReference(tableName);
+
+            // Create the table if required.
+            if (await table.CreateIfNotExistsAsync())
+            {
+                this.loggerService.LogDebug("Created Table named: {0}", tableName);
+            }
+
+            return true;
         }
     }
 }

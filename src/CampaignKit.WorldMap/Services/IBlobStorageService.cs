@@ -38,6 +38,13 @@ namespace CampaignKit.WorldMap.Services
         public Task<bool> DeleteContainerAsync(string containerName);
 
         /// <summary>
+        /// Checks if the container exists.
+        /// </summary>
+        /// <param name="containerName">Unique name of the Azure blob container.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public Task<bool> ContainerExistsAsync(string containerName);
+
+        /// <summary>
         /// Creates the Azure Blob asynchronously.
         /// </summary>
         /// <param name="containerName">Name of the Azure Blob container.</param>
@@ -54,10 +61,5 @@ namespace CampaignKit.WorldMap.Services
         /// <returns>Byte array containing the blob data.</returns>
         public Task<byte[]> ReadBlobAsync(string containerName, string blobName);
 
-        /// <summary>
-        /// Initializes the storage if required.
-        /// </summary>
-        /// <returns>True if successful, false otherwise.</returns>
-        Task<bool> InitStorage();
     }
 }

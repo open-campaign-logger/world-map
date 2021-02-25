@@ -63,6 +63,11 @@ namespace CampaignKit.WorldMap.Data
         private readonly ITableStorageService tableStorageService;
 
         /// <summary>
+        /// The file path service.
+        /// </summary>
+        private readonly IFilePathService filePathService;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
@@ -70,18 +75,21 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="userManagerService">The user manager service.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
+        /// <param name="filePathService">The file path service.</param>
         public DefaultMapRepository(
             IConfiguration configuration,
             ILogger<DefaultMapRepository> loggerService,
             ITableStorageService tableStorageService,
             IUserManagerService userManagerService,
-            IBlobStorageService blobStorageService)
+            IBlobStorageService blobStorageService,
+            IFilePathService filePathService)
         {
             this.configuration = configuration;
             this.loggerService = loggerService;
             this.tableStorageService = tableStorageService;
             this.userManagerService = userManagerService;
             this.blobStorageService = blobStorageService;
+            this.filePathService = filePathService;
         }
 
         /// <summary>
@@ -422,9 +430,33 @@ namespace CampaignKit.WorldMap.Data
         /// </returns>
         public async Task<bool> InitRepository()
         {
-            var result1 = await this.blobStorageService.InitStorage();
-            var result2 = await this.tableStorageService.InitStorage();
-            return result1 && result2;
+            // Ensure tables have been created
+            await this.tableStorageService.InitTablesAsync();
+
+            // Ensure sample map has been created
+            var sampleMap = await this.tableStorageService.GetMapRecordAsync("sample");
+
+            if (sampleMap == null)
+            {
+                var sampleImage = File.ReadAllBytes(Path.Combine(this.filePathService.AppDataPath, "Sample.png"));
+                var sampleJSON = File.ReadAllText(Path.Combine(this.filePathService.AppDataPath, "Sample.json"));
+                var map = new Map()
+                {
+                    Copyright = string.Empty,
+                    MarkerData = sampleJSON,
+                    IsPublic = true,
+                    Name = "Sample",
+                    RepeatMapInX = false,
+                    ShareKey = "lNtqjEVQ",
+                    MapId = "sample",
+                };
+                using (var ms = new MemoryStream(sampleImage))
+                {
+                    await this.Create(map, ms, this.userManagerService.GetSystemUser());
+                }
+            }
+
+            return true;
         }
     }
 }

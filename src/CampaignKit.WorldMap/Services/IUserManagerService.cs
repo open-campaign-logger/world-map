@@ -29,5 +29,11 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="user">The authorized user.</param>
         /// <returns>UserId (String) if found otherwise Null.</returns>
         string GetUserId(ClaimsPrincipal user);
+
+        /// <summary>
+        /// Gets the built in system user.
+        /// </summary>
+        /// <returns>A ClaimsPrincipal object representing the system user.</returns>
+        ClaimsPrincipal GetSystemUser();
     }
 }

@@ -50,6 +50,22 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
+        /// Gets the built in system user.
+        /// </summary>
+        /// <returns>
+        /// A ClaimsPrincipal object representing the system user.
+        /// </returns>
+        public ClaimsPrincipal GetSystemUser()
+        {
+            return new ClaimsPrincipal(
+                new ClaimsIdentity(
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "SystemAccount"),
+                    }));
+        }
+
+        /// <summary>
         ///     Derives the user's userId from the list of their claims.
         /// </summary>
         /// <param name="user">The authorized user.</param>

@@ -170,12 +170,13 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
-        /// Initializes the storage if required.
+        /// Checks if the container exists.
         /// </summary>
+        /// <param name="containerName">Unique name of the Azure blob container.</param>
         /// <returns>
         /// True if successful, false otherwise.
         /// </returns>
-        public async Task<bool> InitStorage()
+        public async Task<bool> ContainerExistsAsync(string containerName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
             BlobServiceClient blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
@@ -184,19 +185,13 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 var containerClient = blobServiceClient.GetBlobContainerClient("mapSample");
-                var exists = await containerClient.ExistsAsync();
-                if (!exists)
-                {
-                    await this.CreateContainerAsync("mapSample");
-                }
+                return await containerClient.ExistsAsync();
             }
             catch (Azure.RequestFailedException ex)
             {
                 this.loggerService.LogError("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
                 return false;
             }
-
-            return true;
         }
     }
 }

@@ -63,5 +63,5 @@ Service for managing world maps and associate them with Campaign Logger log entr
 ## Azure
 
 - [Azure Storage Blobs - Quickstart](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-dotnet)
-- [Azure Tables Client Libraries](https://devblogs.microsoft.com/azure-sdk/azure-tables-client-libraries/)
-- [Azure Storage Tables - Quickstart](https://docs.microsoft.com/en-us/azure/cosmos-db/create-table-dotnet)
+- [Cosmos DB - Quickstart](https://docs.microsoft.com/en-us/azure/cosmos-db/create-table-dotnet)
+- [Cosmos DB - Query Tables](https://docs.microsoft.com/en-us/azure/cosmos-db/tutorial-query-table)
