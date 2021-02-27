@@ -439,7 +439,11 @@ namespace CampaignKit.WorldMap.Services
                 // Query the map record
                 var mapQuery = from m in cloudTable.CreateQuery<Map>()
                                select m;
-                if (includePublic)
+                if (userId == null)
+                {
+                    mapQuery = mapQuery.Where(m => m.IsPublic == true);
+                }
+                else if (includePublic)
                 {
                     mapQuery = mapQuery.Where(m => m.IsPublic == true || m.UserId == userId);
                 }
