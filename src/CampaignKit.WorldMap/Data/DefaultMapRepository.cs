@@ -296,19 +296,17 @@ namespace CampaignKit.WorldMap.Data
                             MapId = map.MapId,
                             ZoomLevel = zoomLevel,
                             CreationTimestamp = DateTime.UtcNow,
+                            CompletionTimestamp = DateTime.MinValue,
                             TileSize = TilePixelSize,
                             X = x,
                             Y = y,
                         };
                         map.Tiles.Add(tile);
+                        await this.tableStorageService.CreateTileRecordAsync(tile);
                     }
                 }
             }
 
-            // ************************************
-            //   Update Map Entity
-            // ************************************
-            await this.tableStorageService.UpdateMapRecordAsync(map);
             return map.MapId;
         }
 

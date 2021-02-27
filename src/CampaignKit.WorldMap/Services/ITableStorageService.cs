@@ -81,7 +81,7 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <param name="tileId">The tile's unique id.</param>
         /// <returns>The tile if found, null otherwise.</returns>
-        public Task<Map> GetTileRecordAsync(string tileId);
+        public Task<Tile> GetTileRecordAsync(string tileId);
 
         /// <summary>
         /// Gets all map records for the specified user asynchronously.
@@ -102,6 +102,5 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <returns>True if succeeds, false otherwise.</returns>
         public Task<bool> InitTablesAsync();
-
     }
 }
