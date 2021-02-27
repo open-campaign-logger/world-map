@@ -20,19 +20,13 @@ namespace CampaignKit.WorldMap.Services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using System.Threading;
     using System.Threading.Tasks;
-    using CampaignKit.WorldMap.Data;
     using CampaignKit.WorldMap.Entities;
-    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
+    using Serilog;
     using SixLabors.ImageSharp;
-    using SixLabors.ImageSharp.Advanced;
-    using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
 
     /// <summary>
@@ -69,6 +63,11 @@ namespace CampaignKit.WorldMap.Services
         private readonly IBlobStorageService blobStorageService;
 
         /// <summary>
+        /// The table storage service.
+        /// </summary>
+        private readonly ITableStorageService tableStorageService;
+
+        /// <summary>
         ///     The executing task.
         /// </summary>
         private Task executingTask;
@@ -77,15 +76,16 @@ namespace CampaignKit.WorldMap.Services
         ///     Initializes a new instance of the <see cref="TileCreationService" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
-        /// <param name="loggerService">The application logger service.</param>
         /// <param name="serviceProvider">The service provider.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
-        public TileCreationService(IConfiguration configuration, ILogger<TileCreationService> loggerService, IServiceProvider serviceProvider, IBlobStorageService blobStorageService)
+        /// <param name="tableStorageService">The table storage service.</param>
+        public TileCreationService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService)
         {
-            this.configuration = configuration;
-            this.loggerService = loggerService;
-            this.serviceProvider = serviceProvider;
-            this.blobStorageService = blobStorageService;
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
+            this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            this.blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
+            this.tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
         }
 
         /// <summary>
@@ -159,76 +159,66 @@ namespace CampaignKit.WorldMap.Services
         /// <returns>True when processing is completed.</returns>
         protected async Task<bool> Process()
         {
-            using (var scope = this.serviceProvider.CreateScope())
+            // Query the tiles table to see if there are any unprocessed tiles.
+            var tiles = await this.tableStorageService.GetUnprocessedTileRecordsAsync();
+
+            if (tiles.Count > 0)
             {
-                // Retrieve the db context from the container
-                var dbContext = scope.ServiceProvider.GetRequiredService<WorldMapDBContext>();
+                this.loggerService.Debug("{0} tiles waiting to be processed.", tiles.Count);
 
-                // Open the db connection
-                dbContext.Database.OpenConnection();
-
-                // Query the tiles table to see if there are any unprocessed tiles.
-                this.loggerService.LogDebug("Determining if there are map tiles to process.");
-                var tiles = (from t in dbContext.Tiles select t)
-                    .Where(t => t.CompletionTimestamp == DateTime.MinValue)
-                    .OrderBy(t => t.MapId).ThenBy(t => t.ZoomLevel)
-                    .ToList();
-
-                if (tiles.Count > 0)
+                // Process each map with unprocessed tiles
+                var mapList = tiles.Select(o => o.MapId).Distinct();
+                foreach (var map in mapList)
                 {
-                    this.loggerService.LogDebug("{0} tiles waiting to be processed.", tiles.Count);
+                    this.loggerService.Debug("Processing tiles for map: {0}.", map);
 
-                    // Process each map with unprocessed tiles
-                    var mapList = tiles.Select(o => o.MapId).Distinct();
-                    foreach (var map in mapList)
+                    // Calculate Folder Paths for the Map
+                    var containerName = $"map{map}";
+                    var masterBlob = await this.blobStorageService.ReadBlobAsync(containerName, "master-file.png");
+
+                    // Process each map zoom level with unprocessed tiles
+                    var zoomList = tiles.Where(t => t.MapId == map).Select(o => o.ZoomLevel).Distinct();
+                    foreach (var zoomLevel in zoomList)
                     {
-                        this.loggerService.LogDebug("Processing tiles for map: {0}.", map);
+                        // Select Tiles for Processing
+                        var tilesToProcess = tiles.Where(t => t.MapId == map).Where(t => t.ZoomLevel == zoomLevel);
 
-                        // Calculate Folder Paths for the Map
-                        var containerName = $"map{map}";
-                        var masterBlob = await this.blobStorageService.ReadBlobAsync(containerName, "master-file.png");
+                        // Calculate Tile Size
+                        var tilePixelSize = tiles[0].TileSize;
 
-                        // Process each map zoom level with unprocessed tiles
-                        var zoomList = tiles.Where(t => t.MapId == map).Select(o => o.ZoomLevel).Distinct();
-                        foreach (var zoomLevel in zoomList)
+                        // Calculate the number of tiles required for this zoom level
+                        var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
+
+                        // Create zoom level base file (sync)
+                        this.loggerService.Debug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
+                        var zoomLevelBlob
+                            = await this.CreateZoomLevelBaseFile(
+                                numberOfTilesPerDimension,
+                                masterBlob,
+                                zoomLevel,
+                                tilePixelSize,
+                                containerName,
+                                $"{zoomLevel}_zoom-level.png");
+
+                        // Create collection for tile creation tasks
+                        var tasks = new List<Task<bool>>();
+                        tasks.Clear();
+
+                        // Cycle through the tiles selected for the current map and zoom and process them
+                        foreach (var tile in tilesToProcess)
                         {
-                            // Select Tiles for Processing
-                            var tilesToProcess = tiles.Where(t => t.MapId == map).Where(t => t.ZoomLevel == zoomLevel);
+                            var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
+                            this.loggerService.Debug("Creating zoom level tile: {0}.", blobName);
+                            tasks.Add(Task.Run(() => this.CreateZoomLevelTileFile(zoomLevelBlob, tile, containerName, blobName)));
+                        }
 
-                            // Calculate Tile Size
-                            var tilePixelSize = tiles[0].TileSize;
+                        // Wait for all tile creation tasks to complete
+                        var results = await Task.WhenAll(tasks);
 
-                            // Calculate the number of tiles required for this zoom level
-                            var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
-
-                            // Create zoom level base file (sync)
-                            this.loggerService.LogDebug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
-                            var zoomLevelBlob
-                                = await this.CreateZoomLevelBaseFile(
-                                    numberOfTilesPerDimension,
-                                    masterBlob,
-                                    zoomLevel,
-                                    tilePixelSize,
-                                    containerName,
-                                    $"{zoomLevel}_zoom-level.png");
-
-                            // Create collection for tile creation tasks
-                            var tasks = new List<Task<bool>>();
-                            tasks.Clear();
-
-                            // Cycle through the tiles selected for the current map and zoom and process them
-                            foreach (var tile in tilesToProcess)
-                            {
-                                var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
-                                this.loggerService.LogDebug("Creating zoom level tile: {0}.", blobName);
-                                tasks.Add(Task.Run(() => this.CreateZoomLevelTileFile(zoomLevelBlob, tile, containerName, blobName)));
-                            }
-
-                            // Wait for all tile creation tasks to complete
-                            var results = await Task.WhenAll(tasks);
-
-                            // Update tile completion timestampts
-                            dbContext.SaveChanges();
+                        // Update tile records
+                        foreach (var tile in tilesToProcess)
+                        {
+                            await this.tableStorageService.UpdateTileRecordAsync(tile);
                         }
                     }
                 }
@@ -290,7 +280,7 @@ namespace CampaignKit.WorldMap.Services
                     await this.blobStorageService.CreateBlobAsync(containerName, blobName, ms.ToArray());
                 }
 
-                tile.CompletionTimestamp = DateTime.UtcNow;
+                tile.IsRendered = true;
                 return true;
             }
         }

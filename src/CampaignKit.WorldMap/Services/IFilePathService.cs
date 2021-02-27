@@ -17,7 +17,7 @@
 namespace CampaignKit.WorldMap.Services
 {
     /// <summary>
-    ///  Interface IFilePathService
+    ///  Interface IFilePathService.
     /// </summary>
     public interface IFilePathService
     {

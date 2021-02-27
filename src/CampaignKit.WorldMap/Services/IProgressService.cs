@@ -18,6 +18,7 @@ namespace CampaignKit.WorldMap.Services
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using CampaignKit.WorldMap.Data;
 
@@ -34,6 +35,6 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <param name="mapId">The map identifier.</param>
         /// <returns>System.Double.</returns>
-        double GetMapProgress(string mapId);
+        Task<double> GetMapProgress(string mapId);
     }
 }

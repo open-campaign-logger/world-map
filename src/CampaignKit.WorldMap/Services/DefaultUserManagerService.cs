@@ -16,10 +16,12 @@
 
 namespace CampaignKit.WorldMap.Services
 {
+    using System;
     using System.Linq;
     using System.Security.Claims;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
+
+    using Serilog;
 
     /// <inheritdoc />
     /// <summary>
@@ -42,11 +44,10 @@ namespace CampaignKit.WorldMap.Services
         /// Initializes a new instance of the <see cref="DefaultUserManagerService"/> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
-        /// <param name="loggerService">The application logger service.</param>
-        public DefaultUserManagerService(IConfiguration configuration, ILogger<DefaultUserManagerService> loggerService)
+        public DefaultUserManagerService(IConfiguration configuration)
         {
-            this.configuration = configuration;
-            this.loggerService = loggerService;
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
         }
 
         /// <summary>

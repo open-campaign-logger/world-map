@@ -16,8 +16,12 @@
 
 namespace CampaignKit.WorldMap.Services
 {
+    using System;
     using System.IO;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
+
+    using Serilog;
 
     /// <summary>
     /// The default file path service.
@@ -26,11 +30,24 @@ namespace CampaignKit.WorldMap.Services
     public class DefaultFilePathService : IFilePathService
     {
         /// <summary>
+        /// The application configuration.
+        /// </summary>
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// The application logging service.
+        /// </summary>
+        private readonly ILogger loggerService;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultFilePathService" /> class.
         /// </summary>
         /// <param name="env">The env.</param>
-        public DefaultFilePathService(IWebHostEnvironment env)
+        /// <param name="configuration">The application configuration.</param>
+        public DefaultFilePathService(IConfiguration configuration, IWebHostEnvironment env)
         {
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
             this.AppDataPath = Path.Combine(env.ContentRootPath, "App_Data");
         }
 

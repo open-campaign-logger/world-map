@@ -18,10 +18,11 @@ namespace CampaignKit.WorldMap.Services
 {
     using System;
     using System.Linq;
-    using CampaignKit.WorldMap.Data;
+    using System.Threading.Tasks;
 
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
+
+    using Serilog;
 
     /// <inheritdoc />
     /// <summary>
@@ -30,7 +31,10 @@ namespace CampaignKit.WorldMap.Services
     /// <seealso cref="T:CampaignKit.WorldMap.Services.IProgressService" />
     public class DefaultProgressService : IProgressService
     {
-        private readonly WorldMapDBContext dbContext;
+        /// <summary>
+        /// The table storage service.
+        /// </summary>
+        private readonly ITableStorageService tableStorageService;
 
         /// <summary>
         /// The application configuration.
@@ -46,16 +50,12 @@ namespace CampaignKit.WorldMap.Services
         /// Initializes a new instance of the <see cref="DefaultProgressService"/> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
-        /// <param name="loggerService">The application logger service.</param>
-        /// <param name="dbContext">The WorldMapDBContext.</param>
-        public DefaultProgressService(
-            IConfiguration configuration,
-            ILogger<DefaultProgressService> loggerService,
-            WorldMapDBContext dbContext)
+        /// <param name="tableStorageService">The table storage service.</param>
+        public DefaultProgressService(IConfiguration configuration, ITableStorageService tableStorageService)
         {
-            this.configuration = configuration;
-            this.loggerService = loggerService;
-            this.dbContext = dbContext;
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
         }
 
         /// <summary>
@@ -64,17 +64,15 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <param name="mapId">The map identifier.</param>
         /// <returns>System.Double.</returns>
-        public double GetMapProgress(string mapId)
+        public async Task<double> GetMapProgress(string mapId)
         {
             // Create a default return value
             var progress = 0D;
 
             // Find tiles related to this map
-            var tiles = (from t in this.dbContext.Tiles select t)
-                .Where(t => t.MapId == Convert.ToInt32(mapId))
-                .ToList();
-            var total = tiles.Count();
-            var completed = tiles.Where(t => t.CompletionTimestamp > DateTime.MinValue).Count();
+            var map = await this.tableStorageService.GetMapRecordAsync(mapId);
+            var total = map.Tiles.Count();
+            var completed = map.Tiles.Where(t => t.IsRendered == true).Count();
 
             // Are there tiles defined for this map?
             if (total > 0)

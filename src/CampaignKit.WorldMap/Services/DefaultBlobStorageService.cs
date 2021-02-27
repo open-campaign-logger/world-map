@@ -23,7 +23,8 @@ namespace CampaignKit.WorldMap.Services
     using Azure.Storage.Blobs;
 
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
+
+    using Serilog;
 
     /// <summary>
     /// Default Blob storage service.
@@ -45,11 +46,10 @@ namespace CampaignKit.WorldMap.Services
         /// Initializes a new instance of the <see cref="DefaultBlobStorageService"/> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
-        /// <param name="loggerService">The application logger service.</param>
-        public DefaultBlobStorageService(IConfiguration configuration, ILogger<DefaultBlobStorageService> loggerService)
+        public DefaultBlobStorageService(IConfiguration configuration)
         {
-            this.configuration = configuration;
-            this.loggerService = loggerService;
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.LogError("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
+                this.loggerService.Error("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
                 return false;
             }
 
@@ -104,7 +104,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.LogError("Unable to create Azure blob: {0}/{1}.  Error message: {2}.", containerName, blobName, ex.Message);
+                this.loggerService.Error("Unable to create Azure blob: {0}/{1}.  Error message: {2}.", containerName, blobName, ex.Message);
                 return false;
             }
 
@@ -137,7 +137,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.LogError("Unable to read Azure blob: {0}/{1}.  Error message: {2}.", containerName, blobName, ex.Message);
+                this.loggerService.Error("Unable to read Azure blob: {0}/{1}.  Error message: {2}.", containerName, blobName, ex.Message);
                 return null;
             }
         }
@@ -162,7 +162,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.LogError("Unable to delete Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
+                this.loggerService.Error("Unable to delete Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
                 return false;
             }
 
@@ -189,7 +189,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.LogError("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
+                this.loggerService.Error("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
                 return false;
             }
         }

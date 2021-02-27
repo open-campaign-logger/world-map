@@ -24,7 +24,8 @@ namespace CampaignKit.WorldMap.Services
 
     using Microsoft.Azure.Cosmos.Table;
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
+
+    using Serilog;
 
     /// <summary>
     /// Default table storage service.
@@ -46,11 +47,10 @@ namespace CampaignKit.WorldMap.Services
         /// Initializes a new instance of the <see cref="DefaultTableStorageService"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        /// <param name="loggerService">The logger service.</param>
-        public DefaultTableStorageService(IConfiguration configuration, ILogger loggerService)
+        public DefaultTableStorageService(IConfiguration configuration)
         {
-            this.configuration = configuration;
-            this.loggerService = loggerService;
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to create map record: {0}", ex.Message);
+                this.loggerService.Error("Unable to create map record: {0}", ex.Message);
                 return null;
             }
         }
@@ -134,7 +134,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to create tile record: {0}", ex.Message);
+                this.loggerService.Error("Unable to create tile record: {0}", ex.Message);
                 return null;
             }
         }
@@ -182,7 +182,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to delete map and tile records: {0}", ex.Message);
+                this.loggerService.Error("Unable to delete map and tile records: {0}", ex.Message);
                 return false;
             }
         }
@@ -214,7 +214,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to delete tile record: {0}", ex.Message);
+                this.loggerService.Error("Unable to delete tile record: {0}", ex.Message);
                 return false;
             }
         }
@@ -296,7 +296,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to update map record: {0}", ex.Message);
+                this.loggerService.Error("Unable to update map record: {0}", ex.Message);
                 return false;
             }
         }
@@ -330,7 +330,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to update tile record: {0}", ex.Message);
+                this.loggerService.Error("Unable to update tile record: {0}", ex.Message);
                 return false;
             }
         }
@@ -354,7 +354,7 @@ namespace CampaignKit.WorldMap.Services
             // Create the table if required.
             if (await table.CreateIfNotExistsAsync())
             {
-                this.loggerService.LogDebug("Created Table named: {0}", "worldmapmaps");
+                this.loggerService.Debug("Created Table named: {0}", "worldmapmaps");
             }
 
             // Verify worldmaptiles table exists
@@ -363,7 +363,7 @@ namespace CampaignKit.WorldMap.Services
             // Create the table if required.
             if (await table.CreateIfNotExistsAsync())
             {
-                this.loggerService.LogDebug("Created Table named: {0}", "worldmaptiles");
+                this.loggerService.Debug("Created Table named: {0}", "worldmaptiles");
             }
 
             return true;
@@ -392,26 +392,26 @@ namespace CampaignKit.WorldMap.Services
                 var mapQuery = from m in cloudTable.CreateQuery<Map>()
                                where m.MapId == mapId
                                select m;
-                var mapCount = mapQuery.Count<Map>();
-                if (mapCount == 0)
+                var mapList = mapQuery.ToList();
+                if (mapList.Count == 0)
                 {
-                    this.loggerService.LogError("Map not found: {0}", mapId);
+                    return null;
                 }
 
-                var map = mapQuery.First();
+                var map = mapList.First();
 
                 // Query the tile records
                 cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
                 var tileQuery = from t in cloudTable.CreateQuery<Tile>()
                                 where t.PartitionKey == map.RowKey
                                 select t;
-                map.Tiles = tileQuery.ToList<Tile>();
+                map.Tiles = tileQuery.ToList();
 
                 return map;
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to retrieve map and tile records : {0}", ex.Message);
+                this.loggerService.Error("Unable to retrieve map and tile records : {0}", ex.Message);
                 return null;
             }
         }
@@ -448,11 +448,11 @@ namespace CampaignKit.WorldMap.Services
                     mapQuery = mapQuery.Where(m => m.UserId == userId);
                 }
 
-                return mapQuery.ToList<Map>();
+                return mapQuery.ToList();
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to retrieve maps for user: {0}", ex.Message);
+                this.loggerService.Error("Unable to retrieve maps for user: {0}", ex.Message);
                 return null;
             }
         }
@@ -480,16 +480,17 @@ namespace CampaignKit.WorldMap.Services
                 var tileQuery = from t in cloudTable.CreateQuery<Tile>()
                                where t.TileId == tileId
                                select t;
-                if (tileQuery.Count() == 0)
+                var tileList = tileQuery.ToList();
+                if (tileList.Count == 0)
                 {
                     return null;
                 }
 
-                return tileQuery.First();
+                return tileList.First();
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to retrieve tile records: {0}", ex.Message);
+                this.loggerService.Error("Unable to retrieve tile records: {0}", ex.Message);
                 return null;
             }
         }
@@ -514,13 +515,19 @@ namespace CampaignKit.WorldMap.Services
 
                 // Query the tile record
                 var tileQuery = from t in cloudTable.CreateQuery<Tile>()
-                                where t.CompletionTimestamp == DateTime.MinValue
+                                where t.IsRendered == false
                                 select t;
-                return tileQuery.ToList<Tile>();
+                var tileList = tileQuery
+                    .ToList()
+                    .OrderBy(x => x.MapId)
+                    .ThenBy(x => x.ZoomLevel)
+                    .ToList();
+
+                return tileList;
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to retrieve tile records: {0}", ex.Message);
+                this.loggerService.Error("Unable to retrieve tile records: {0}", ex.Message);
                 return null;
             }
         }

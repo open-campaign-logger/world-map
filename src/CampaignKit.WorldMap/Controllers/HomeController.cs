@@ -57,7 +57,7 @@ namespace CampaignKit.WorldMap.Controllers
             // Anonymous User: all public maps
             // Authenticated User: all public and owned maps.
             var model = (await this.mapRepository.FindAll(this.User, true))
-                .Where(m => m.MapId != 1)
+                .Where(m => !m.MapId.Equals("sample"))
                 .OrderByDescending(m => m.CreationTimestamp)
                 .Take(3);
 

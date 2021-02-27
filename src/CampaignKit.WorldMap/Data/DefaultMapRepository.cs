@@ -296,7 +296,7 @@ namespace CampaignKit.WorldMap.Data
                             MapId = map.MapId,
                             ZoomLevel = zoomLevel,
                             CreationTimestamp = DateTime.UtcNow,
-                            CompletionTimestamp = DateTime.MinValue,
+                            IsRendered = false,
                             TileSize = TilePixelSize,
                             X = x,
                             Y = y,

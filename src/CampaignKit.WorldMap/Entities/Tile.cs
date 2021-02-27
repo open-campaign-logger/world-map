@@ -70,15 +70,17 @@ namespace CampaignKit.WorldMap.Entities
         public int ZoomLevel { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is rendered.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is completed; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsRendered { get; set; }
+
+        /// <summary>
         ///     Gets or sets the tile creation timestamp.
         /// </summary>
         /// <value>Time that the tile creation process started.</value>
         public DateTime CreationTimestamp { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the tile completion timestamp.
-        /// </summary>
-        /// <value>Time that the tile creation process completed.</value>
-        public DateTime CompletionTimestamp { get; set; }
     }
 }
