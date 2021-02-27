@@ -153,7 +153,7 @@ namespace CampaignKit.WorldMap.Services
         {
             // Create a BlobServiceClient object which will be used to create a container client
             var blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
-            var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient($"map{containerName}");
 
             // Create the container and return a container client object
             try

@@ -19,7 +19,6 @@ namespace CampaignKit.WorldMap.Entities
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations.Schema;
     using Microsoft.Azure.Cosmos.Table;
 
     /// <summary>Map Entity.</summary>

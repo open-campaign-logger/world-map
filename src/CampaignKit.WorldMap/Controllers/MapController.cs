@@ -324,9 +324,10 @@ namespace CampaignKit.WorldMap.Controllers
         /// <returns>Tile creation progress for map in JSON format.</returns>
         [HttpGet("Progress/{id?}")]
         [Authorize]
-        public IActionResult Progress(string id)
+        public async Task<IActionResult> Progress(string id)
         {
-            return this.Json(new { Progress = this.progressService.GetMapProgress(id) });
+            var json = this.Json(new { Progress = await this.progressService.GetMapProgress(id) });
+            return json;
         }
 
         /// <summary>
