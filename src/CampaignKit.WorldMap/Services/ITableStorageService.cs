@@ -96,11 +96,5 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <returns>List of unprocessed tiles, empty list of no tiles require processing.</returns>
         public Task<List<Tile>> GetUnprocessedTileRecordsAsync();
-
-        /// <summary>
-        /// Initializes Azure tables if required.
-        /// </summary>
-        /// <returns>True if succeeds, false otherwise.</returns>
-        public Task<bool> InitTablesAsync();
     }
 }

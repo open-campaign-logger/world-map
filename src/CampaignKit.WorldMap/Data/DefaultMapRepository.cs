@@ -124,7 +124,7 @@ namespace CampaignKit.WorldMap.Data
             await this.tableStorageService.DeleteMapRecordAsync(map);
 
             // Delete map directory and files
-            await this.blobStorageService.DeleteFolderAsync(map.MapId);
+            await this.blobStorageService.DeleteFolderAsync($"map{map.MapId}");
 
             // Return result
             return true;
@@ -428,9 +428,6 @@ namespace CampaignKit.WorldMap.Data
         /// </returns>
         public async Task<bool> InitRepository()
         {
-            // Ensure tables have been created
-            await this.tableStorageService.InitTablesAsync();
-
             // Ensure sample map has been created
             var sampleMap = await this.tableStorageService.GetMapRecordAsync("sample");
 

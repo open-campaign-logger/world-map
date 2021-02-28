@@ -77,7 +77,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -117,7 +117,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -151,7 +151,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -172,6 +172,9 @@ namespace CampaignKit.WorldMap.Services
                 }
 
                 // Connect to the worlmapmaps table.
+                cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
+                cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
+                cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
                 cloudTable = cloudTableClient.GetTableReference("worldmapmaps");
 
                 // Delete the map record.
@@ -199,7 +202,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -279,7 +282,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -313,7 +316,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -336,40 +339,6 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
-        /// Initializes Azure tables if required.
-        /// </summary>
-        /// <returns>
-        /// True if succeeds, false otherwise.
-        /// </returns>
-        public async Task<bool> InitTablesAsync()
-        {
-            // Initialize connection to Azure table storage
-            var storageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
-            var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
-            var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
-
-            // Verify worldmapmaps table exists
-            var table = tableClient.GetTableReference("worldmapmaps");
-
-            // Create the table if required.
-            if (await table.CreateIfNotExistsAsync())
-            {
-                this.loggerService.Debug("Created Table named: {0}", "worldmapmaps");
-            }
-
-            // Verify worldmaptiles table exists
-            table = tableClient.GetTableReference("worldmaptiles");
-
-            // Create the table if required.
-            if (await table.CreateIfNotExistsAsync())
-            {
-                this.loggerService.Debug("Created Table named: {0}", "worldmaptiles");
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Gets a map record and any associated tile records.
         /// </summary>
         /// <param name="mapId">The map's unique id.</param>
@@ -381,7 +350,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -401,6 +370,9 @@ namespace CampaignKit.WorldMap.Services
                 var map = mapList.First();
 
                 // Query the tile records
+                cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
+                cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
+                cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
                 cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
                 var tileQuery = from t in cloudTable.CreateQuery<Tile>()
                                 where t.PartitionKey == map.RowKey
@@ -429,7 +401,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -473,7 +445,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -510,7 +482,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorage");
+                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 

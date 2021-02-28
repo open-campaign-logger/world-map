@@ -21,6 +21,7 @@ namespace CampaignKit.WorldMap.Services
     using System.Threading.Tasks;
 
     using Azure.Storage.Blobs;
+    using Azure.Storage.Blobs.Models;
 
     using Microsoft.Extensions.Configuration;
 
@@ -132,8 +133,18 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 var blobContainerClient = blobServiceClient.GetBlobContainerClient("world-map");
-                var blobClient = blobContainerClient.GetBlobClient($"{folderName}");
-                await blobClient.DeleteIfExistsAsync();
+
+                // Call the listing operation and return pages of the specified size.
+                var resultSegment = blobContainerClient.GetBlobsAsync(prefix: folderName).AsPages(default, 500);
+
+                // Enumerate the blobs returned for each page.
+                await foreach (Azure.Page<BlobItem> blobPage in resultSegment)
+                {
+                    foreach (BlobItem blobItem in blobPage.Values)
+                    {
+                        await blobContainerClient.DeleteBlobAsync(blobItem.Name);
+                    }
+                }
             }
             catch (Azure.RequestFailedException ex)
             {

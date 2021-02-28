@@ -43,9 +43,10 @@ Enabling public access to blobs.
   - Open **Tools > NuGet Package Manager > NuGet Package Manager Console**
   - `cd src\CampaignKit.WorldMap`
   - `dotnet user-secrets init`
-  - `dotnet user-secrets set "ConnectionStrings:DefaultConnection" "<YOUR CUSTOM CONNECTION STRING>"`
   - `dotnet user-secrets set "ConnectionStrings:AzureBlobStorage" "<YOUR CUSTOM CONNECTION STRING>"`
-  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorage" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageMaps" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageTiles" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "AzureBlobBaseURL" "<YOUR CUSTOM AZURE BLOB BASE URL>"`
 
 # Reference Material
 
