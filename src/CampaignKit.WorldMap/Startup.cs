@@ -31,8 +31,6 @@ namespace CampaignKit.WorldMap
     using Microsoft.Extensions.Hosting;
     using Newtonsoft.Json;
 
-    using Serilog;
-
     /// <summary>
     ///     Class Startup.
     /// </summary>
@@ -97,16 +95,6 @@ namespace CampaignKit.WorldMap
         {
             // This method gets called by the runtime. Use this method to add services to the container.
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
-
-            // Instantiate logging
-            var logFile = "Logs/worldmap_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .ReadFrom.Configuration(this.Configuration)
-                .Enrich.FromLogContext()
-                .WriteTo.File(logFile)
-                .WriteTo.Console()
-                .CreateLogger();
 
             // Add the MVC service
             services.AddMvc();

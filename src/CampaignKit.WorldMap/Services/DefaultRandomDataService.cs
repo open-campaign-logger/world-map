@@ -19,8 +19,7 @@ namespace CampaignKit.WorldMap.Services
     using System;
     using System.Text;
     using Microsoft.Extensions.Configuration;
-
-    using Serilog;
+    using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     /// <summary>
@@ -48,10 +47,11 @@ namespace CampaignKit.WorldMap.Services
         /// Initializes a new instance of the <see cref="DefaultRandomDataService"/> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
-        public DefaultRandomDataService(IConfiguration configuration)
+        /// <param name="loggerService">The logger service.</param>
+        public DefaultRandomDataService(IConfiguration configuration, ILogger<DefaultRandomDataService> loggerService)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
+            this.loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
         /// <inheritdoc />

@@ -21,8 +21,7 @@ namespace CampaignKit.WorldMap.Services
     using System.Threading.Tasks;
 
     using Microsoft.Extensions.Configuration;
-
-    using Serilog;
+    using Microsoft.Extensions.Logging;
 
     /// <inheritdoc />
     /// <summary>
@@ -51,11 +50,12 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
         /// <param name="tableStorageService">The table storage service.</param>
-        public DefaultProgressService(IConfiguration configuration, ITableStorageService tableStorageService)
+        /// <param name="loggerService">The logger service.</param>
+        public DefaultProgressService(IConfiguration configuration, ITableStorageService tableStorageService, ILogger<DefaultProgressService> loggerService)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             this.tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
-            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
+            this.loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
         /// <summary>

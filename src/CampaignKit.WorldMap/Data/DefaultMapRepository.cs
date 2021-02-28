@@ -84,12 +84,12 @@ namespace CampaignKit.WorldMap.Data
             IBlobStorageService blobStorageService,
             IFilePathService filePathService)
         {
-            this.configuration = configuration;
-            this.loggerService = loggerService;
-            this.tableStorageService = tableStorageService;
-            this.userManagerService = userManagerService;
-            this.blobStorageService = blobStorageService;
-            this.filePathService = filePathService;
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            this.tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            this.userManagerService = userManagerService ?? throw new ArgumentNullException(nameof(userManagerService));
+            this.blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
+            this.filePathService = filePathService ?? throw new ArgumentNullException(nameof(filePathService));
         }
 
         /// <summary>

@@ -25,7 +25,8 @@ namespace CampaignKit.WorldMap.Services
     using CampaignKit.WorldMap.Entities;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Hosting;
-    using Serilog;
+    using Microsoft.Extensions.Logging;
+
     using SixLabors.ImageSharp;
     using SixLabors.ImageSharp.Processing;
 
@@ -79,10 +80,11 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="serviceProvider">The service provider.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
         /// <param name="tableStorageService">The table storage service.</param>
-        public TileCreationService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService)
+        /// <param name="loggerService">The logger service.</param>
+        public TileCreationService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, ILogger<TileCreationService> loggerService)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.loggerService = new LoggerConfiguration().ReadFrom.Configuration(this.configuration).CreateLogger();
+            this.loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
             this.tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
@@ -164,13 +166,13 @@ namespace CampaignKit.WorldMap.Services
 
             if (tiles.Count > 0)
             {
-                this.loggerService.Debug("{0} tiles waiting to be processed.", tiles.Count);
+                this.loggerService.LogDebug("{0} tiles waiting to be processed.", tiles.Count);
 
                 // Process each map with unprocessed tiles
                 var mapList = tiles.Select(o => o.MapId).Distinct();
                 foreach (var map in mapList)
                 {
-                    this.loggerService.Debug("Processing tiles for map: {0}.", map);
+                    this.loggerService.LogDebug("Processing tiles for map: {0}.", map);
 
                     // Calculate Folder Paths for the Map
                     var folderName = $"map{map}";
@@ -190,7 +192,7 @@ namespace CampaignKit.WorldMap.Services
                         var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
 
                         // Create zoom level base file (sync)
-                        this.loggerService.Debug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
+                        this.loggerService.LogDebug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
                         var zoomLevelBlob
                             = await this.CreateZoomLevelBaseFile(
                                 numberOfTilesPerDimension,
@@ -208,7 +210,7 @@ namespace CampaignKit.WorldMap.Services
                         foreach (var tile in tilesToProcess)
                         {
                             var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
-                            this.loggerService.Debug("Creating zoom level tile: {0}.", blobName);
+                            this.loggerService.LogDebug("Creating zoom level tile: {0}.", blobName);
                             tasks.Add(Task.Run(() => this.CreateZoomLevelTileFile(zoomLevelBlob, tile, folderName, blobName)));
                         }
 

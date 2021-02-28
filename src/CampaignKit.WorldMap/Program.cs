@@ -26,8 +26,6 @@ namespace CampaignKit.WorldMap
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
 
-    using Serilog;
-
     /// <summary>
     /// Main application executable.
     /// </summary>
@@ -51,7 +49,7 @@ namespace CampaignKit.WorldMap
         /// <returns>Program initialization utility.</returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, builder) =>
+            .ConfigureAppConfiguration((hostingContext, builder) =>
                 {
                     builder.Sources.Clear();
 
@@ -75,8 +73,13 @@ namespace CampaignKit.WorldMap
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
-                    .UseSerilog()
-                    .UseStartup<Startup>();
+                    .UseStartup<Startup>()
+                    .ConfigureLogging(logging =>
+                    {
+                        logging.ClearProviders();
+                        logging.AddConsole();
+                        logging.AddAzureWebAppDiagnostics();
+                    });
                 });
 
         /// <summary>
