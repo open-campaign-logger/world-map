@@ -53,41 +53,15 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
-        /// Creates the Azure Blob container asynchronously.
-        /// </summary>
-        /// <param name="containerName">Unique name of the Azure blob container.</param>
-        /// <returns>
-        /// True if successful, false otherwise.
-        /// </returns>
-        public async Task<bool> CreateContainerAsync(string containerName)
-        {
-            // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
-
-            // Create the container and return a container client object
-            try
-            {
-                await blobServiceClient.CreateBlobContainerAsync(containerName, Azure.Storage.Blobs.Models.PublicAccessType.Blob);
-            }
-            catch (Azure.RequestFailedException ex)
-            {
-                this.loggerService.Error("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
         /// Creates the Azure Blob asynchronously.
         /// </summary>
-        /// <param name="containerName">Name of the Azure Blob container.</param>
+        /// <param name="folderName">Name of the Azure Blob folder.</param>
         /// <param name="blobName">Name of the blob to create in the Azure Blob container.</param>
         /// <param name="blob">Byte array containing the blob data.</param>
         /// <returns>
         /// True if successful, false otherwise.
         /// </returns>
-        public async Task<bool> CreateBlobAsync(string containerName, string blobName, byte[] blob)
+        public async Task<bool> CreateBlobAsync(string folderName, string blobName, byte[] blob)
         {
             // Create a BlobServiceClient object which will be used to create a container client
             BlobServiceClient blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
@@ -95,8 +69,8 @@ namespace CampaignKit.WorldMap.Services
             // Create the container and return a container client object
             try
             {
-                var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-                var blobClient = blobContainerClient.GetBlobClient(blobName);
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient("world-map");
+                var blobClient = blobContainerClient.GetBlobClient($"{folderName}/{blobName}");
                 using (var ms = new MemoryStream(blob, false))
                 {
                     await blobClient.UploadAsync(ms);
@@ -104,7 +78,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.Error("Unable to create Azure blob: {0}/{1}.  Error message: {2}.", containerName, blobName, ex.Message);
+                this.loggerService.Error("Unable to create blob: {0}/{1}.  Error message: {2}.", folderName, blobName, ex.Message);
                 return false;
             }
 
@@ -114,12 +88,12 @@ namespace CampaignKit.WorldMap.Services
         /// <summary>
         /// Retrieves the Azure Blob asynchronously.
         /// </summary>
-        /// <param name="containerName">Name of the Azure Blob container.</param>
+        /// <param name="folderName">Name of the Azure Blob folder.</param>
         /// <param name="blobName">Name of the blob to create in the Azure Blob container.</param>
         /// <returns>
         /// Byte array containing the blob data.
         /// </returns>
-        public async Task<byte[]> ReadBlobAsync(string containerName, string blobName)
+        public async Task<byte[]> ReadBlobAsync(string folderName, string blobName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
             BlobServiceClient blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
@@ -127,8 +101,8 @@ namespace CampaignKit.WorldMap.Services
             // Create the container and return a container client object
             try
             {
-                var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-                var blobClient = blobContainerClient.GetBlobClient(blobName);
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient("world-map");
+                var blobClient = blobContainerClient.GetBlobClient($"{folderName}/{blobName}");
                 using (var ms = new MemoryStream())
                 {
                     await blobClient.DownloadToAsync(ms);
@@ -137,32 +111,33 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.Error("Unable to read Azure blob: {0}/{1}.  Error message: {2}.", containerName, blobName, ex.Message);
+                this.loggerService.Error("Unable to read blob: {0}/{1}.  Error message: {2}.", folderName, blobName, ex.Message);
                 return null;
             }
         }
 
         /// <summary>
-        /// Deletes the Azure Blob container asynchronously.
+        /// Deletes the Azure Blob folder asynchronously.
         /// </summary>
-        /// <param name="containerName">Unique name of the Azure blob container.</param>
+        /// <param name="folderName">Unique name of the Azure blob folder.</param>
         /// <returns>
         /// True if successful, false otherwise.
         /// </returns>
-        public async Task<bool> DeleteContainerAsync(string containerName)
+        public async Task<bool> DeleteFolderAsync(string folderName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
             var blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
-            var blobContainerClient = blobServiceClient.GetBlobContainerClient($"map{containerName}");
 
             // Create the container and return a container client object
             try
             {
-                await blobContainerClient.DeleteIfExistsAsync();
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient("world-map");
+                var blobClient = blobContainerClient.GetBlobClient($"{folderName}");
+                await blobClient.DeleteIfExistsAsync();
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.Error("Unable to delete Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
+                this.loggerService.Error("Unable to delete Azure container: {0}.  Error message: {1}.", folderName, ex.Message);
                 return false;
             }
 
@@ -170,13 +145,13 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
-        /// Checks if the container exists.
+        /// Checks if the folder exists.
         /// </summary>
-        /// <param name="containerName">Unique name of the Azure blob container.</param>
+        /// <param name="folderName">Unique name of the Azure blob folder.</param>
         /// <returns>
         /// True if successful, false otherwise.
         /// </returns>
-        public async Task<bool> ContainerExistsAsync(string containerName)
+        public async Task<bool> FolderExistsAsync(string folderName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
             BlobServiceClient blobServiceClient = new BlobServiceClient(this.configuration.GetConnectionString("AzureBlobStorage"));
@@ -184,12 +159,13 @@ namespace CampaignKit.WorldMap.Services
             // Create the container and return a container client object
             try
             {
-                var containerClient = blobServiceClient.GetBlobContainerClient("mapSample");
-                return await containerClient.ExistsAsync();
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient("world-map");
+                var blobClient = blobContainerClient.GetBlobClient($"{folderName}");
+                return await blobClient.ExistsAsync();
             }
             catch (Azure.RequestFailedException ex)
             {
-                this.loggerService.Error("Unable to create Azure container: {0}.  Error message: {1}.", containerName, ex.Message);
+                this.loggerService.Error("Unable to create Azure container: {0}.  Error message: {1}.", folderName, ex.Message);
                 return false;
             }
         }

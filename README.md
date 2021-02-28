@@ -31,6 +31,12 @@ Service for managing world maps and associate them with Campaign Logger log entr
 ## Azure Storage Emulator
 The Azure Storage Emulator is used by the application to simulate reading/writing from Azure storage in the local environment.  See: [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
 
+Setting up blob containers and tables.
+![Azure Storage Emulator](./AzureStorageEmulator.png)
+
+Enabling public access to blobs.
+![Azure Blob Public Access Level](AzureBlobPublicAccessLevel.png)
+
 ## Local Development
 - Connection strings in `appsettings.Development.json` can be overwritten locally for testing against other sources.  Use the .Net Core User Secrets manager to make these overrides. See: [Working with User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=windows).
 - To setup connection string overrides locally:

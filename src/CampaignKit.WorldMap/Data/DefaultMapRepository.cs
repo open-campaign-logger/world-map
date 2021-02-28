@@ -124,7 +124,7 @@ namespace CampaignKit.WorldMap.Data
             await this.tableStorageService.DeleteMapRecordAsync(map);
 
             // Delete map directory and files
-            await this.blobStorageService.DeleteContainerAsync(map.MapId);
+            await this.blobStorageService.DeleteFolderAsync(map.MapId);
 
             // Return result
             return true;
@@ -220,8 +220,7 @@ namespace CampaignKit.WorldMap.Data
             // **********************
             //   Create Map Folder
             // **********************
-            var containerName = $"map{map.MapId}";
-            await this.blobStorageService.CreateContainerAsync(containerName);
+            var folderName = $"map{map.MapId}";
 
             // ****************************
             //   Save Original Image File
@@ -232,7 +231,7 @@ namespace CampaignKit.WorldMap.Data
                 // Save original file.
                 stream.CopyTo(ms);
                 originalImageBlob = ms.ToArray();
-                await this.blobStorageService.CreateBlobAsync(containerName, $"original-file{map.FileExtension}", originalImageBlob);
+                await this.blobStorageService.CreateBlobAsync(folderName, $"original-file{map.FileExtension}", originalImageBlob);
             }
 
             // ****************************
@@ -262,7 +261,7 @@ namespace CampaignKit.WorldMap.Data
             {
                 masterImage.Save(ms, new PngEncoder());
                 masterImageBlob = ms.ToArray();
-                await this.blobStorageService.CreateBlobAsync(containerName, "master-file.png", masterImageBlob);
+                await this.blobStorageService.CreateBlobAsync(folderName, "master-file.png", masterImageBlob);
             }
 
             // ****************************

@@ -173,8 +173,8 @@ namespace CampaignKit.WorldMap.Services
                     this.loggerService.Debug("Processing tiles for map: {0}.", map);
 
                     // Calculate Folder Paths for the Map
-                    var containerName = $"map{map}";
-                    var masterBlob = await this.blobStorageService.ReadBlobAsync(containerName, "master-file.png");
+                    var folderName = $"map{map}";
+                    var masterBlob = await this.blobStorageService.ReadBlobAsync(folderName, "master-file.png");
 
                     // Process each map zoom level with unprocessed tiles
                     var zoomList = tiles.Where(t => t.MapId == map).Select(o => o.ZoomLevel).Distinct();
@@ -197,7 +197,7 @@ namespace CampaignKit.WorldMap.Services
                                 masterBlob,
                                 zoomLevel,
                                 tilePixelSize,
-                                containerName,
+                                folderName,
                                 $"{zoomLevel}_zoom-level.png");
 
                         // Create collection for tile creation tasks
@@ -209,16 +209,16 @@ namespace CampaignKit.WorldMap.Services
                         {
                             var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
                             this.loggerService.Debug("Creating zoom level tile: {0}.", blobName);
-                            tasks.Add(Task.Run(() => this.CreateZoomLevelTileFile(zoomLevelBlob, tile, containerName, blobName)));
+                            tasks.Add(Task.Run(() => this.CreateZoomLevelTileFile(zoomLevelBlob, tile, folderName, blobName)));
                         }
 
                         // Wait for all tile creation tasks to complete
                         var results = await Task.WhenAll(tasks);
 
-                        // Update tile records
+                        // Delete processed tile records
                         foreach (var tile in tilesToProcess)
                         {
-                            await this.tableStorageService.UpdateTileRecordAsync(tile);
+                            await this.tableStorageService.DeleteTileRecordAsync(tile);
                         }
                     }
                 }
@@ -234,10 +234,10 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="masterBlob">The master image.</param>
         /// <param name="zoomLevel">The zoom level.</param>
         /// <param name="tilePixelSize">Tile pixel size.</param>
-        /// <param name="containerName">The blob container name.</param>
+        /// <param name="folderName">The blob container name.</param>
         /// <param name="blobName">The name of the blob.</param>
         /// <returns>byte[] of zoom level base file.</returns>
-        private async Task<byte[]> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize, string containerName, string blobName)
+        private async Task<byte[]> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize, string folderName, string blobName)
         {
             using (var masterBaseImage = Image.Load(masterBlob))
             {
@@ -254,7 +254,7 @@ namespace CampaignKit.WorldMap.Services
                 {
                     await masterBaseImage.SaveAsPngAsync(ms);
                     var blob = ms.ToArray();
-                    await this.blobStorageService.CreateBlobAsync(containerName, blobName, blob);
+                    await this.blobStorageService.CreateBlobAsync(folderName, blobName, blob);
                     return blob;
                 }
             }
@@ -265,10 +265,10 @@ namespace CampaignKit.WorldMap.Services
         /// </summary>
         /// <param name="zoomLevelBlob">The zoome level image.</param>
         /// <param name="tile">The tile to be created.</param>
-        /// <param name="containerName">The blob container name.</param>
+        /// <param name="folderName">The blob container name.</param>
         /// <param name="blobName">The name of the blob.</param>
         /// <returns>True when complete.</returns>
-        private async Task<bool> CreateZoomLevelTileFile(byte[] zoomLevelBlob, Tile tile, string containerName, string blobName)
+        private async Task<bool> CreateZoomLevelTileFile(byte[] zoomLevelBlob, Tile tile, string folderName, string blobName)
         {
             using (var zoomLevelImage = Image.Load(zoomLevelBlob))
             {
@@ -277,7 +277,7 @@ namespace CampaignKit.WorldMap.Services
                 using (var ms = new MemoryStream())
                 {
                     await zoomLevelImage.SaveAsPngAsync(ms);
-                    await this.blobStorageService.CreateBlobAsync(containerName, blobName, ms.ToArray());
+                    await this.blobStorageService.CreateBlobAsync(folderName, blobName, ms.ToArray());
                 }
 
                 tile.IsRendered = true;

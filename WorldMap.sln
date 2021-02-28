@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2000
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap", "src\CampaignKit.WorldMap\CampaignKit.WorldMap.csproj", "{BF639E9F-C085-4FC9-9701-AE1924B4C9DA}"
 EndProject
@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.Tests"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{20D912B1-46EC-4C23-AFE7-0F7FA4071179}"
 	ProjectSection(SolutionItems) = preProject
+		AzureBlobPublicAccessLevel.png = AzureBlobPublicAccessLevel.png
+		AzureStorageEmulator.png = AzureStorageEmulator.png
 		README.md = README.md
 	EndProjectSection
 EndProject

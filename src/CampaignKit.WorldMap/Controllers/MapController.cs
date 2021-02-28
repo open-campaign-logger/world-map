@@ -352,7 +352,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             this.ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            this.ViewBag.WorldPath = $"{this.configuration.GetValue<string>("AzureBlobBaseURL")}/sample";
+            this.ViewBag.WorldPath = map.WorldFolderPath;
             this.ViewBag.NoWrap = !map.RepeatMapInX;
 
             return this.View(model);

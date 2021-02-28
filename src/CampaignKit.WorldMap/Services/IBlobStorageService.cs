@@ -24,41 +24,34 @@ namespace CampaignKit.WorldMap.Services
     public interface IBlobStorageService
     {
         /// <summary>
-        /// Creates the Azure Blob container asynchronously.
+        /// Deletes the Azure Blob folder asynchronously.
         /// </summary>
-        /// <param name="containerName">Unique name of the Azure blob container.</param>
+        /// <param name="folderName">Unique name of the Azure blob folder.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public Task<bool> CreateContainerAsync(string containerName);
+        public Task<bool> DeleteFolderAsync(string folderName);
 
         /// <summary>
-        /// Deletes the Azure Blob container asynchronously.
+        /// Checks if the folder exists.
         /// </summary>
-        /// <param name="containerName">Unique name of the Azure blob container.</param>
+        /// <param name="folderName">Unique name of the Azure blob folder.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public Task<bool> DeleteContainerAsync(string containerName);
-
-        /// <summary>
-        /// Checks if the container exists.
-        /// </summary>
-        /// <param name="containerName">Unique name of the Azure blob container.</param>
-        /// <returns>True if successful, false otherwise.</returns>
-        public Task<bool> ContainerExistsAsync(string containerName);
+        public Task<bool> FolderExistsAsync(string folderName);
 
         /// <summary>
         /// Creates the Azure Blob asynchronously.
         /// </summary>
-        /// <param name="containerName">Name of the Azure Blob container.</param>
-        /// <param name="blobName">Name of the blob to create in the Azure Blob container.</param>
+        /// <param name="folderName">Name of the Azure Blob folder.</param>
+        /// <param name="blobName">Name of the blob to create in the Azure Blob folder.</param>
         /// <param name="blob">Byte array containing the blob data.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public Task<bool> CreateBlobAsync(string containerName, string blobName, byte[] blob);
+        public Task<bool> CreateBlobAsync(string folderName, string blobName, byte[] blob);
 
         /// <summary>
         /// Retrieves the Azure Blob asynchronously.
         /// </summary>
-        /// <param name="containerName">Name of the Azure Blob container.</param>
-        /// <param name="blobName">Name of the blob to create in the Azure Blob container.</param>
+        /// <param name="folderName">Name of the Azure Blob folder.</param>
+        /// <param name="blobName">Name of the blob to create in the Azure Blob folder.</param>
         /// <returns>Byte array containing the blob data.</returns>
-        public Task<byte[]> ReadBlobAsync(string containerName, string blobName);
+        public Task<byte[]> ReadBlobAsync(string folderName, string blobName);
     }
 }
