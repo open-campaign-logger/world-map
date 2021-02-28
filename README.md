@@ -37,7 +37,7 @@ Setting up blob containers and tables.
 Enabling public access to blobs.
 ![Azure Blob Public Access Level](AzureBlobPublicAccessLevel.png)
 
-## Local Development
+## Connection Strings
 - Connection strings in `appsettings.Development.json` can be overwritten locally for testing against other sources.  Use the .Net Core User Secrets manager to make these overrides. See: [Working with User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=windows).
 - To setup connection string overrides locally:
   - Open **Tools > NuGet Package Manager > NuGet Package Manager Console**
@@ -47,6 +47,10 @@ Enabling public access to blobs.
   - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageMaps" "<YOUR CUSTOM CONNECTION STRING>"`
   - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageTiles" "<YOUR CUSTOM CONNECTION STRING>"`
   - `dotnet user-secrets set "AzureBlobBaseURL" "<YOUR CUSTOM AZURE BLOB BASE URL>"`
+- To convert an Azure SAS URI into a connection string:
+  - Your URI will have the following format: `https://<ACCOUNT>.<blob/table>.core.windows.net/<RESOURCE>?<SAS String>`
+  - Reformat it as follows: `<BlobEndpoint\TableEndpoint>=https://<ACCOUNT>.<blob/table>.core.windows.net;SharedAccessSignature=<SAS String>`
+  - Note that the `<RESOURCE>` and `?` elements were dropped.
 
 # Reference Material
 
@@ -75,3 +79,4 @@ Enabling public access to blobs.
 - [Cosmos DB - Quickstart](https://docs.microsoft.com/en-us/azure/cosmos-db/create-table-dotnet)
 - [Cosmos DB - Query Tables](https://docs.microsoft.com/en-us/azure/cosmos-db/tutorial-query-table)
 - [Cosmos DB - Query Examples](https://docs.microsoft.com/en-us/azure/cosmos-db/sql-api-dotnet-v3sdk-samples#query-examples)
+- [Azure Connection Strings](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string)
