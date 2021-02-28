@@ -17,6 +17,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="UnitTests\**" />
+    <Content Remove="UnitTests\**" />
+    <EmbeddedResource Remove="UnitTests\**" />
+    <None Remove="UnitTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.3" />
@@ -30,10 +37,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CampaignKit.WorldMap\CampaignKit.WorldMap.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="UnitTests\" />
   </ItemGroup>
 
 </Project>

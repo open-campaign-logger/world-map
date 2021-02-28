@@ -362,14 +362,14 @@ namespace CampaignKit.WorldMap.Controllers
         ///     GET: /Map/Show/{id?}.
         /// </summary>
         /// <param name="id">The identifier.</param>
-        /// <param name="shareKey">The share key.</param>
+        /// <param name="share">The share key.</param>
         /// <param name="showProgress">if set to <c>true</c> [show progress].</param>
         /// <returns>The selected map.</returns>
         [HttpGet("Show/{id?}")]
-        public async Task<IActionResult> Show(string id, string shareKey = null, bool showProgress = false)
+        public async Task<IActionResult> Show(string id, string share = null, bool showProgress = false)
         {
             // Determine if user can view map
-            var canView = await this.mapRepository.CanView(id, this.User, shareKey);
+            var canView = await this.mapRepository.CanView(id, this.User, share);
             if (!canView)
             {
                 return this.ShowErrorView();
@@ -379,18 +379,18 @@ namespace CampaignKit.WorldMap.Controllers
             var canEdit = await this.mapRepository.CanEdit(id, this.User);
 
             // Retrieve the map
-            var map = await this.mapRepository.Find(id, this.User, shareKey);
+            var map = await this.mapRepository.Find(id, this.User, share);
 
             // Create a view model
             var protocol = this.Request.IsHttps ? "https" : "http";
             var model = new MapShowViewModel
             {
                 Name = map.Name,
-                Share = shareKey,
+                Share = share,
                 UserId = map.UserId,
                 ShowProgress = showProgress,
                 ProgressUrl = this.Url.Action(nameof(this.Progress), new { Id = id }),
-                ShowUrl = this.Url.Action(nameof(this.Show), "Map", new { Id = id, Share = shareKey }, protocol, this.Request.Host.Value),
+                ShowUrl = this.Url.Action(nameof(this.Show), "Map", new { Id = id, Share = share }, protocol, this.Request.Host.Value),
                 DeleteUrl = this.Url.Action(nameof(this.Delete), "Map", new { Id = id }, protocol, this.Request.Host.Value),
                 EditUrl = this.Url.Action(nameof(this.Edit), "Map", new { Id = id }, protocol, this.Request.Host.Value),
                 Id = id,

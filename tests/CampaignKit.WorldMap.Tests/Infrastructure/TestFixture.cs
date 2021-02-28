@@ -36,19 +36,8 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
     /// <typeparam name="TTestStartup">Actual startup implementation to use for the test.</typeparam>
     public sealed class TestFixture<TMainStartup, TTestStartup> : IDisposable
     {
-        #region Static Fields
-
         private const string SolutionName = "WorldMap.sln";
-
-        #endregion
-
-        #region Fields
-
         private readonly TestServer _server;
-
-        #endregion
-
-        #region Constructors
 
         /// <inheritdoc />
         /// <summary>
@@ -116,8 +105,6 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
             DatabaseService.Maps.Add(map_1);
             DatabaseService.SaveChanges();
         }
-
-        #endregion
 
         #region Properties
 
