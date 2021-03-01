@@ -8,10 +8,13 @@ trigger:
 
 pool:
   vmImage: 'ubuntu-latest'
+ 
+variables:
+  buildConfiguration: 'Release'
 
 steps:
 - checkout: self
-  submodules: true
+  submodules: 'true'
 - task: UseDotNet@2
   inputs:
     version: '5.0.x'
@@ -20,7 +23,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: true
-    arguments: '--configuration release'
+    arguments: '--configuration $(buildConfiguration)'
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(System.DefaultWorkingDirectory)/src/CampaignKit.WorldMap/bin/Release/net5.0'
