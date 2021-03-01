@@ -22,7 +22,7 @@ steps:
     publishWebProjects: true
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/src/LoggerService/bin/Release/netcoreapp3.1'
+    SourceFolder: '$(System.DefaultWorkingDirectory)/src/CampaignKit.WorldMap/bin/Release/net5.0'
     Contents: 'publish.zip'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 - task: PublishBuildArtifacts@1
