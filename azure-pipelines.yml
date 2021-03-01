@@ -20,6 +20,11 @@ steps:
     version: '5.0.x'
     includePreviewVersions: true # Required for preview versions
 - task: DotNetCoreCLI@2
+  inputs: 
+    command: 'test'
+    projects: '**/*tests/CampaignKit.WorldMap.Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+- task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: true
