@@ -99,6 +99,29 @@ namespace CampaignKit.WorldMap
             // Add the MVC service
             services.AddMvc();
 
+            // Configuration Authentiation
+            this.ConfigureAuth(services);
+
+            // Add services to context
+            services.AddSingleton<IRandomDataService, DefaultRandomDataService>();
+            services.AddSingleton<IFilePathService, DefaultFilePathService>();
+            services.AddSingleton<IProgressService, DefaultProgressService>();
+            services.AddSingleton<IUserManagerService, DefaultUserManagerService>();
+            services.AddSingleton<IMapRepository, DefaultMapRepository>();
+
+            // Add storage services
+            this.ConfigureStorage(services);
+        }
+
+        /// <summary>
+        ///     Configures the authentication.
+        ///     This virtual method is used to encapsulate authentication
+        ///     configuration information in a way that can be easily overridden
+        ///     in the unit testing project.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        protected virtual void ConfigureAuth(IServiceCollection services)
+        {
             // Configure services to expect a Campaign-Identity access_token in the
             // Authorization header using the JWT Bearer scheme.
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -110,38 +133,40 @@ namespace CampaignKit.WorldMap
                     {
                         OnTokenValidated = context =>
                         {
-                            // Create an asp.net identity object for the user
-                            var userName = context.Principal.FindFirstValue("preferred_username") ??
-                                context.Principal.FindFirstValue("name");
-                            var identity = new GenericIdentity(userName);
-                            context.Principal.AddIdentity(identity);
+                        // Create an asp.net identity object for the user
+                        var userName = context.Principal.FindFirstValue("preferred_username") ??
+                        context.Principal.FindFirstValue("name");
+                        var identity = new GenericIdentity(userName);
+                        context.Principal.AddIdentity(identity);
 
-                            // Store the JWT bearer details in a client side cookie.
-                            var tokenString = context.Request.Headers["Authorization"];
+                        // Store the JWT bearer details in a client side cookie.
+                        var tokenString = context.Request.Headers["Authorization"];
 
-                            context.Response.Cookies.Append(
-                                ".worldmap.ui",
-                                tokenString,
-                                new CookieOptions
+                        context.Response.Cookies.Append(
+                        ".worldmap.ui",
+                        tokenString,
+                        new CookieOptions
                                 {
                                     Path = "/",
                                 });
 
-                            return Task.CompletedTask;
+                        return Task.CompletedTask;
                         },
                     };
                 });
+        }
 
-            // Add services to context
-            services.AddSingleton<IRandomDataService, DefaultRandomDataService>();
-            services.AddSingleton<IFilePathService, DefaultFilePathService>();
-            services.AddSingleton<IProgressService, DefaultProgressService>();
-            services.AddSingleton<IUserManagerService, DefaultUserManagerService>();
+        /// <summary>
+        ///     Configures the storage provider.
+        ///     This virtual method is used to encapsulate storage configuration
+        ///     information in a way that can be easily overridden in the unit
+        ///     testing project.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        protected virtual void ConfigureStorage(IServiceCollection services)
+        {
             services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
-            services.AddSingleton<IMapRepository, DefaultMapRepository>();
-
-            // Add background services
             services.AddSingleton<IHostedService, TileCreationService>();
         }
     }

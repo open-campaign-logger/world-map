@@ -1,4 +1,5 @@
-﻿// Copyright 2017 Jochen Linnemann
+﻿// <copyright file="TestFixture.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System;
 using System.IO;
@@ -75,35 +77,35 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
             Client = _server.CreateClient();
             Client.BaseAddress = new Uri("http://localhost");
 
-            // Get Services from Scope
-            DatabaseService = _server.Host.Services.GetRequiredService<WorldMapDBContext>();
-            FilePathService = _server.Host.Services.GetRequiredService<IFilePathService>();
-            MapDataService = _server.Host.Services.GetRequiredService<IMapRepository>();
-            ProgressService = _server.Host.Services.GetRequiredService<IProgressService>();
-            RandomDataService = _server.Host.Services.GetRequiredService<IRandomDataService>();
+            //// Get Services from Scope
+            //DatabaseService = _server.Host.Services.GetRequiredService<WorldMapDBContext>();
+            //FilePathService = _server.Host.Services.GetRequiredService<IFilePathService>();
+            //MapDataService = _server.Host.Services.GetRequiredService<IMapRepository>();
+            //ProgressService = _server.Host.Services.GetRequiredService<IProgressService>();
+            //RandomDataService = _server.Host.Services.GetRequiredService<IRandomDataService>();
 
-            // Create sample map
-            // Create a sample map
-            var map_1 = new Map
-            {
-                AdjustedSize = 4000,
-                ContentType = "image/png",
-                Copyright = "Copyright 2017 Jochen Linnemann ",
-                CreationTimestamp = DateTime.Today.AddDays(-2),
-                FileExtension = ".png",
-                MaxZoomLevel = 4,
-                Name = "Sample",
-                RepeatMapInX = false,
-                UserId = TestAuthenticationOptions.TEST_ID,
-                WorldFolderPath = "C:\\Users\\mf1939\\source\\repos\\open-campaign-logger\\world-map\\src\\CampaignKit.WorldMap\\wwwroot\\world\\1",
-                ThumbnailPath = "~/world/1/0/zoom-level.png",
-                MarkerData = "[{ \"options\": { }, \"properties\": { } ] ",
-                ShareKey = "lNtqjEVQ",
-                IsPublic = true
-            };
+            //// Create sample map
+            //// Create a sample map
+            //var map_1 = new Map
+            //{
+            //    AdjustedSize = 4000,
+            //    ContentType = "image/png",
+            //    Copyright = "Copyright 2017 Jochen Linnemann ",
+            //    CreationTimestamp = DateTime.Today.AddDays(-2),
+            //    FileExtension = ".png",
+            //    MaxZoomLevel = 4,
+            //    Name = "Sample",
+            //    RepeatMapInX = false,
+            //    UserId = TestAuthenticationOptions.TEST_ID,
+            //    WorldFolderPath = "C:\\Users\\mf1939\\source\\repos\\open-campaign-logger\\world-map\\src\\CampaignKit.WorldMap\\wwwroot\\world\\1",
+            //    ThumbnailPath = "~/world/1/0/zoom-level.png",
+            //    MarkerData = "[{ \"options\": { }, \"properties\": { } ] ",
+            //    ShareKey = "lNtqjEVQ",
+            //    IsPublic = true
+            //};
 
-            DatabaseService.Maps.Add(map_1);
-            DatabaseService.SaveChanges();
+            //DatabaseService.Maps.Add(map_1);
+            //DatabaseService.SaveChanges();
         }
 
         #region Properties
@@ -119,14 +121,6 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
         /// </summary>
         /// <value>The client handler.</value>
         public HttpMessageHandler ClientHander { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the database service.
-        /// </summary>
-        /// <value>
-        ///     The database service.
-        /// </value>
-        public WorldMapDBContext DatabaseService { get; set; }
 
         /// <summary>
         ///     Gets or sets the file path service.

@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
+﻿// <copyright file="TestStartupNoAuth.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,84 +12,32 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
-using System.Data.Common;
+using CampaignKit.WorldMap.Services;
+using CampaignKit.WorldMap.Tests.MockServices;
 
-using CampaignKit.WorldMap.Data;
-
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
     public class TestStartupNoAuth : Startup
     {
-        #region Constructors
-
-        public TestStartupNoAuth(IWebHostEnvironment env) : base(env)
+        public TestStartupNoAuth(IConfiguration configuration) : base(configuration)
         {
         }
-
-        #endregion
-
-        #region Methods
 
         protected override void ConfigureAuth(IServiceCollection services)
         {
         }
 
-        protected override void ConfigureDb(IServiceCollection services)
+        protected override void ConfigureStorage(IServiceCollection services)
         {
-            // Create a new service provider.
-            var serviceProvider = new ServiceCollection()
-                .AddEntityFrameworkSqlite()
-                .BuildServiceProvider();
-
-            // Add a database context (MappingContext) using an in-memory 
-            // database for testing.
-            services.AddDbContext<WorldMapDBContext>(options =>
-            {
-                options.UseSqlite(CreateInMemoryDatabase());
-                options.UseInternalServiceProvider(serviceProvider);
-            });
-
-            // Build the service provider.
-            var sp = services.BuildServiceProvider();
-
-            // Create a scope to obtain a reference to the database
-            // and other services
-            using var scope = sp.CreateScope();
-
-            // Get a handle to the service provider
-            var scopedServices = scope.ServiceProvider;
-
-            // Get a handle to the database service
-            var databaseService = scopedServices.GetRequiredService<WorldMapDBContext>();
-            databaseService.Database.Migrate();
+            services.AddSingleton<IBlobStorageService, MockBlobStorageService>();
+            services.AddSingleton<ITableStorageService, MockTableStorageService>();
+            services.AddSingleton<IHostedService, MockTileCreationService>();
         }
-
-        /// <summary>
-        ///     Creates the in memory database.
-        /// </summary>
-        /// <returns>System.Data.Common.DbConnection.</returns>
-        private DbConnection CreateInMemoryDatabase()
-        {
-            var cxn = new SqliteConnection("Filename=:memory:");
-            cxn.Open();
-
-            //var cmd = cxn.CreateCommand();
-            //cmd.CommandText = @"
-            //    CREATE TABLE ""__EFMigrationsHistory"" (
-            //        ""MigrationId"" TEXT NOT NULL CONSTRAINT ""PK___EFMigrationsHistory"" PRIMARY KEY,
-            //        ""ProductVersion"" TEXT NOT NULL
-            //    )";
-            //cmd.ExecuteNonQuery();
-
-            return cxn;
-        }
-
-        #endregion
     }
 }

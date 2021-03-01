@@ -45,13 +45,6 @@ namespace CampaignKit.WorldMap.Tests.IntegrationTests
         }
 
         [Fact]
-        public void TestDatabase()
-        {
-            // Is the database accessible?
-            Assert.True(_testFixture.DatabaseService.Database.CanConnect());
-        }
-
-        [Fact]
         public async Task TestWebServer()
         {
             // Is the application home page available

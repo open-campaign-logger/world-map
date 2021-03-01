@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2020 Jochen Linnemann, Cory Gill
+﻿// <copyright file="TestStartupAuth.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,23 +12,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
     public class TestStartupAuth : TestStartupNoAuth
     {
-        #region Constructors
-
-        public TestStartupAuth(IWebHostEnvironment env) : base(env)
+        public TestStartupAuth(IConfiguration configuration) : base(configuration)
         {
         }
-
-        #endregion
-
-        #region Methods
 
         protected override void ConfigureAuth(IServiceCollection services)
         {
@@ -38,7 +34,5 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
                 options.DefaultChallengeScheme = "Test Scheme";
             }).AddTestAuth(o => { });
         }
-
-        #endregion
     }
 }
