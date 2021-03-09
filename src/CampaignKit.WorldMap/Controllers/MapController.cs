@@ -172,11 +172,11 @@ namespace CampaignKit.WorldMap.Controllers
         }
 
         /// <summary>
-        ///     GET: /Map/Delete/{id?}.
+        ///     GET: /Map/Delete/{id}.
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Delete view displaying confirmation popup.</returns>
-        [HttpGet("Delete/{id?}")]
+        [HttpGet("Delete/{id}")]
         [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
@@ -188,12 +188,12 @@ namespace CampaignKit.WorldMap.Controllers
         }
 
         /// <summary>
-        ///     POST: /Map/Delete/{id?}.
+        ///     POST: /Map/Delete/{id}.
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <param name="model">Unused.</param>
         /// <returns>Redirect to home view.</returns>
-        [HttpPost("Delete/{id?}")]
+        [HttpPost("Delete/{id}")]
         [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id, MapDeleteViewModel model)
@@ -221,11 +221,11 @@ namespace CampaignKit.WorldMap.Controllers
         }
 
         /// <summary>
-        ///     GET: /Map/Edit/{id?}.
+        ///     GET: /Map/Edit/{id}.
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Map edit view for the specified map.</returns>
-        [HttpGet("Edit/{id?}")]
+        [HttpGet("Edit/{id}")]
         [Authorize]
         public async Task<IActionResult> Edit(string id)
         {
@@ -256,12 +256,12 @@ namespace CampaignKit.WorldMap.Controllers
         }
 
         /// <summary>
-        ///     POST: /Map/Edit/{id?}.
+        ///     POST: /Map/Edit/{id}.
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <param name="model">The model.</param>
         /// <returns>Map show view.</returns>
-        [HttpPost("Edit/{id?}")]
+        [HttpPost("Edit/{id}")]
         [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, MapEditViewModel model)
@@ -320,11 +320,11 @@ namespace CampaignKit.WorldMap.Controllers
         }
 
         /// <summary>
-        ///     GET: /Map/Progress/{id?}.
+        ///     GET: /Map/Progress/{id}.
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Tile creation progress for map in JSON format.</returns>
-        [HttpGet("Progress/{id?}")]
+        [HttpGet("Progress/{id}")]
         [Authorize]
         public async Task<IActionResult> Progress(string id)
         {
@@ -361,13 +361,13 @@ namespace CampaignKit.WorldMap.Controllers
         }
 
         /// <summary>
-        ///     GET: /Map/Show/{id?}.
+        ///     GET: /Map/Show/{id}.
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <param name="share">The share key.</param>
         /// <param name="showProgress">if set to <c>true</c> [show progress].</param>
         /// <returns>The selected map.</returns>
-        [HttpGet("Show/{id?}")]
+        [HttpGet("Show/{id}")]
         public async Task<IActionResult> Show(string id, string share = null, bool showProgress = false)
         {
             // Determine if user can view map
@@ -407,12 +407,12 @@ namespace CampaignKit.WorldMap.Controllers
         }
 
         /// <summary>
-        ///     GET: /Map/MarkerData/{id?}.
+        ///     GET: /Map/MarkerData/{id}.
         /// </summary>
         /// <param name="id">The map identifier.</param>
         /// <param name="shareKey">The map's shareKey.</param>
         /// <returns>The map's marker data in JSON format.</returns>
-        [HttpGet("MarkerData/{id?}")]
+        [HttpGet("MarkerData/{id}")]
         public async Task<IActionResult> MarkerData(string id, string shareKey)
         {
             // Determine if user can view map
@@ -440,7 +440,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// </summary>
         /// <param name="model">Map marker data.</param>
         /// <returns>Response JSON.</returns>
-        [HttpPost("MarkerData/{MapId?}")]
+        [HttpPost("MarkerData/{MapId}")]
         [Authorize]
         public async Task<IActionResult> MarkerData([FromBody] MarkerEditViewModel model)
         {
