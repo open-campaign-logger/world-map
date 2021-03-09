@@ -35,12 +35,12 @@ namespace CampaignKit.WorldMap.Services
         /// <summary>
         /// The application configuration.
         /// </summary>
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger loggerService;
+        private readonly ILogger _loggerService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTableStorageService"/> class.
@@ -49,8 +49,8 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="loggerService">The logger service.</param>
         public DefaultTableStorageService(IConfiguration configuration, ILogger<DefaultTableStorageService> loggerService)
         {
-            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this._loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -94,7 +94,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to create map record: {0}", ex.Message);
+                this._loggerService.LogError("Unable to create map record: {0}", ex.Message);
                 return null;
             }
         }
@@ -117,7 +117,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -134,7 +134,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to create tile record: {0}", ex.Message);
+                this._loggerService.LogError("Unable to create tile record: {0}", ex.Message);
                 return null;
             }
         }
@@ -151,7 +151,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -172,7 +172,7 @@ namespace CampaignKit.WorldMap.Services
                 }
 
                 // Connect to the worlmapmaps table.
-                cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
+                cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageMaps");
                 cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
                 cloudTable = cloudTableClient.GetTableReference("worldmapmaps");
@@ -185,7 +185,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to delete map and tile records: {0}", ex.Message);
+                this._loggerService.LogError("Unable to delete map and tile records: {0}", ex.Message);
                 return false;
             }
         }
@@ -202,7 +202,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -217,7 +217,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to delete tile record: {0}", ex.Message);
+                this._loggerService.LogError("Unable to delete tile record: {0}", ex.Message);
                 return false;
             }
         }
@@ -282,7 +282,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -299,7 +299,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to update map record: {0}", ex.Message);
+                this._loggerService.LogError("Unable to update map record: {0}", ex.Message);
                 return false;
             }
         }
@@ -316,7 +316,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -333,7 +333,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to update tile record: {0}", ex.Message);
+                this._loggerService.LogError("Unable to update tile record: {0}", ex.Message);
                 return false;
             }
         }
@@ -350,7 +350,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -370,7 +370,7 @@ namespace CampaignKit.WorldMap.Services
                 var map = mapList.First();
 
                 // Query the tile records
-                cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
+                cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageTiles");
                 cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
                 cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
@@ -383,7 +383,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to retrieve map and tile records : {0}", ex.Message);
+                this._loggerService.LogError("Unable to retrieve map and tile records : {0}", ex.Message);
                 return null;
             }
         }
@@ -401,7 +401,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -428,7 +428,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to retrieve maps for user: {0}", ex.Message);
+                this._loggerService.LogError("Unable to retrieve maps for user: {0}", ex.Message);
                 return null;
             }
         }
@@ -445,7 +445,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -466,7 +466,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to retrieve tile records: {0}", ex.Message);
+                this._loggerService.LogError("Unable to retrieve tile records: {0}", ex.Message);
                 return null;
             }
         }
@@ -482,7 +482,7 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = this.configuration.GetConnectionString("AzureTableStorageTiles");
+                var cloudStorageConnectionString = this._configuration.GetConnectionString("AzureTableStorageTiles");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -503,7 +503,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (StorageException ex)
             {
-                this.loggerService.LogError("Unable to retrieve tile records: {0}", ex.Message);
+                this._loggerService.LogError("Unable to retrieve tile records: {0}", ex.Message);
                 return null;
             }
         }

@@ -36,12 +36,12 @@ namespace CampaignKit.WorldMap.Services
         /// <summary>
         /// The application configuration.
         /// </summary>
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger loggerService;
+        private readonly ILogger _loggerService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultRandomDataService"/> class.
@@ -50,8 +50,8 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="loggerService">The logger service.</param>
         public DefaultRandomDataService(IConfiguration configuration, ILogger<DefaultRandomDataService> loggerService)
         {
-            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this._loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
         /// <inheritdoc />

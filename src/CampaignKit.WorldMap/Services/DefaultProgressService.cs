@@ -33,17 +33,17 @@ namespace CampaignKit.WorldMap.Services
         /// <summary>
         /// The table storage service.
         /// </summary>
-        private readonly ITableStorageService tableStorageService;
+        private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
         /// The application configuration.
         /// </summary>
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger loggerService;
+        private readonly ILogger _loggerService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultProgressService"/> class.
@@ -53,9 +53,9 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="loggerService">The logger service.</param>
         public DefaultProgressService(IConfiguration configuration, ITableStorageService tableStorageService, ILogger<DefaultProgressService> loggerService)
         {
-            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
-            this.loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this._tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            this._loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace CampaignKit.WorldMap.Services
             var progress = 0D;
 
             // Find tiles related to this map
-            var map = await this.tableStorageService.GetMapRecordAsync(mapId);
+            var map = await this._tableStorageService.GetMapRecordAsync(mapId);
             var total = map.Tiles.Count();
             var completed = map.Tiles.Where(t => t.IsRendered == true).Count();
 

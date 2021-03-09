@@ -41,27 +41,27 @@ namespace CampaignKit.WorldMap.Controllers
         /// <summary>
         /// The application configuration.
         /// </summary>
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger loggerService;
+        private readonly ILogger _loggerService;
 
         /// <summary>
         ///     The EntityFramework repository for Map data elements.
         /// </summary>
-        private readonly IMapRepository mapRepository;
+        private readonly IMapRepository _mapRepository;
 
         /// <summary>
         ///     The progress service.
         /// </summary>
-        private readonly IProgressService progressService;
+        private readonly IProgressService _progressService;
 
         /// <summary>
         ///     The random data service.
         /// </summary>
-        private readonly IRandomDataService randomDataService;
+        private readonly IRandomDataService _randomDataService;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="MapController" /> class.
@@ -78,11 +78,11 @@ namespace CampaignKit.WorldMap.Controllers
             IMapRepository mapRepository,
             IProgressService progressService)
         {
-            this.configuration = configuration;
-            this.loggerService = loggerService;
-            this.randomDataService = randomDataService;
-            this.mapRepository = mapRepository;
-            this.progressService = progressService;
+            this._configuration = configuration;
+            this._loggerService = loggerService;
+            this._randomDataService = randomDataService;
+            this._mapRepository = mapRepository;
+            this._progressService = progressService;
         }
 
         /// <summary>
@@ -93,9 +93,9 @@ namespace CampaignKit.WorldMap.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            this.loggerService.LogDebug("Enter GET Map/Create");
+            this._loggerService.LogDebug("Enter GET Map/Create");
 
-            var model = new MapCreateViewModel { Share = this.randomDataService.GetRandomText(8) };
+            var model = new MapCreateViewModel { Share = this._randomDataService.GetRandomText(8) };
             return this.View(model);
         }
 
@@ -109,7 +109,7 @@ namespace CampaignKit.WorldMap.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MapCreateViewModel model)
         {
-            this.loggerService.LogDebug("Enter POST Map/Create");
+            this._loggerService.LogDebug("Enter POST Map/Create");
 
             if (!this.ModelState.IsValid)
             {
@@ -156,7 +156,7 @@ namespace CampaignKit.WorldMap.Controllers
                 MarkerData = string.Empty,
             };
 
-            var id = await this.mapRepository.Create(map, model.Image.OpenReadStream(), this.User);
+            var id = await this._mapRepository.Create(map, model.Image.OpenReadStream(), this.User);
             if (id is null)
             {
                 this.ModelState.AddModelError(
@@ -180,7 +180,7 @@ namespace CampaignKit.WorldMap.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
-            var model = await this.mapRepository.Find(id, this.User, string.Empty);
+            var model = await this._mapRepository.Find(id, this.User, string.Empty);
 
             return model == null
                 ? this.DeleteErrorView()
@@ -203,7 +203,7 @@ namespace CampaignKit.WorldMap.Controllers
                 return this.View();
             }
 
-            var map = await this.mapRepository.Delete(id, this.User);
+            var map = await this._mapRepository.Delete(id, this.User);
 
             if (!map)
             {
@@ -213,7 +213,7 @@ namespace CampaignKit.WorldMap.Controllers
             }
             else
             {
-                await this.mapRepository.Delete(id, this.User);
+                await this._mapRepository.Delete(id, this.User);
                 return this.RedirectToAction(nameof(this.Index));
             }
 
@@ -230,14 +230,14 @@ namespace CampaignKit.WorldMap.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             // Determine if user has rights to edit this map
-            var canEdit = await this.mapRepository.CanEdit(id, this.User);
+            var canEdit = await this._mapRepository.CanEdit(id, this.User);
             if (!canEdit)
             {
                 return this.EditErrorView();
             }
 
             // Load model
-            var map = await this.mapRepository.Find(id, this.User, string.Empty);
+            var map = await this._mapRepository.Find(id, this.User, string.Empty);
             if (map == null)
             {
                 return this.EditErrorView();
@@ -273,14 +273,14 @@ namespace CampaignKit.WorldMap.Controllers
             }
 
             // Determine if user has rights to edit this map
-            var canEdit = await this.mapRepository.CanEdit(id, this.User);
+            var canEdit = await this._mapRepository.CanEdit(id, this.User);
             if (!canEdit)
             {
                 return this.EditErrorView();
             }
 
             // Load model
-            var map = await this.mapRepository.Find(id, this.User, string.Empty);
+            var map = await this._mapRepository.Find(id, this.User, string.Empty);
             if (map == null)
             {
                 return this.EditErrorView();
@@ -291,7 +291,7 @@ namespace CampaignKit.WorldMap.Controllers
             map.RepeatMapInX = model.RepeatMapInX;
             map.IsPublic = model.MakeMapPublic;
 
-            var result = await this.mapRepository.Save(map, this.User);
+            var result = await this._mapRepository.Save(map, this.User);
             if (!result)
             {
                 this.ModelState.AddModelError(
@@ -314,7 +314,7 @@ namespace CampaignKit.WorldMap.Controllers
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            var model = await this.mapRepository.FindAll(this.User, true);
+            var model = await this._mapRepository.FindAll(this.User, true);
             model = model.OrderByDescending(m => m.CreationTimestamp);
             return this.View(model);
         }
@@ -328,7 +328,7 @@ namespace CampaignKit.WorldMap.Controllers
         [Authorize]
         public async Task<IActionResult> Progress(string id)
         {
-            var json = this.Json(new { Progress = await this.progressService.GetMapProgress(id) });
+            var json = this.Json(new { Progress = await this._progressService.GetMapProgress(id) });
             return json;
         }
 
@@ -339,7 +339,7 @@ namespace CampaignKit.WorldMap.Controllers
         [HttpGet("Sample")]
         public async Task<IActionResult> Sample()
         {
-            var map = await this.mapRepository.Find("sample", this.User, string.Empty);
+            var map = await this._mapRepository.Find("sample", this.User, string.Empty);
 
             if (map == null)
             {
@@ -371,17 +371,17 @@ namespace CampaignKit.WorldMap.Controllers
         public async Task<IActionResult> Show(string id, string share = null, bool showProgress = false)
         {
             // Determine if user can view map
-            var canView = await this.mapRepository.CanView(id, this.User, share);
+            var canView = await this._mapRepository.CanView(id, this.User, share);
             if (!canView)
             {
                 return this.ShowErrorView();
             }
 
             // Determine if user can edit map
-            var canEdit = await this.mapRepository.CanEdit(id, this.User);
+            var canEdit = await this._mapRepository.CanEdit(id, this.User);
 
             // Retrieve the map
-            var map = await this.mapRepository.Find(id, this.User, share);
+            var map = await this._mapRepository.Find(id, this.User, share);
 
             // Create a view model
             var protocol = this.Request.IsHttps ? "https" : "http";
@@ -400,7 +400,7 @@ namespace CampaignKit.WorldMap.Controllers
             };
 
             this.ViewBag.MaxZoomLevel = map.MaxZoomLevel;
-            this.ViewBag.WorldPath = $"{this.configuration.GetValue<string>("AzureBlobBaseURL")}/map{map.MapId}";
+            this.ViewBag.WorldPath = $"{this._configuration.GetValue<string>("AzureBlobBaseURL")}/map{map.MapId}";
             this.ViewBag.NoWrap = !map.RepeatMapInX;
 
             return this.View(model);
@@ -416,14 +416,14 @@ namespace CampaignKit.WorldMap.Controllers
         public async Task<IActionResult> MarkerData(string id, string shareKey)
         {
             // Determine if user can view map
-            var canView = await this.mapRepository.CanView(id, this.User, shareKey);
+            var canView = await this._mapRepository.CanView(id, this.User, shareKey);
             if (!canView)
             {
                 return this.ShowErrorView();
             }
 
             // Retrieve the map
-            var map = await this.mapRepository.Find(id, this.User, shareKey);
+            var map = await this._mapRepository.Find(id, this.User, shareKey);
 
             // Create response data
             var markerData = map.MarkerData;
@@ -445,24 +445,24 @@ namespace CampaignKit.WorldMap.Controllers
         public async Task<IActionResult> MarkerData([FromBody] MarkerEditViewModel model)
         {
             // Ensure that user has privileges to update map
-            var canEdit = await this.mapRepository.CanEdit(model.MapId, this.User);
+            var canEdit = await this._mapRepository.CanEdit(model.MapId, this.User);
             if (!canEdit)
             {
                 return this.Json("Not Authorized");
             }
 
             // Attempt to retrieve the map
-            var map = await this.mapRepository.Find(model.MapId, this.User, string.Empty);
+            var map = await this._mapRepository.Find(model.MapId, this.User, string.Empty);
             if (map == null)
             {
-                this.loggerService.LogDebug($"Map with id:{model.MapId} not found");
+                this._loggerService.LogDebug($"Map with id:{model.MapId} not found");
                 return this.Json("Failed to update marker");
             }
 
             // Update the map
             map.MarkerData = model.MarkerData;
 
-            await this.mapRepository.Save(map, this.User);
+            await this._mapRepository.Save(map, this.User);
 
             return this.Json("Success");
         }

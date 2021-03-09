@@ -36,7 +36,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// <summary>
         ///     The EntityFramework repository for Map data elements.
         /// </summary>
-        private readonly IMapRepository mapRepository;
+        private readonly IMapRepository _mapRepository;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="HomeController" /> class.
@@ -44,7 +44,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="mapDataService">The map data service.</param>
         public HomeController(IMapRepository mapDataService)
         {
-            this.mapRepository = mapDataService;
+            this._mapRepository = mapDataService;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace CampaignKit.WorldMap.Controllers
             // Retrieve a listing of maps for this user.
             // Anonymous User: all public maps
             // Authenticated User: all public and owned maps.
-            var model = (await this.mapRepository.FindAll(this.User, true))
+            var model = (await this._mapRepository.FindAll(this.User, true))
                 .Where(m => !m.MapId.Equals("sample"))
                 .OrderByDescending(m => m.CreationTimestamp)
                 .Take(3);
