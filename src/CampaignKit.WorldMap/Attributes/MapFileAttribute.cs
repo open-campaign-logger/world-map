@@ -14,14 +14,14 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.ComponentModel.DataAnnotations;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+
 namespace CampaignKit.WorldMap.Attributes
 {
-    using System;
-    using System.ComponentModel.DataAnnotations;
-
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-
     /// <summary>
     /// This custom validation attribute decorates a model field with the following jQuery validation attributes:
     ///

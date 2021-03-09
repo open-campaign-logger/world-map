@@ -14,21 +14,24 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
+using CampaignKit.WorldMap.Entities;
+using CampaignKit.WorldMap.Services;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
+
 namespace CampaignKit.WorldMap.Data
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Security.Claims;
-    using System.Threading.Tasks;
-    using CampaignKit.WorldMap.Entities;
-    using CampaignKit.WorldMap.Services;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-    using SixLabors.ImageSharp;
-    using SixLabors.ImageSharp.Formats.Png;
-    using SixLabors.ImageSharp.Processing;
-
     /// <summary>
     ///     Default implementation of the EntityFramework repository for Map data elements.
     /// </summary>

@@ -14,14 +14,12 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+
+using Microsoft.Azure.Cosmos.Table;
+
 namespace CampaignKit.WorldMap.Entities
 {
-    using System;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-
-    using Microsoft.Azure.Cosmos.Table;
-
     /// <summary>
     ///     Tile entity.
     /// </summary>

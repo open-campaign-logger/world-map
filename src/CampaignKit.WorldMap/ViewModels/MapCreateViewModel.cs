@@ -14,12 +14,14 @@
 // limitations under the License.
 // </copyright>
 
+using System.ComponentModel.DataAnnotations;
+
+using CampaignKit.WorldMap.Attributes;
+
+using Microsoft.AspNetCore.Http;
+
 namespace CampaignKit.WorldMap.ViewModels
 {
-    using System.ComponentModel.DataAnnotations;
-    using CampaignKit.WorldMap.Attributes;
-    using Microsoft.AspNetCore.Http;
-
     /// <summary>
     ///     Class MapCreateViewModel.
     /// </summary>

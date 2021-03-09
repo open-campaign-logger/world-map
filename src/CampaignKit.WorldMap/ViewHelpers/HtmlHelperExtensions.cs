@@ -14,13 +14,14 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.Linq.Expressions;
+
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+
 namespace CampaignKit.WorldMap.ViewHelpers
 {
-    using System;
-    using System.Linq.Expressions;
-    using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.AspNetCore.Mvc.ViewFeatures;
-
     /// <summary>
     ///     Class HtmlHelperExtensions.
     /// </summary>

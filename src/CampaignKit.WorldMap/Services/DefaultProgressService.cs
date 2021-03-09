@@ -14,15 +14,15 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
 namespace CampaignKit.WorldMap.Services
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-
     /// <inheritdoc />
     /// <summary>
     ///     Class DefaultProgressService.

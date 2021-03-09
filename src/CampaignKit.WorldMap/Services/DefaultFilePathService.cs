@@ -14,14 +14,15 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.IO;
+
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
 namespace CampaignKit.WorldMap.Services
 {
-    using System;
-    using System.IO;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-
     /// <summary>
     /// The default file path service.
     /// </summary>

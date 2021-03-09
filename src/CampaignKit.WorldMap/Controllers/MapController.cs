@@ -14,20 +14,22 @@
 // limitations under the License.
 // </copyright>
 
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
+using CampaignKit.WorldMap.Data;
+using CampaignKit.WorldMap.Entities;
+using CampaignKit.WorldMap.Services;
+using CampaignKit.WorldMap.ViewModels;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
 namespace CampaignKit.WorldMap.Controllers
 {
-    using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using CampaignKit.WorldMap.Data;
-    using CampaignKit.WorldMap.Entities;
-    using CampaignKit.WorldMap.Services;
-    using CampaignKit.WorldMap.ViewModels;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-
     /// <inheritdoc />
     /// <summary>
     ///     Map MVC controller for application.

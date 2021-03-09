@@ -14,13 +14,14 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+
+using Microsoft.Azure.Cosmos.Table;
+
 namespace CampaignKit.WorldMap.Entities
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using Microsoft.Azure.Cosmos.Table;
-
     /// <summary>Map Entity.</summary>
     public class Map : TableEntity
     {

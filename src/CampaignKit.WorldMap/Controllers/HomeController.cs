@@ -14,14 +14,16 @@
 // limitations under the License.
 // </copyright>
 
+using System.Linq;
+using System.Threading.Tasks;
+
+using CampaignKit.WorldMap.Data;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 namespace CampaignKit.WorldMap.Controllers
 {
-    using System.Linq;
-    using System.Threading.Tasks;
-    using CampaignKit.WorldMap.Data;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-
     /// <inheritdoc />
     /// <summary>
     ///     Main MVC controller for application.

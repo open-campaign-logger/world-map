@@ -14,18 +14,18 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.IO;
+using System.Threading.Tasks;
+
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
 namespace CampaignKit.WorldMap.Services
 {
-    using System;
-    using System.IO;
-    using System.Threading.Tasks;
-
-    using Azure.Storage.Blobs;
-    using Azure.Storage.Blobs.Models;
-
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-
     /// <summary>
     /// Default Blob storage service.
     /// </summary>

@@ -14,15 +14,15 @@
 // limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
+using CampaignKit.WorldMap.Entities;
+
 namespace CampaignKit.WorldMap.Data
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Security.Claims;
-    using System.Threading.Tasks;
-
-    using CampaignKit.WorldMap.Entities;
-
     /// <summary>
     ///     EntityFramework interface for <c>Map</c> data elements.
     /// </summary>

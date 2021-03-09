@@ -14,10 +14,10 @@
 // limitations under the License.
 // </copyright>
 
+using Microsoft.AspNetCore.Mvc;
+
 namespace CampaignKit.WorldMap.ViewModels
 {
-    using Microsoft.AspNetCore.Mvc;
-
     /// <summary>
     ///     Class MapDeleteViewModel.
     /// </summary>
