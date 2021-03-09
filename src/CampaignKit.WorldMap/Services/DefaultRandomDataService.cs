@@ -36,9 +36,7 @@ namespace CampaignKit.WorldMap.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultRandomDataService"/> class.
         /// </summary>
-        /// <param name="configuration">The application configuration.</param>
-        /// <param name="loggerService">The logger service.</param>
-        public DefaultRandomDataService(IConfiguration configuration, ILogger<DefaultRandomDataService> loggerService)
+        public DefaultRandomDataService()
         {
         }
 
