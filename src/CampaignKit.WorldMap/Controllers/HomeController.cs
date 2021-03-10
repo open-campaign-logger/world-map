@@ -44,7 +44,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// <param name="mapDataService">The map data service.</param>
         public HomeController(IMapRepository mapDataService)
         {
-            this._mapRepository = mapDataService;
+            _mapRepository = mapDataService;
         }
 
         /// <summary>
@@ -58,12 +58,12 @@ namespace CampaignKit.WorldMap.Controllers
             // Retrieve a listing of maps for this user.
             // Anonymous User: all public maps
             // Authenticated User: all public and owned maps.
-            var model = (await this._mapRepository.FindAll(this.User, true))
+            var model = (await _mapRepository.FindAll(User, true))
                 .Where(m => !m.MapId.Equals("sample"))
                 .OrderByDescending(m => m.CreationTimestamp)
                 .Take(3);
 
-            return this.View(model);
+            return View(model);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace CampaignKit.WorldMap.Controllers
         [Authorize]
         public ActionResult JwtCookie()
         {
-            return this.View();
+            return View();
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace CampaignKit.WorldMap.Controllers
         [HttpGet("Legalities")]
         public ActionResult Legalities()
         {
-            return this.View();
+            return View();
         }
     }
 }

@@ -49,8 +49,8 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="loggerService">The logger service.</param>
         public DefaultBlobStorageService(IConfiguration configuration, ILogger<DefaultBlobStorageService> loggerService)
         {
-            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this._loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace CampaignKit.WorldMap.Services
         public async Task<bool> CreateBlobAsync(string folderName, string blobName, byte[] blob)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(this._configuration.GetConnectionString("AzureBlobStorage"));
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
 
             // Create the container and return a container client object
             try
@@ -79,7 +79,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this._loggerService.LogError("Unable to create blob: {0}/{1}.  Error message: {2}.", folderName, blobName, ex.Message);
+                _loggerService.LogError("Unable to create blob: {0}/{1}.  Error message: {2}.", folderName, blobName, ex.Message);
                 return false;
             }
 
@@ -97,7 +97,7 @@ namespace CampaignKit.WorldMap.Services
         public async Task<byte[]> ReadBlobAsync(string folderName, string blobName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(this._configuration.GetConnectionString("AzureBlobStorage"));
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
 
             // Create the container and return a container client object
             try
@@ -112,7 +112,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this._loggerService.LogError("Unable to read blob: {0}/{1}.  Error message: {2}.", folderName, blobName, ex.Message);
+                _loggerService.LogError("Unable to read blob: {0}/{1}.  Error message: {2}.", folderName, blobName, ex.Message);
                 return null;
             }
         }
@@ -127,7 +127,7 @@ namespace CampaignKit.WorldMap.Services
         public async Task<bool> DeleteFolderAsync(string folderName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            var blobServiceClient = new BlobServiceClient(this._configuration.GetConnectionString("AzureBlobStorage"));
+            var blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
 
             // Create the container and return a container client object
             try
@@ -148,7 +148,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this._loggerService.LogError("Unable to delete Azure container: {0}.  Error message: {1}.", folderName, ex.Message);
+                _loggerService.LogError("Unable to delete Azure container: {0}.  Error message: {1}.", folderName, ex.Message);
                 return false;
             }
 
@@ -165,7 +165,7 @@ namespace CampaignKit.WorldMap.Services
         public async Task<bool> FolderExistsAsync(string folderName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(this._configuration.GetConnectionString("AzureBlobStorage"));
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
 
             // Create the container and return a container client object
             try
@@ -176,7 +176,7 @@ namespace CampaignKit.WorldMap.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                this._loggerService.LogError("Unable to create Azure container: {0}.  Error message: {1}.", folderName, ex.Message);
+                _loggerService.LogError("Unable to create Azure container: {0}.  Error message: {1}.", folderName, ex.Message);
                 return false;
             }
         }

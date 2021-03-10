@@ -35,7 +35,7 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="env">The env.</param>
         public DefaultFilePathService(IWebHostEnvironment env)
         {
-            this.AppDataPath = Path.Combine(env.ContentRootPath, "App_Data");
+            AppDataPath = Path.Combine(env.ContentRootPath, "App_Data");
         }
 
         /// <inheritdoc />

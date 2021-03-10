@@ -53,9 +53,9 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="loggerService">The logger service.</param>
         public DefaultProgressService(IConfiguration configuration, ITableStorageService tableStorageService, ILogger<DefaultProgressService> loggerService)
         {
-            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this._tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
-            this._loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace CampaignKit.WorldMap.Services
             var progress = 0D;
 
             // Find tiles related to this map
-            var map = await this._tableStorageService.GetMapRecordAsync(mapId);
+            var map = await _tableStorageService.GetMapRecordAsync(mapId);
             var total = map.Tiles.Count();
             var completed = map.Tiles.Where(t => t.IsRendered == true).Count();
 

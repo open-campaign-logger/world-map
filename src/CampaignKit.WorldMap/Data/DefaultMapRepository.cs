@@ -87,12 +87,12 @@ namespace CampaignKit.WorldMap.Data
             IBlobStorageService blobStorageService,
             IFilePathService filePathService)
         {
-            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this._loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
-            this._tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
-            this._userManagerService = userManagerService ?? throw new ArgumentNullException(nameof(userManagerService));
-            this._blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
-            this._filePathService = filePathService ?? throw new ArgumentNullException(nameof(filePathService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            _userManagerService = userManagerService ?? throw new ArgumentNullException(nameof(userManagerService));
+            _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
+            _filePathService = filePathService ?? throw new ArgumentNullException(nameof(filePathService));
         }
 
         /// <summary>
@@ -108,26 +108,26 @@ namespace CampaignKit.WorldMap.Data
         public async Task<bool> Delete(string mapId, ClaimsPrincipal user)
         {
             // Ensure user is authenticated
-            var userId = this._userManagerService.GetUserId(user);
+            var userId = _userManagerService.GetUserId(user);
             if (userId == null)
             {
-                this._loggerService.LogError("Database operation prohibited for non-authenticated user");
+                _loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return false;
             }
 
             // Determine if this map exists
-            var map = await this._tableStorageService.GetMapRecordAsync(mapId);
+            var map = await _tableStorageService.GetMapRecordAsync(mapId);
             if (map == null)
             {
-                this._loggerService.LogError($"Map with id:{mapId} not found");
+                _loggerService.LogError($"Map with id:{mapId} not found");
                 return false;
             }
 
             // Remove the map from the context.
-            await this._tableStorageService.DeleteMapRecordAsync(map);
+            await _tableStorageService.DeleteMapRecordAsync(map);
 
             // Delete map directory and files
-            await this._blobStorageService.DeleteFolderAsync($"map{map.MapId}");
+            await _blobStorageService.DeleteFolderAsync($"map{map.MapId}");
 
             // Return result
             return true;
@@ -147,22 +147,22 @@ namespace CampaignKit.WorldMap.Data
         public async Task<Map> Find(string mapId, ClaimsPrincipal user, string shareKey)
         {
             // Retrieve the map entry and any associated markers.
-            var map = await this._tableStorageService.GetMapRecordAsync(mapId);
+            var map = await _tableStorageService.GetMapRecordAsync(mapId);
 
             // Ensure map has been found
             if (map == null)
             {
-                this._loggerService.LogError($"Map with id:{mapId} not found");
+                _loggerService.LogError($"Map with id:{mapId} not found");
                 return null;
             }
 
             // If the map is not public ensure user has rights to it
             if (!map.IsPublic)
             {
-                var userid = this._userManagerService.GetUserId(user);
+                var userid = _userManagerService.GetUserId(user);
                 if (!map.UserId.Equals(userid) && !map.ShareKey.Equals(shareKey))
                 {
-                    this._loggerService.LogError($"User not authorized to access map with id:{mapId}.");
+                    _loggerService.LogError($"User not authorized to access map with id:{mapId}.");
                     return null;
                 }
             }
@@ -180,8 +180,8 @@ namespace CampaignKit.WorldMap.Data
         /// <returns>IEnumerable&lt;Map&gt;.</returns>
         public async Task<IEnumerable<Map>> FindAll(ClaimsPrincipal user, bool includePublic)
         {
-            var userId = this._userManagerService.GetUserId(user);
-            return await this._tableStorageService.GetMapRecordsForUserAsync(userId, includePublic);
+            var userId = _userManagerService.GetUserId(user);
+            return await _tableStorageService.GetMapRecordsForUserAsync(userId, includePublic);
         }
 
         /// <summary>
@@ -205,10 +205,10 @@ namespace CampaignKit.WorldMap.Data
             }
 
             // User must be authenticated
-            var userid = this._userManagerService.GetUserId(user);
+            var userid = _userManagerService.GetUserId(user);
             if (userid == null)
             {
-                this._loggerService.LogError("Database operation prohibited for non-authenticated user");
+                _loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return null;
             }
 
@@ -218,7 +218,7 @@ namespace CampaignKit.WorldMap.Data
             map.CreationTimestamp = DateTime.UtcNow;
             map.UpdateTimestamp = map.CreationTimestamp;
             map.UserId = userid;
-            await this._tableStorageService.CreateMapRecordAsync(map);
+            await _tableStorageService.CreateMapRecordAsync(map);
 
             // **********************
             //   Create Map Folder
@@ -234,7 +234,7 @@ namespace CampaignKit.WorldMap.Data
                 // Save original file.
                 stream.CopyTo(ms);
                 originalImageBlob = ms.ToArray();
-                await this._blobStorageService.CreateBlobAsync(folderName, $"original-file{map.FileExtension}", originalImageBlob);
+                await _blobStorageService.CreateBlobAsync(folderName, $"original-file{map.FileExtension}", originalImageBlob);
             }
 
             // ****************************
@@ -264,7 +264,7 @@ namespace CampaignKit.WorldMap.Data
             {
                 masterImage.Save(ms, new PngEncoder());
                 masterImageBlob = ms.ToArray();
-                await this._blobStorageService.CreateBlobAsync(folderName, "master-file.png", masterImageBlob);
+                await _blobStorageService.CreateBlobAsync(folderName, "master-file.png", masterImageBlob);
             }
 
             // ****************************
@@ -273,9 +273,9 @@ namespace CampaignKit.WorldMap.Data
             // Save png master file.
             map.MaxZoomLevel = adjustedMaxZoomLevel;
             map.AdjustedSize = adjustedLargestSize;
-            map.WorldFolderPath = $"{this._configuration.GetValue<string>("AzureBlobBaseURL")}/map{map.MapId}";
+            map.WorldFolderPath = $"{_configuration.GetValue<string>("AzureBlobBaseURL")}/map{map.MapId}";
             map.ThumbnailPath = $"{map.WorldFolderPath}/0_zoom-level.png";
-            await this._tableStorageService.UpdateMapRecordAsync(map);
+            await _tableStorageService.UpdateMapRecordAsync(map);
 
             // ****************************************
             //        Create Tile Entities
@@ -305,7 +305,7 @@ namespace CampaignKit.WorldMap.Data
                             Y = y,
                         };
                         map.Tiles.Add(tile);
-                        await this._tableStorageService.CreateTileRecordAsync(tile);
+                        await _tableStorageService.CreateTileRecordAsync(tile);
                     }
                 }
             }
@@ -324,21 +324,21 @@ namespace CampaignKit.WorldMap.Data
         public async Task<bool> Save(Map map, ClaimsPrincipal user)
         {
             // Ensure user is authenticated
-            var userid = this._userManagerService.GetUserId(user);
+            var userid = _userManagerService.GetUserId(user);
             if (userid == null)
             {
-                this._loggerService.LogError("Database operation prohibited for non-authenticated user");
+                _loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return false;
             }
 
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                this._loggerService.LogError($"User {userid} does not have rights to delete map with id:{map.MapId}.");
+                _loggerService.LogError($"User {userid} does not have rights to delete map with id:{map.MapId}.");
                 return false;
             }
 
-            await this._tableStorageService.UpdateMapRecordAsync(map);
+            await _tableStorageService.UpdateMapRecordAsync(map);
             return true;
         }
 
@@ -353,27 +353,27 @@ namespace CampaignKit.WorldMap.Data
         public async Task<bool> CanEdit(string mapId, ClaimsPrincipal user)
         {
             // Ensure user is authenticated
-            var userid = this._userManagerService.GetUserId(user);
+            var userid = _userManagerService.GetUserId(user);
             if (userid == null)
             {
-                this._loggerService.LogError("Database operation prohibited for non-authenticated user");
+                _loggerService.LogError("Database operation prohibited for non-authenticated user");
                 return false;
             }
 
             // Retrieve the map entry and any associated markers.
-            var map = await this._tableStorageService.GetMapRecordAsync(mapId);
+            var map = await _tableStorageService.GetMapRecordAsync(mapId);
 
             // Ensure map has been found
             if (map == null)
             {
-                this._loggerService.LogError($"Map with id:{mapId} not found");
+                _loggerService.LogError($"Map with id:{mapId} not found");
                 return false;
             }
 
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                this._loggerService.LogError($"User {userid} does not have rights to delete map with id:{mapId}.");
+                _loggerService.LogError($"User {userid} does not have rights to delete map with id:{mapId}.");
                 return false;
             }
 
@@ -388,12 +388,12 @@ namespace CampaignKit.WorldMap.Data
         public async Task<bool> CanView(string mapId, ClaimsPrincipal user, string shareKey)
         {
             // Retrieve the map entry and any associated markers.
-            var map = await this._tableStorageService.GetMapRecordAsync(mapId);
+            var map = await _tableStorageService.GetMapRecordAsync(mapId);
 
             // Ensure map has been found
             if (map == null)
             {
-                this._loggerService.LogError($"Map with id:{mapId} not found");
+                _loggerService.LogError($"Map with id:{mapId} not found");
                 return false;
             }
 
@@ -411,12 +411,12 @@ namespace CampaignKit.WorldMap.Data
             }
 
             // Determine if user is authenticated
-            var userid = this._userManagerService.GetUserId(user);
+            var userid = _userManagerService.GetUserId(user);
 
             // Determine if the user has rights to delete the map
             if (!map.UserId.Equals(userid))
             {
-                this._loggerService.LogError($"User {userid} does not have rights to delete map with id:{mapId}.");
+                _loggerService.LogError($"User {userid} does not have rights to delete map with id:{mapId}.");
                 return false;
             }
 
@@ -432,12 +432,12 @@ namespace CampaignKit.WorldMap.Data
         public async Task<bool> InitRepository()
         {
             // Ensure sample map has been created
-            var sampleMap = await this._tableStorageService.GetMapRecordAsync("sample");
+            var sampleMap = await _tableStorageService.GetMapRecordAsync("sample");
 
             if (sampleMap == null)
             {
-                var sampleImage = File.ReadAllBytes(Path.Combine(this._filePathService.AppDataPath, "Sample.png"));
-                var sampleJSON = File.ReadAllText(Path.Combine(this._filePathService.AppDataPath, "Sample.json"));
+                var sampleImage = File.ReadAllBytes(Path.Combine(_filePathService.AppDataPath, "Sample.png"));
+                var sampleJSON = File.ReadAllText(Path.Combine(_filePathService.AppDataPath, "Sample.json"));
                 var map = new Map()
                 {
                     Copyright = string.Empty,
@@ -450,7 +450,7 @@ namespace CampaignKit.WorldMap.Data
                 };
                 using (var ms = new MemoryStream(sampleImage))
                 {
-                    await this.Create(map, ms, this._userManagerService.GetSystemUser());
+                    await Create(map, ms, _userManagerService.GetSystemUser());
                 }
             }
 

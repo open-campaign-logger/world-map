@@ -46,8 +46,8 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="loggerService">The logger service.</param>
         public DefaultUserManagerService(IConfiguration configuration, ILogger<DefaultUserManagerService> loggerService)
         {
-            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this._loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
         /// <summary>

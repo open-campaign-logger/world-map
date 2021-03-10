@@ -61,9 +61,9 @@ namespace CampaignKit.WorldMap.Attributes
         public void AddValidation(ClientModelValidationContext context)
         {
             context.Attributes.Add("data-val", "true");
-            var maxMB = Math.Floor((double)this.MaxLength / 1024 / 1024);
+            var maxMB = Math.Floor((double)MaxLength / 1024 / 1024);
             context.Attributes.Add("data-val-mapfilesize", $"Invalid file size. File must be less that {maxMB} MB.");
-            context.Attributes.Add("data-val-mapfiletype", $"Invalid file type. File type must be one of the following: {this.Extensions}.");
+            context.Attributes.Add("data-val-mapfiletype", $"Invalid file type. File type must be one of the following: {Extensions}.");
         }
 
         /// <summary>
@@ -81,15 +81,15 @@ namespace CampaignKit.WorldMap.Attributes
             IFormFile file = (IFormFile)value;
 
             // Check file size
-            if (file.Length > this.MaxLength)
+            if (file.Length > MaxLength)
             {
-                var maxMB = Math.Floor((double)this.MaxLength / 1024 / 1024);
+                var maxMB = Math.Floor((double)MaxLength / 1024 / 1024);
 
                 return new ValidationResult($"Invalid file size. File must be less that {maxMB} MB.");
             }
 
             // Check file type
-            var extensionList = this.Extensions.Split(",");
+            var extensionList = Extensions.Split(",");
             var validExtension = false;
             foreach (string ext in extensionList)
             {
@@ -101,7 +101,7 @@ namespace CampaignKit.WorldMap.Attributes
 
             if (!validExtension)
             {
-                return new ValidationResult($"Invalid file type. File type must be one of the following: {this.Extensions}.");
+                return new ValidationResult($"Invalid file type. File type must be one of the following: {Extensions}.");
             }
 
             return ValidationResult.Success;

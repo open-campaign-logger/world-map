@@ -54,7 +54,7 @@ namespace CampaignKit.WorldMap.Services
             var sb = new StringBuilder();
             for (var i = 0; i < numberOfCharacters; i++)
             {
-                var next = this.rand.Next(characters.Length);
+                var next = rand.Next(characters.Length);
                 sb.Append(characters[next]);
             }
 

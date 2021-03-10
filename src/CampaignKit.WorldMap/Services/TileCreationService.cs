@@ -46,27 +46,27 @@ namespace CampaignKit.WorldMap.Services
         /// <summary>
         /// The application configuration.
         /// </summary>
-        private readonly IConfiguration configuration;
+        private readonly IConfiguration _configuration;
 
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger loggerService;
+        private readonly ILogger _loggerService;
 
         /// <summary>
         /// The service provider.
         /// </summary>
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// The BLOB storage service.
         /// </summary>
-        private readonly IBlobStorageService blobStorageService;
+        private readonly IBlobStorageService _blobStorageService;
 
         /// <summary>
         /// The table storage service.
         /// </summary>
-        private readonly ITableStorageService tableStorageService;
+        private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
         ///     The executing task.
@@ -83,11 +83,11 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="loggerService">The logger service.</param>
         public TileCreationService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, ILogger<TileCreationService> loggerService)
         {
-            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            this.loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
-            this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            this.blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
-            this.tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
+            _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
         }
 
         /// <summary>
@@ -98,13 +98,13 @@ namespace CampaignKit.WorldMap.Services
         public override Task StartAsync(CancellationToken cancellationToken)
         {
             // Store the task we're executing
-            this.executingTask = this.ExecuteAsync(this.stoppingCts.Token);
+            executingTask = ExecuteAsync(stoppingCts.Token);
 
             // If the task is completed then return it,
             // this will bubble cancellation and failure to the caller
-            if (this.executingTask.IsCompleted)
+            if (executingTask.IsCompleted)
             {
-                return this.executingTask;
+                return executingTask;
             }
 
             // Otherwise it's running
@@ -119,7 +119,7 @@ namespace CampaignKit.WorldMap.Services
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             // Stop called without start
-            if (this.executingTask == null)
+            if (executingTask == null)
             {
                 return;
             }
@@ -127,12 +127,12 @@ namespace CampaignKit.WorldMap.Services
             try
             {
                 // Signal cancellation to the executing method
-                this.stoppingCts.Cancel();
+                stoppingCts.Cancel();
             }
             finally
             {
                 // Wait until the task completes or the stop token triggers
-                await Task.WhenAny(this.executingTask, Task.Delay(
+                await Task.WhenAny(executingTask, Task.Delay(
                     Timeout.Infinite,
                     cancellationToken));
             }
@@ -148,7 +148,7 @@ namespace CampaignKit.WorldMap.Services
         {
             do
             {
-                await this.Process();
+                await Process();
 
                 await Task.Delay(5000, stoppingToken); // 5 seconds delay
             }
@@ -162,21 +162,21 @@ namespace CampaignKit.WorldMap.Services
         protected async Task<bool> Process()
         {
             // Query the tiles table to see if there are any unprocessed tiles.
-            var tiles = await this.tableStorageService.GetUnprocessedTileRecordsAsync();
+            var tiles = await _tableStorageService.GetUnprocessedTileRecordsAsync();
 
             if (tiles.Count > 0)
             {
-                this.loggerService.LogDebug("{0} tiles waiting to be processed.", tiles.Count);
+                _loggerService.LogDebug("{0} tiles waiting to be processed.", tiles.Count);
 
                 // Process each map with unprocessed tiles
                 var mapList = tiles.Select(o => o.MapId).Distinct();
                 foreach (var map in mapList)
                 {
-                    this.loggerService.LogDebug("Processing tiles for map: {0}.", map);
+                    _loggerService.LogDebug("Processing tiles for map: {0}.", map);
 
                     // Calculate Folder Paths for the Map
                     var folderName = $"map{map}";
-                    var masterBlob = await this.blobStorageService.ReadBlobAsync(folderName, "master-file.png");
+                    var masterBlob = await _blobStorageService.ReadBlobAsync(folderName, "master-file.png");
 
                     // Process each map zoom level with unprocessed tiles
                     var zoomList = tiles.Where(t => t.MapId == map).Select(o => o.ZoomLevel).Distinct();
@@ -192,9 +192,9 @@ namespace CampaignKit.WorldMap.Services
                         var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
 
                         // Create zoom level base file (sync)
-                        this.loggerService.LogDebug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
+                        _loggerService.LogDebug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
                         var zoomLevelBlob
-                            = await this.CreateZoomLevelBaseFile(
+                            = await CreateZoomLevelBaseFile(
                                 numberOfTilesPerDimension,
                                 masterBlob,
                                 zoomLevel,
@@ -210,8 +210,8 @@ namespace CampaignKit.WorldMap.Services
                         foreach (var tile in tilesToProcess)
                         {
                             var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
-                            this.loggerService.LogDebug("Creating zoom level tile: {0}.", blobName);
-                            tasks.Add(Task.Run(() => this.CreateZoomLevelTileFile(zoomLevelBlob, tile, folderName, blobName)));
+                            _loggerService.LogDebug("Creating zoom level tile: {0}.", blobName);
+                            tasks.Add(Task.Run(() => CreateZoomLevelTileFile(zoomLevelBlob, tile, folderName, blobName)));
                         }
 
                         // Wait for all tile creation tasks to complete
@@ -220,7 +220,7 @@ namespace CampaignKit.WorldMap.Services
                         // Delete processed tile records
                         foreach (var tile in tilesToProcess)
                         {
-                            await this.tableStorageService.DeleteTileRecordAsync(tile);
+                            await _tableStorageService.DeleteTileRecordAsync(tile);
                         }
                     }
                 }
@@ -256,7 +256,7 @@ namespace CampaignKit.WorldMap.Services
                 {
                     await masterBaseImage.SaveAsPngAsync(ms);
                     var blob = ms.ToArray();
-                    await this.blobStorageService.CreateBlobAsync(folderName, blobName, blob);
+                    await _blobStorageService.CreateBlobAsync(folderName, blobName, blob);
                     return blob;
                 }
             }
@@ -279,7 +279,7 @@ namespace CampaignKit.WorldMap.Services
                 using (var ms = new MemoryStream())
                 {
                     await zoomLevelImage.SaveAsPngAsync(ms);
-                    await this.blobStorageService.CreateBlobAsync(folderName, blobName, ms.ToArray());
+                    await _blobStorageService.CreateBlobAsync(folderName, blobName, ms.ToArray());
                 }
 
                 tile.IsRendered = true;

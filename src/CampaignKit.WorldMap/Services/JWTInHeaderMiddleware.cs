@@ -47,7 +47,7 @@ namespace CampaignKit.WorldMap.Services
     /// </summary>
     public class JWTInHeaderMiddleware
     {
-        private readonly RequestDelegate next;
+        private readonly RequestDelegate _next;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JWTInHeaderMiddleware"/> class.
@@ -55,7 +55,7 @@ namespace CampaignKit.WorldMap.Services
         /// <param name="next">The HTTP operation to invoke once this middleware component has had a chance to perform its functions.</param>
         public JWTInHeaderMiddleware(RequestDelegate next)
         {
-            this.next = next;
+            _next = next;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace CampaignKit.WorldMap.Services
                 }
             }
 
-            await this.next.Invoke(context);
+            await _next.Invoke(context);
         }
     }
 }
