@@ -41,9 +41,9 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 
         [Theory]
         [InlineData("/Map/Create")]
-        [InlineData("/Map/Delete")]
-        [InlineData("/Map/Edit")]
-        [InlineData("/Map/Progress")]
+        [InlineData("/Map/Delete/1")]
+        [InlineData("/Map/Edit/1")]
+        [InlineData("/Map/Progress/1")]
         public async Task TestAuthorizedGets(string page)
         {
             var response = await _testFixture.Client.GetAsync(page);

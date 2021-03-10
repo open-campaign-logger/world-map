@@ -216,13 +216,13 @@ namespace CampaignKit.WorldMap.Services
 
                         // Wait for all tile creation tasks to complete
                         var results = await Task.WhenAll(tasks);
-
-                        // Delete processed tile records
-                        foreach (var tile in tilesToProcess)
-                        {
-                            await _tableStorageService.DeleteTileRecordAsync(tile);
-                        }
                     }
+                }
+
+                // Delete all processed tile records
+                foreach (var tile in tiles)
+                {
+                    await _tableStorageService.DeleteTileRecordAsync(tile);
                 }
             }
 
@@ -283,6 +283,7 @@ namespace CampaignKit.WorldMap.Services
                 }
 
                 tile.IsRendered = true;
+                await _tableStorageService.UpdateTileRecordAsync(tile);
                 return true;
             }
         }
