@@ -34,7 +34,7 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
         [InlineData("/Map/Create")]
         [InlineData("/Map/Delete/1")]
         [InlineData("/Map/Edit/1")]
-        public async Task TestAuthorizedGetsWithForms(string page)
+        public async Task TestAuthorizedGetsWithAntiForgeryTokens(string page)
         {
             var token = await AntiForgeryHelper.EnsureAntiForgeryTokenAsync(_client, page);
             Assert.NotNull(token);
@@ -42,7 +42,7 @@ namespace CampaignKit.WorldMap.Tests.ControllerTests
 
         [Theory]
         [InlineData("/Map/Progress/1")]
-        public async Task TestAuthorizedGetsWithoutForms(string page)
+        public async Task TestAuthorizedGets(string page)
         {
             var response = await _client.GetAsync(page);
             response.EnsureSuccessStatusCode();

@@ -441,7 +441,7 @@ namespace CampaignKit.WorldMap.Controllers
         /// </summary>
         /// <param name="model">Map marker data.</param>
         /// <returns>Response JSON.</returns>
-        [HttpPost]
+        [HttpPost("MarkerData")]
         [Authorize]
         public async Task<IActionResult> MarkerData([FromBody] MarkerEditViewModel model)
         {
