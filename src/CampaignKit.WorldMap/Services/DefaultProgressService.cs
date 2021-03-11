@@ -71,17 +71,22 @@ namespace CampaignKit.WorldMap.Services
 
             // Find tiles related to this map
             var map = await _tableStorageService.GetMapRecordAsync(mapId);
-            var total = map.Tiles.Count();
-            var completed = map.Tiles.Where(t => t.IsRendered == true).Count();
 
-            // Are there tiles defined for this map?
-            if (total > 0)
+            // If map found calculate what percentage of files have been found.
+            if (map != null)
             {
-                progress = completed / (double)total;
-            }
-            else
-            {
-                progress = 1;
+                var total = map.Tiles.Count();
+                var completed = map.Tiles.Where(t => t.IsRendered == true).Count();
+
+                // Are there tiles defined for this map?
+                if (total > 0)
+                {
+                    progress = completed / (double)total;
+                }
+                else
+                {
+                    progress = 1;
+                }
             }
 
             // Return the progress value

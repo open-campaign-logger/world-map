@@ -38,7 +38,11 @@ namespace CampaignKit.WorldMap.Tests.MockServices
 
         public async Task<List<Map>> GetMapRecordsForUserAsync(string userId, bool includePublic)
         {
-            return await Task.Run(() => new List<Map>());
+            var userMapList = new List<Map>()
+            {
+                this.GetSampleMap(),
+            };
+            return await Task.Run(() => userMapList);
         }
 
         public Task<Tile> GetTileRecordAsync(string tileId)
@@ -65,6 +69,8 @@ namespace CampaignKit.WorldMap.Tests.MockServices
         {
             return new Map()
             {
+                PartitionKey = TestAuthenticationOptions.TEST_ID,
+                MapId = "sample",
                 AdjustedSize = 4000,
                 ContentType = "image/png",
                 Copyright = "Copyright 2017 Jochen Linnemann ",
