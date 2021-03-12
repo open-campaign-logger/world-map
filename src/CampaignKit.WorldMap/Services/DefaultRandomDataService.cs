@@ -14,13 +14,11 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+using System.Text;
+
 namespace CampaignKit.WorldMap.Services
 {
-    using System;
-    using System.Text;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-
     /// <inheritdoc />
     /// <summary>
     ///     Class DefaultRandomDataService.
