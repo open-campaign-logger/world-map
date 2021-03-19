@@ -2,61 +2,79 @@
 
 Service for managing world maps and associate them with Campaign Logger log entries.
 
-## upload and automatic tile creation
-
 # Development Environment
 
-## .Net SDK
-.Net Core 2.2 SDK: https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral
+## SDKs
+- [.Net 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
 
-## Git
-- Git for Windows 2.20: https://gitforwindows.org/
-	- Uncheked "Windows Explorer Integration"
-	- "Use Notepad++ ad Git's default editor"
-	- Checkout as-is, commit as-is
-- Tortoise Git (Recommended): https://tortoisegit.org/download/
+## Azure Tools
+- [Microsoft Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
+- [Microsoft Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
 
 ## Visual Studio
-- VS2017 Community
-- ASP.NET and web development workload
-- .Net Core cross-platform development
+- [VS2019 Community](https://visualstudio.microsoft.com/downloads/)
+- Workloads
+  - ASP.NET and web development
+  - .Net Core cross-platform development
+  - Node.js development
 
 ## Visual Studio Extensions
-- GhostDoc: https://marketplace.visualstudio.com/items?itemName=sergeb.GhostDoc
-- GitHub Extension for VisualStudio: https://visualstudio.github.com/
-- GitFlow Extension for VisualStudio: https://marketplace.visualstudio.com/items?itemName=vs-publisher-57624.GitFlowforVisualStudio2017
-- Sqlite/SQL Server Compact Toolbox: https://marketplace.visualstudio.com/items?itemName=ErikEJ.SQLServerCompactSQLiteToolbox
+- [Markdown Editor](https://marketplace.visualstudio.com/items?itemName=ChrisDahlberg.StyleCop)
+- [GhostDoc](https://marketplace.visualstudio.com/items?itemName=sergeb.GhostDoc)
+- [GitFlow](https://marketplace.visualstudio.com/items?itemName=vs-publisher-57624.GitFlowforVisualStudio2019)
+- [GitHub](https://marketplace.visualstudio.com/items?itemName=GitHub.GitHubExtensionforVisualStudio)
+- [Web Compiler](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.WebCompiler)
 
-## git
+## Node and NPM
+- [NodeJS](https://nodejs.org/en/download/)
 
-- Git for Windows 2.20
+## Azure Storage Emulator
+The Azure Storage Emulator is used by the application to simulate reading/writing from Azure storage in the local environment.  See: [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
 
-## npm/gulp Reference Material
+Setting up blob containers and tables.
+![Azure Storage Emulator](./AzureStorageEmulator.png)
 
-- Using gulp and npm in VisualStudio: https://blog.bitscry.com/2018/03/13/using-npm-and-gulp-in-visual-studio-2017/
-	- note: install Node.js which will install npm 
-	- Working with npm behind a proxy: https://superuser.com/questions/347476/how-to-install-npm-behind-authentication-proxy-on-windows
+Enabling public access to blobs.
+![Azure Blob Public Access Level](AzureBlobPublicAccessLevel.png)
 
-## OpenID Connect Reference Material
+## Connection Strings
+- Connection strings in `appsettings.Development.json` can be overwritten locally for testing against other sources.  Use the .Net Core User Secrets manager to make these overrides. See: [Working with User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=windows).
+- To setup connection string overrides locally:
+  - Open **Tools > NuGet Package Manager > NuGet Package Manager Console**
+  - `cd src\CampaignKit.WorldMap`
+  - `dotnet user-secrets init`
+  - `dotnet user-secrets set "ConnectionStrings:AzureBlobStorage" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageMaps" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageTiles" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "AzureBlobBaseURL" "<YOUR CUSTOM AZURE BLOB BASE URL>"`
+- To convert an Azure SAS URI into a connection string:
+  - Your URI will have the following format: `https://<ACCOUNT>.<blob/table>.core.windows.net/<RESOURCE>?<SAS String>`
+  - Reformat it as follows: `<BlobEndpoint\TableEndpoint>=https://<ACCOUNT>.<blob/table>.core.windows.net;SharedAccessSignature=<SAS String>`
+  - Note that the `<RESOURCE>` and `?` elements were dropped.
 
-- OpenID Connect JavaScript Client library: https://github.com/IdentityModel/oidc-client-js
-- Using JWT and Asp.Net Core Cookies: https://amanagrawal.blog/2017/09/18/jwt-token-authentication-with-cookies-in-asp-net-core/
-- IdentityServer4 Examples: https://github.com/IdentityServer/IdentityServer4.Samples
-- IdentityServer4 QuickStart - Adding User Authentication with OpenID Connect: http://docs.identityserver.io/en/latest/quickstarts/3_interactive_login.html
-- IdentityServer4 JavaScript Client Quickstart - http://docs.identityserver.io/en/latest/quickstarts/6_javascript_client.html
-- Configuring App to Recognize JWT authorization tokens - https://developer.okta.com/blog/2018/03/23/token-authentication-aspnetcore-complete-guide
+# Reference Material
 
-## Testing Reference Material
+## OpenID Connect
 
-- Testing: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-2.2
-- Integration Testing: https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2
-- Integration Testing: https://fullstackmark.com/post/20/painless-integration-testing-with-aspnet-core-web-api
-- Integration Testing with OpenID Connect: https://github.com/stottle-uk/IntegrationTestingWithIdentityServer
-- Mocking authentication in integration tests: https://github.com/jackowild/aspnetcore-bypassing-authentication/tree/master/MockingAuthApi
-- Sharing test context between tests: https://xunit.github.io/docs/shared-context
-- Supporting AntiForgeryTokens: https://www.matheus.ro/2018/09/03/integration-tests-in-asp-net-core-controllers/
+- [OpenID Connect JavaScript Client library](https://github.com/IdentityModel/oidc-client-js)
+- [Using JWT and Asp.Net Core Cookies](https://amanagrawal.blog/2017/09/18/jwt-token-authentication-with-cookies-in-asp-net-core/)
+- [IdentityServer4 Examples](https://github.com/IdentityServer/IdentityServer4.Samples)
+- [IdentityServer4 QuickStart - Adding User Authentication with OpenID Connect](http://docs.identityserver.io/en/latest/quickstarts/3_interactive_login.html)
+- [IdentityServer4 JavaScript Client Quickstart](http://docs.identityserver.io/en/latest/quickstarts/6_javascript_client.html)
+- [Configuring App to Recognize JWT authorization tokens](https://developer.okta.com/blog/2018/03/23/token-authentication-aspnetcore-complete-guide)
 
-## Security Material
+## Testing
+- [Unit Testing Controllers in ASP.Net Core](https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/testing?view=aspnetcore-5.0)
+- [Integration Testing in ASP.Net Core](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-5.0)
+- [Integration Testing with OpenID Connect](https://github.com/stottle-uk/IntegrationTestingWithIdentityServer)
+- [Mocking authentication in integration tests](https://github.com/jackowild/aspnetcore-bypassing-authentication/tree/master/MockingAuthApi)
+- [Supporting AntiForgeryTokens](https://www.matheus.ro/2018/09/03/integration-tests-in-asp-net-core-controllers/)
 
-- Running .Net Core 2.1 With Self-Signed Cert: https://www.hanselman.com/blog/DevelopingLocallyWithASPNETCoreUnderHTTPSSSLAndSelfSignedCerts.aspx
-- Configure HTTPS in ASP.Net Core 2.1: https://asp.net-hacker.rocks/2018/07/09/aspnetcore-ssl.html
+## Azure
+
+- [Azure Storage Blobs - Quickstart](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-dotnet)
+- [Cosmos DB - Quickstart](https://docs.microsoft.com/en-us/azure/cosmos-db/create-table-dotnet)
+- [Cosmos DB - Query Tables](https://docs.microsoft.com/en-us/azure/cosmos-db/tutorial-query-table)
+- [Cosmos DB - Query Examples](https://docs.microsoft.com/en-us/azure/cosmos-db/sql-api-dotnet-v3sdk-samples#query-examples)
+- [Azure Connection Strings](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string)
+- [Configuring Logging in Azure App Service](https://ardalis.com/configuring-logging-in-azure-app-services/)

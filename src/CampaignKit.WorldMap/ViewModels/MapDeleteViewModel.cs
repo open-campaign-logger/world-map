@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="MapDeleteViewModel.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,21 +23,17 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class MapDeleteViewModel
     {
-        #region Properties
-
         /// <summary>
         ///     Gets or sets the Map identifier.
         /// </summary>
         /// <value>The map identifier.</value>
         [HiddenInput]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         ///     Gets or sets the name.
         /// </summary>
         /// <value>The name.</value>
         public string Name { get; set; }
-
-        #endregion
     }
 }

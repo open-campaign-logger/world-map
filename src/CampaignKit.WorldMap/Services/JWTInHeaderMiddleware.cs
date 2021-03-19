@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="JWTInHeaderMiddleware.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,13 +12,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Http;
+// </copyright>
 
 namespace CampaignKit.WorldMap.Services
 {
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+
     /// <summary>
     ///     This application uses the implicit oidc authentication flow which means that the client
     ///     obtains and manages access tokens itself.
@@ -42,46 +43,40 @@ namespace CampaignKit.WorldMap.Services
     ///     automatically pass it with each request without the need for JavaScript coding.
     ///     The following middleware component looks for JWT information stored in a cookie and adds it
     ///     to the request headers as if it was submitted via JavaScript code.
-    ///     see: https://stackoverflow.com/questions/37398276/how-can-i-validate-a-jwt-passed-via-cookies
+    ///     see: https://stackoverflow.com/questions/37398276/how-can-i-validate-a-jwt-passed-via-cookies.
     /// </summary>
     public class JWTInHeaderMiddleware
     {
-        #region Fields
-
         private readonly RequestDelegate _next;
 
-        #endregion
-
-        #region Constructors
-
         /// <summary>
+        /// Initializes a new instance of the <see cref="JWTInHeaderMiddleware"/> class.
         /// </summary>
-        /// <param name="next"></param>
+        /// <param name="next">The HTTP operation to invoke once this middleware component has had a chance to perform its functions.</param>
         public JWTInHeaderMiddleware(RequestDelegate next)
         {
             _next = next;
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
+        /// If the browser has an appropriate JWT cookied append it to the HTTP request.
         /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
+        /// <param name="context">The HttpContext.</param>
+        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         public async Task Invoke(HttpContext context)
         {
             var name = ".worldmap.ui";
             var cookie = context.Request.Cookies[name];
 
             if (cookie != null)
+            {
                 if (!context.Request.Headers.ContainsKey("Authorization"))
+                {
                     context.Request.Headers.Append("Authorization", cookie);
+                }
+            }
 
             await _next.Invoke(context);
         }
-
-        #endregion
     }
 }

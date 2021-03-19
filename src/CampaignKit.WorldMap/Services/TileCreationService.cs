@@ -1,4 +1,5 @@
-// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+// <copyright file="TileCreationService.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,74 +12,145 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using CampaignKit.WorldMap.Data;
-using CampaignKit.WorldMap.Entities;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.Primitives;
+// </copyright>
 
 namespace CampaignKit.WorldMap.Services
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using CampaignKit.WorldMap.Entities;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+
+    using SixLabors.ImageSharp;
+    using SixLabors.ImageSharp.Processing;
+
     /// <summary>
     ///     A timed background service that queries the Tiles table and processes
     ///     tiles that haven't been created yet.
     ///     This article was used to model this timed background service.
-    ///     https://thinkrethink.net/2018/02/21/asp-net-core-background-processing/
+    ///     https://thinkrethink.net/2018/02/21/asp-net-core-background-processing/.
     /// </summary>
     public class TileCreationService : BackgroundService
     {
-        #region Constructors
+        /// <summary>
+        ///     The stopping cancellation token.
+        /// </summary>
+        private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
+
+        /// <summary>
+        /// The application configuration.
+        /// </summary>
+        private readonly IConfiguration _configuration;
+
+        /// <summary>
+        /// The application logging service.
+        /// </summary>
+        private readonly ILogger _loggerService;
+
+        /// <summary>
+        /// The service provider.
+        /// </summary>
+        private readonly IServiceProvider _serviceProvider;
+
+        /// <summary>
+        /// The BLOB storage service.
+        /// </summary>
+        private readonly IBlobStorageService _blobStorageService;
+
+        /// <summary>
+        /// The table storage service.
+        /// </summary>
+        private readonly ITableStorageService _tableStorageService;
+
+        /// <summary>
+        ///     The executing task.
+        /// </summary>
+        private Task executingTask;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="TileCreationService" /> class.
         /// </summary>
+        /// <param name="configuration">The application configuration.</param>
         /// <param name="serviceProvider">The service provider.</param>
+        /// <param name="blobStorageService">The blob storage service.</param>
+        /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="loggerService">The logger service.</param>
-        public TileCreationService(IServiceProvider serviceProvider, ILogger<TileCreationService> loggerService)
+        public TileCreationService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, ILogger<TileCreationService> loggerService)
         {
-            _loggerService = loggerService;
-            _serviceProvider = serviceProvider;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
+            _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
         }
 
-        #endregion
+        /// <summary>
+        /// Triggered when the application host is ready to start the service.
+        /// </summary>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public override Task StartAsync(CancellationToken cancellationToken)
+        {
+            // Store the task we're executing
+            executingTask = ExecuteAsync(stoppingCts.Token);
 
-        #region Methods
+            // If the task is completed then return it,
+            // this will bubble cancellation and failure to the caller
+            if (executingTask.IsCompleted)
+            {
+                return executingTask;
+            }
+
+            // Otherwise it's running
+            return Task.CompletedTask;
+        }
 
         /// <summary>
-        ///     This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The
-        ///     implementation should return a task that represents
-        ///     the lifetime of the long running operation(s) being performed.
+        /// Triggered when the application host is performing a graceful shutdown.
         /// </summary>
-        /// <param name="stoppingToken">
-        ///     Triggered when
-        ///     <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is
-        ///     called.
-        /// </param>
-        /// <returns>
-        ///     A <see cref="T:System.Threading.Tasks.Task" /> that represents the long running operations.
-        /// </returns>
+        /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            // Stop called without start
+            if (executingTask == null)
+            {
+                return;
+            }
+
+            try
+            {
+                // Signal cancellation to the executing method
+                stoppingCts.Cancel();
+            }
+            finally
+            {
+                // Wait until the task completes or the stop token triggers
+                await Task.WhenAny(executingTask, Task.Delay(
+                    Timeout.Infinite,
+                    cancellationToken));
+            }
+        }
+
+        /// <summary>
+        /// This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The implementation should return a task that represents
+        /// the lifetime of the long running operation(s) being performed.
+        /// </summary>
+        /// <param name="stoppingToken">Triggered when <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is called.</param>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             do
             {
                 await Process();
 
-                await Task.Delay(5000, stoppingToken); //5 seconds delay
+                await Task.Delay(5000, stoppingToken); // 5 seconds delay
             }
             while (!stoppingToken.IsCancellationRequested);
         }
@@ -86,80 +158,71 @@ namespace CampaignKit.WorldMap.Services
         /// <summary>
         ///     Executes the timed background process for generating tiles.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True when processing is completed.</returns>
         protected async Task<bool> Process()
         {
-            using (var scope = _serviceProvider.CreateScope())
+            // Query the tiles table to see if there are any unprocessed tiles.
+            var tiles = await _tableStorageService.GetUnprocessedTileRecordsAsync();
+
+            if (tiles.Count > 0)
             {
-                // Retrieve the db context from the container
-                var dbContext = scope.ServiceProvider.GetRequiredService<WorldMapDBContext>();
-                var filePathService = scope.ServiceProvider.GetRequiredService<IFilePathService>();
+                _loggerService.LogDebug("{0} tiles waiting to be processed.", tiles.Count);
 
-                // Open the db connection
-                dbContext.Database.OpenConnection();
-
-                // Query the tiles table to see if there are any unprocessed tiles.
-                var tiles = (from t in dbContext.Tiles select t)
-                    .Where(t => t.CompletionTimestamp == DateTime.MinValue)
-                    .OrderBy(t => t.MapId).ThenBy(t => t.ZoomLevel)
-                    .ToList();
-
-                if (tiles.Count > 0)
+                // Process each map with unprocessed tiles
+                var mapList = tiles.Select(o => o.MapId).Distinct();
+                foreach (var map in mapList)
                 {
-                    _loggerService.LogDebug($"{tiles.Count} Tiles found.");
+                    _loggerService.LogDebug("Processing tiles for map: {0}.", map);
 
-                    // Process each map with unprocessed tiles
-                    var mapList = tiles.Select(o => o.MapId).Distinct();
-                    foreach (var map in mapList)
+                    // Calculate Folder Paths for the Map
+                    var folderName = $"map{map}";
+                    var masterBlob = await _blobStorageService.ReadBlobAsync(folderName, "master-file.png");
+
+                    // Process each map zoom level with unprocessed tiles
+                    var zoomList = tiles.Where(t => t.MapId == map).Select(o => o.ZoomLevel).Distinct();
+                    foreach (var zoomLevel in zoomList)
                     {
-                        // Process each map zoom level with unprocessed tiles
-                        var zoomList = tiles.Where(t => t.MapId == map).Select(o => o.ZoomLevel).Distinct();
-                        foreach (var zoomLevel in zoomList)
+                        // Select Tiles for Processing
+                        var tilesToProcess = tiles.Where(t => t.MapId == map).Where(t => t.ZoomLevel == zoomLevel);
+
+                        // Calculate Tile Size
+                        var tilePixelSize = tiles[0].TileSize;
+
+                        // Calculate the number of tiles required for this zoom level
+                        var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
+
+                        // Create zoom level base file (sync)
+                        _loggerService.LogDebug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
+                        var zoomLevelBlob
+                            = await CreateZoomLevelBaseFile(
+                                numberOfTilesPerDimension,
+                                masterBlob,
+                                zoomLevel,
+                                tilePixelSize,
+                                folderName,
+                                $"{zoomLevel}_zoom-level.png");
+
+                        // Create collection for tile creation tasks
+                        var tasks = new List<Task<bool>>();
+                        tasks.Clear();
+
+                        // Cycle through the tiles selected for the current map and zoom and process them
+                        foreach (var tile in tilesToProcess)
                         {
-                            // Calculate Folder Paths
-                            var worldFolderPath = Path.Combine(filePathService.PhysicalWorldBasePath, $"{map}");
-                            var masterFilePath = Path.Combine(worldFolderPath, "master-file.png");
-                            var zoomLevelFolderPath = Path.Combine(worldFolderPath, $"{zoomLevel}");
-                            var zoomLevelBaseFilePath = Path.Combine(zoomLevelFolderPath, "zoom-level.png");
-
-                            // Select Tiles for Processing
-                            var tilesToProcess = tiles.Where(t => t.MapId == map).Where(t => t.ZoomLevel == zoomLevel);
-
-                            // Calculate Tile Size
-                            var tilePixelSize = tiles[0].TileSize;
-
-                            // Calculate the number of tiles required for this zoom level
-                            var numberOfTilesPerDimension = (int) Math.Pow(2, zoomLevel);
-
-                            // Create zoom level directory if required
-                            if (!Directory.Exists(zoomLevelFolderPath)) Directory.CreateDirectory(zoomLevelFolderPath);
-
-                            // Create zoom level base file (sync)
-                            var zoomLevelBaseImage
-                                = CreateZoomLevelBaseFile(
-                                    numberOfTilesPerDimension,
-                                    masterFilePath,
-                                    zoomLevelBaseFilePath,
-                                    tilePixelSize);
-
-                            // Create collection for tile creation tasks
-                            var tasks = new List<Task<bool>>();
-                            tasks.Clear();
-
-                            // Cycle through the tiles selected for the current map and zoom and process them
-                            foreach (var tile in tilesToProcess)
-                            {
-                                var zoomLevelTileFilePath = Path.Combine(zoomLevelFolderPath, $"{tile.X}_{tile.Y}.png");
-                                tasks.Add(Task.Run(() => CreateZoomLevelTileFile(zoomLevelBaseImage.Clone(), tile, zoomLevelTileFilePath)));
-                            }
-
-                            // Wait for all tile creation tasks to complete
-                            var results = await Task.WhenAll(tasks);
-
-                            // Update tile completion timestampts
-                            dbContext.SaveChanges();
+                            var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
+                            _loggerService.LogDebug("Creating zoom level tile: {0}.", blobName);
+                            tasks.Add(Task.Run(() => CreateZoomLevelTileFile(zoomLevelBlob, tile, folderName, blobName)));
                         }
+
+                        // Wait for all tile creation tasks to complete
+                        var results = await Task.WhenAll(tasks);
                     }
+                }
+
+                // Delete all processed tile records
+                foreach (var tile in tiles)
+                {
+                    await _tableStorageService.DeleteTileRecordAsync(tile);
                 }
             }
 
@@ -167,15 +230,18 @@ namespace CampaignKit.WorldMap.Services
         }
 
         /// <summary>
-        ///     Creates the zoom level base file.
+        /// Creates the zoom level base file.
         /// </summary>
         /// <param name="numberOfTilesPerDimension">The number of tiles per dimension.</param>
-        /// <param name="masterFilePath">The master file path.</param>
-        /// <param name="zoomLevelBaseFilePath">The zoom level base file path.</param>
+        /// <param name="masterBlob">The master image.</param>
+        /// <param name="zoomLevel">The zoom level.</param>
         /// <param name="tilePixelSize">Tile pixel size.</param>
-        private Image<Rgba32> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, string masterFilePath, string zoomLevelBaseFilePath, int tilePixelSize)
+        /// <param name="folderName">The blob container name.</param>
+        /// <param name="blobName">The name of the blob.</param>
+        /// <returns>byte[] of zoom level base file.</returns>
+        private async Task<byte[]> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize, string folderName, string blobName)
         {
-            using (var masterBaseImage = Image.Load(masterFilePath))
+            using (var masterBaseImage = Image.Load(masterBlob))
             {
                 var size = numberOfTilesPerDimension * tilePixelSize;
 
@@ -183,109 +249,43 @@ namespace CampaignKit.WorldMap.Services
                 {
                     Mode = ResizeMode.Pad,
                     Position = AnchorPositionMode.Center,
-                    Size = new Size(size, size)
+                    Size = new Size(size, size),
                 }));
 
-                masterBaseImage.Save(zoomLevelBaseFilePath);
+                using (var ms = new MemoryStream())
+                {
+                    await masterBaseImage.SaveAsPngAsync(ms);
+                    var blob = ms.ToArray();
+                    await _blobStorageService.CreateBlobAsync(folderName, blobName, blob);
+                    return blob;
+                }
             }
-
-            return Image.Load(zoomLevelBaseFilePath);
         }
 
         /// <summary>
-        ///     Creates the zoom level tile file.
+        /// Creates the zoom level tile file.
         /// </summary>
-        /// <param name="baseImage">The base image.</param>
-        /// <param name="tile">The tile.</param>
-        /// <param name="zoomLevelTileFilePath">The zoom level tile file path.</param>
-        /// <returns></returns>
-        private bool CreateZoomLevelTileFile(Image<Rgba32> baseImage, Tile tile, string zoomLevelTileFilePath)
+        /// <param name="zoomLevelBlob">The zoome level image.</param>
+        /// <param name="tile">The tile to be created.</param>
+        /// <param name="folderName">The blob container name.</param>
+        /// <param name="blobName">The name of the blob.</param>
+        /// <returns>True when complete.</returns>
+        private async Task<bool> CreateZoomLevelTileFile(byte[] zoomLevelBlob, Tile tile, string folderName, string blobName)
         {
-            if (!File.Exists(zoomLevelTileFilePath))
+            using (var zoomLevelImage = Image.Load(zoomLevelBlob))
             {
-                baseImage.Mutate(context => context.Crop(
-                    new Rectangle(tile.X * tile.TileSize, tile.Y * tile.TileSize, tile.TileSize, tile.TileSize)));
+                zoomLevelImage.Mutate(context => context.Crop(
+                new Rectangle(tile.X * tile.TileSize, tile.Y * tile.TileSize, tile.TileSize, tile.TileSize)));
+                using (var ms = new MemoryStream())
+                {
+                    await zoomLevelImage.SaveAsPngAsync(ms);
+                    await _blobStorageService.CreateBlobAsync(folderName, blobName, ms.ToArray());
+                }
 
-                baseImage.Save(zoomLevelTileFilePath);
-
-                tile.CompletionTimestamp = DateTime.UtcNow;
-            }
-
-            return true;
-        }
-
-        #endregion
-
-        #region Private Members
-
-        /// <summary>
-        ///     The application logging service.
-        /// </summary>
-        private readonly ILogger _loggerService;
-
-        /// <summary>
-        ///     Gets the service provider.
-        /// </summary>
-        /// <value>
-        ///     The service provider.
-        /// </value>
-        private IServiceProvider _serviceProvider { get; }
-
-        /// <summary>
-        ///     The executing task
-        /// </summary>
-        private Task _executingTask;
-
-        /// <summary>
-        ///     The stopping cancellation token.
-        /// </summary>
-        private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
-
-        #endregion
-
-        #region Public Members
-
-        /// <summary>
-        ///     Triggered when the application host is ready to start the service.
-        /// </summary>
-        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns></returns>
-        public override Task StartAsync(CancellationToken cancellationToken)
-        {
-            // Store the task we're executing
-            _executingTask = ExecuteAsync(_stoppingCts.Token);
-
-            // If the task is completed then return it,
-            // this will bubble cancellation and failure to the caller
-            if (_executingTask.IsCompleted) return _executingTask;
-
-            // Otherwise it's running
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        ///     Triggered when the application host is performing a graceful shutdown.
-        /// </summary>
-        /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
-        /// <returns></returns>
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            // Stop called without start
-            if (_executingTask == null) return;
-
-            try
-            {
-                // Signal cancellation to the executing method
-                _stoppingCts.Cancel();
-            }
-            finally
-            {
-                // Wait until the task completes or the stop token triggers
-                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite,
-                    cancellationToken));
+                tile.IsRendered = true;
+                await _tableStorageService.UpdateTileRecordAsync(tile);
+                return true;
             }
         }
-
-        #endregion
     }
 }

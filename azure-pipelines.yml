@@ -8,17 +8,30 @@ trigger:
 
 pool:
   vmImage: 'ubuntu-latest'
+ 
+variables:
+  buildConfiguration: 'Release'
 
 steps:
 - checkout: self
-  submodules: true
+  submodules: 'true'
+- task: UseDotNet@2
+  inputs:
+    version: '5.0.x'
+    includePreviewVersions: true # Required for preview versions
+- task: DotNetCoreCLI@2
+  inputs: 
+    command: 'test'
+    projects: '**/*tests/CampaignKit.WorldMap.Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: true
+    arguments: '--configuration $(buildConfiguration)'
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/src/LoggerService/bin/Release/netcoreapp3.1'
+    SourceFolder: '$(System.DefaultWorkingDirectory)/src/CampaignKit.WorldMap/bin/Release/net5.0'
     Contents: 'publish.zip'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 - task: PublishBuildArtifacts@1

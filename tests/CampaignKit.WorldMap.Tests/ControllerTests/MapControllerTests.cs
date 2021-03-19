@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net.Http;
 using System.Threading.Tasks;
 
 using CampaignKit.WorldMap.Tests.Infrastructure;
@@ -20,38 +21,31 @@ using Xunit;
 
 namespace CampaignKit.WorldMap.Tests.ControllerTests
 {
-    public class MapControllerTests : IClassFixture<TestFixture<Startup, TestStartupAuth>>
+    public class MapControllerTests : IClassFixture<TestFixture>
     {
-        #region Fields
+        protected readonly HttpClient _client;
 
-        private readonly TestFixture<Startup, TestStartupAuth> _testFixture;
-
-        #endregion
-
-        #region Constructors
-
-        public MapControllerTests(TestFixture<Startup, TestStartupAuth> testFixture)
+        public MapControllerTests(TestFixture factory)
         {
-            _testFixture = testFixture;
+            _client = factory.CreateClient();
         }
-
-        #endregion
-
-        #region Methods
 
         [Theory]
         [InlineData("/Map/Create")]
-        [InlineData("/Map/Delete")]
-        [InlineData("/Map/Edit")]
-        [InlineData("/Map/Progress")]
-        public async Task TestAuthorizedGets(string page)
+        [InlineData("/Map/Delete/1")]
+        [InlineData("/Map/Edit/1")]
+        public async Task TestAuthorizedGetsWithAntiForgeryTokens(string page)
         {
-            var response = await _testFixture.Client.GetAsync(page);
-            response.EnsureSuccessStatusCode();
-            var token = await AntiForgeryHelper.EnsureAntiForgeryTokenAsync(_testFixture.Client, page);
+            var token = await AntiForgeryHelper.EnsureAntiForgeryTokenAsync(_client, page);
             Assert.NotNull(token);
         }
 
-        #endregion
+        [Theory]
+        [InlineData("/Map/Progress/1")]
+        public async Task TestAuthorizedGets(string page)
+        {
+            var response = await _client.GetAsync(page);
+            response.EnsureSuccessStatusCode();
+        }
     }
 }

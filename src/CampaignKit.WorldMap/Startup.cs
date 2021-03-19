@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="Startup.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,8 +12,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
-using System;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -24,15 +25,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Newtonsoft.Json;
-
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace CampaignKit.WorldMap
 {
@@ -41,62 +38,41 @@ namespace CampaignKit.WorldMap
     /// </summary>
     public class Startup
     {
-        #region Fields
-
-        private readonly IConfiguration _configuration;
-
-        #endregion
-
-        #region Constructors
-
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Startup" /> class.
+        /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
-        /// <param name="env">The env.</param>
-        public Startup(IHostingEnvironment env)
+        /// <param name="configuration">The configuration.</param>
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true)
-                .AddEnvironmentVariables();
-
-            _configuration = builder.Build();
+            this.Configuration = configuration;
         }
 
-        #endregion
-
-        #region Properties
-
         /// <summary>
-        ///     Gets a value indicating whether this instance is development configured.
+        /// Gets the configuration.
         /// </summary>
-        /// <value><c>true</c> if this instance is development configured; otherwise, <c>false</c>.</value>
-        public bool IsDevelopmentConfigured =>
-            string.Equals(_configuration["IsDevelopment"], bool.TrueString, StringComparison.OrdinalIgnoreCase);
-
-        #endregion
-
-        #region Methods
+        /// <value>
+        /// The configuration.
+        /// </value>
+        public IConfiguration Configuration { get; }
 
         /// <summary>
-        ///     Configures the specified application.
+        /// Configures the specified application.
         /// </summary>
         /// <param name="app">The application.</param>
         /// <param name="env">The env.</param>
-
-        // ReSharper disable once UnusedMember.Global
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-
             app.UseHttpsRedirection();
 
             // Json conversion settings
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings { Formatting = Formatting.Indented };
 
             // Reads the IsDevelopment configuration variable to determine if this is a development environment or not
-            if (env.IsDevelopment() || IsDevelopmentConfigured) app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
             // Enable all static file middleware (except directory browsing) for the current request path in the current directory.
             app.UseFileServer();
@@ -108,7 +84,9 @@ namespace CampaignKit.WorldMap
             app.UseAuthentication();
 
             // Adds MVC to the IApplicationBuilder request execution pipeline.
-            app.UseMvcWithDefaultRoute();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(configure => configure.MapControllers());
         }
 
         /// <summary>
@@ -120,29 +98,21 @@ namespace CampaignKit.WorldMap
             // This method gets called by the runtime. Use this method to add services to the container.
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
 
-            // Add the configuration to the context
-            services.AddSingleton(_configuration);
-
-            // Instantiate the database and add to the context
-            ConfigureDb(services);
-
             // Add the MVC service
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc();
 
-            // Configure Authentication
-            ConfigureAuth(services);
+            // Configuration Authentiation
+            this.ConfigureAuth(services);
 
-            // Add data services to context
-            // Note: these have been changed from singleton to scoped services in order
-            //       to work with the db context which is scoped.
-            services.AddScoped<IFilePathService, DefaultFilePathService>();
-            services.AddScoped<IRandomDataService, DefaultRandomDataService>();
-            services.AddScoped<IProgressService, DefaultProgressService>();
-            services.AddScoped<IMapRepository, DefaultMapRepository>();
-            services.AddScoped<IUserManagerService, DefaultUserManagerService>();
+            // Add services to context
+            services.AddSingleton<IRandomDataService, DefaultRandomDataService>();
+            services.AddSingleton<IFilePathService, DefaultFilePathService>();
+            services.AddSingleton<IProgressService, DefaultProgressService>();
+            services.AddSingleton<IUserManagerService, DefaultUserManagerService>();
+            services.AddSingleton<IMapRepository, DefaultMapRepository>();
 
-            // Add background services
-            services.AddSingleton<IHostedService, TileCreationService>();
+            // Add storage services
+            this.ConfigureStorage(services);
         }
 
         /// <summary>
@@ -154,7 +124,7 @@ namespace CampaignKit.WorldMap
         /// <param name="services">The services.</param>
         protected virtual void ConfigureAuth(IServiceCollection services)
         {
-            // Configure services to expect a Campaign-Identity access_token in the 
+            // Configure services to expect a Campaign-Identity access_token in the
             // Authorization header using the JWT Bearer scheme.
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -165,43 +135,41 @@ namespace CampaignKit.WorldMap
                     {
                         OnTokenValidated = context =>
                         {
-                            // Create an asp.net identity object for the user
-                            var userName = context.Principal.FindFirstValue("preferred_username") ?? context.Principal.FindFirstValue("name");
-                            var identity = new GenericIdentity(userName);
-                            context.Principal.AddIdentity(identity);
+                        // Create an asp.net identity object for the user
+                        var userName = context.Principal.FindFirstValue("preferred_username") ??
+                        context.Principal.FindFirstValue("name");
+                        var identity = new GenericIdentity(userName);
+                        context.Principal.AddIdentity(identity);
 
-                            // Store the JWT bearer details in a client side cookie.
-                            var tokenString = context.Request.Headers["Authorization"];
+                        // Store the JWT bearer details in a client side cookie.
+                        var tokenString = context.Request.Headers["Authorization"];
 
-                            context.Response.Cookies.Append(
-                                ".worldmap.ui",
-                                tokenString,
-                                new CookieOptions
+                        context.Response.Cookies.Append(
+                        ".worldmap.ui",
+                        tokenString,
+                        new CookieOptions
                                 {
-                                    Path = "/"
-                                }
-                            );
+                                    Path = "/",
+                                });
 
-                            return Task.CompletedTask;
-                        }
+                        return Task.CompletedTask;
+                        },
                     };
                 });
         }
 
         /// <summary>
-        ///     Configures the database provider.
-        ///     This virtual method is used to encapsulate database configuration
+        ///     Configures the storage provider.
+        ///     This virtual method is used to encapsulate storage configuration
         ///     information in a way that can be easily overridden in the unit
         ///     testing project.
         /// </summary>
         /// <param name="services">The services.</param>
-        protected virtual void ConfigureDb(IServiceCollection services)
+        protected virtual void ConfigureStorage(IServiceCollection services)
         {
-            // Instantiate the database and add to the context
-            services.AddDbContext<WorldMapDBContext>
-                (options => options.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
+            services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
+            services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
+            services.AddSingleton<IHostedService, TileCreationService>();
         }
-
-        #endregion
     }
 }

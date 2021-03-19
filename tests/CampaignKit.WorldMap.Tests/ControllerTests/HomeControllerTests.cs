@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Net.Http;
 using System.Threading.Tasks;
 
 using CampaignKit.WorldMap.Tests.Infrastructure;
@@ -20,20 +21,20 @@ using Xunit;
 
 namespace CampaignKit.WorldMap.Tests.ControllerTests
 {
-    public class HomeControllerTests : IClassFixture<TestFixture<Startup, TestStartupAuth>>
+    public class HomeControllerTests : IClassFixture<TestFixture>
     {
-        public HomeControllerTests(TestFixture<Startup, TestStartupAuth> testFixture)
-        {
-            _testFixture = testFixture;
-        }
+        protected readonly HttpClient _client;
 
-        private readonly TestFixture<Startup, TestStartupAuth> _testFixture;
+        public HomeControllerTests(TestFixture factory)
+        {
+            _client = factory.CreateClient();
+        }
 
         [Fact]
         public async Task TestJWTCookie()
         {
             // Is the application home page available
-            var response = await _testFixture.Client.GetAsync("/Home/JWTCookie");
+            var response = await _client.GetAsync("/Home/JWTCookie");
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var stringResponse = await response.Content.ReadAsStringAsync();

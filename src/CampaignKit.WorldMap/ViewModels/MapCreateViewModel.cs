@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="MapCreateViewModel.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,11 +12,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System.ComponentModel.DataAnnotations;
 
-using Microsoft.AspNetCore.Http;
 using CampaignKit.WorldMap.Attributes;
+
+using Microsoft.AspNetCore.Http;
 
 namespace CampaignKit.WorldMap.ViewModels
 {
@@ -24,8 +27,6 @@ namespace CampaignKit.WorldMap.ViewModels
     /// </summary>
     public class MapCreateViewModel
     {
-        #region Properties
-
         /// <summary>
         ///     Gets or sets the copyright.
         /// </summary>
@@ -40,7 +41,7 @@ namespace CampaignKit.WorldMap.ViewModels
         [Display(Name = "World Map Image")]
         [Required]
         [DataType(DataType.Upload)]
-		[MapFile(MaxLength = 10485760, Extensions = "png,jpg,jpeg,gif,bmp")]
+        [MapFile(MaxLength = 10485760, Extensions = "png,jpg,jpeg,gif,bmp")]
         public IFormFile Image { get; set; }
 
         /// <summary>
@@ -97,7 +98,5 @@ namespace CampaignKit.WorldMap.ViewModels
         [Display(Name = "This map image does not present offensive nor obviously illegal content.")]
         [Required]
         public bool ThisIsNotOffensiveNorObviouslyIllegalContent { get; set; }
-
-        #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿// Copyright 2017-2019 Jochen Linnemann, Cory Gill
+﻿// <copyright file="HomeController.cs" company="Jochen Linnemann - IT-Service">
+// Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+// </copyright>
 
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +21,6 @@ using CampaignKit.WorldMap.Data;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.Controllers
 {
@@ -28,52 +29,37 @@ namespace CampaignKit.WorldMap.Controllers
     ///     Main MVC controller for application.
     /// </summary>
     /// <seealso cref="T:Microsoft.AspNetCore.Mvc.Controller" />
+    [Route("")]
+    [Route("[controller]")]
     public class HomeController : Controller
     {
-        #region Fields
-
-        /// <summary>
-        ///     The application logging service.
-        /// </summary>
-        private readonly ILogger _loggerService;
-
         /// <summary>
         ///     The EntityFramework repository for Map data elements.
         /// </summary>
         private readonly IMapRepository _mapRepository;
 
-        #endregion
-
-        #region Constructors
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="HomeController" /> class.
         /// </summary>
         /// <param name="mapDataService">The map data service.</param>
-        /// <param name="logger">The logger.</param>
-        public HomeController(IMapRepository mapDataService,
-            ILogger<HomeController> logger)
+        public HomeController(IMapRepository mapDataService)
         {
             _mapRepository = mapDataService;
-            _loggerService = logger;
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        ///     GET: /
+        ///     GET: /.
         /// </summary>
         /// <returns>Home view showing last three created maps.</returns>
-        [HttpGet]
+        [HttpGet("")]
+        [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
-            // Retrieve a listing of maps for this user.  
+            // Retrieve a listing of maps for this user.
             // Anonymous User: all public maps
             // Authenticated User: all public and owned maps.
             var model = (await _mapRepository.FindAll(User, true))
-                .Where(m => m.MapId != 1)
+                .Where(m => !m.MapId.Equals("sample"))
                 .OrderByDescending(m => m.CreationTimestamp)
                 .Take(3);
 
@@ -89,8 +75,8 @@ namespace CampaignKit.WorldMap.Controllers
         ///     subsequent form submits will be able to send in the auth details
         ///     automatically.
         /// </summary>
-        /// <returns></returns>
-        [HttpGet]
+        /// <returns>A default view.</returns>
+        [HttpGet("JwtCookie")]
         [Authorize]
         public ActionResult JwtCookie()
         {
@@ -98,15 +84,13 @@ namespace CampaignKit.WorldMap.Controllers
         }
 
         /// <summary>
-        ///     GET: /Home/Legalities
+        ///     GET: /Home/Legalities.
         /// </summary>
         /// <returns>Application legalities view.</returns>
-        [HttpGet]
+        [HttpGet("Legalities")]
         public ActionResult Legalities()
         {
             return View();
         }
-
-        #endregion
     }
 }
