@@ -49,8 +49,12 @@ Enabling public access to blobs.
   - `dotnet user-secrets set "AzureBlobBaseURL" "<YOUR CUSTOM AZURE BLOB BASE URL>"`
 - To convert an Azure SAS URI into a connection string:
   - Your URI will have the following format: `https://<ACCOUNT>.<blob/table>.core.windows.net/<RESOURCE>?<SAS String>`
-  - Reformat it as follows: `<BlobEndpoint\TableEndpoint>=https://<ACCOUNT>.<blob/table>.core.windows.net;SharedAccessSignature=<SAS String>`
+  - Reformat it as follows: `<BlobEndpoint\TableEndpoint>=https://<ACCOUNT>.<blob/table>.core.windows.net/;SharedAccessSignature=<SAS String>`
   - Note that the `<RESOURCE>` and `?` elements were dropped.
+
+# Deployment
+
+Ensure that the startup command is set to `dotnet CampaignKit.WorldMap.dll --urls "http://+:8080"`
 
 # Reference Material
 
