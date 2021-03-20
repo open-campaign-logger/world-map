@@ -384,8 +384,14 @@ namespace CampaignKit.WorldMap.Controllers
             // Retrieve the map
             var map = await _mapRepository.Find(id, User, share);
 
-            // Create a view model
+            // Determine protocol being used
             var protocol = Request.IsHttps ? "https" : "http";
+            _loggerService.LogDebug("Request protocol: {0}", protocol);
+
+            // Determine host address
+            var hostFromHeader = Request.Host.Value;
+            _loggerService.LogDebug("Host value from request header: {0}", hostFromHeader);
+
             var model = new MapShowViewModel
             {
                 Name = map.Name,
@@ -393,9 +399,9 @@ namespace CampaignKit.WorldMap.Controllers
                 UserId = map.UserId,
                 ShowProgress = showProgress,
                 ProgressUrl = Url.Action(nameof(Progress), new { Id = id }),
-                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Share = share }, protocol, Request.Host.Value),
-                DeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, Request.Host.Value),
-                EditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, Request.Host.Value),
+                ShowUrl = Url.Action(nameof(Show), "Map", new { Id = id, Share = share }, protocol, hostFromHeader),
+                DeleteUrl = Url.Action(nameof(Delete), "Map", new { Id = id }, protocol, hostFromHeader),
+                EditUrl = Url.Action(nameof(Edit), "Map", new { Id = id }, protocol, hostFromHeader),
                 Id = id,
                 CanEdit = canEdit,
             };
