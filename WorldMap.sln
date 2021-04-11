@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B6C2D82C-BA53-4AFA-9BAB-829ED709321F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampaignKit.WorldMap.TileProcessor", "src\CampaignKit.WorldMap.TileProcessor\CampaignKit.WorldMap.TileProcessor.csproj", "{CC136D54-03E6-4010-8E04-BEFCA5E66F37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{CD62D678-74FE-4B11-B4F3-BD5E72B82BD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD62D678-74FE-4B11-B4F3-BD5E72B82BD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD62D678-74FE-4B11-B4F3-BD5E72B82BD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC136D54-03E6-4010-8E04-BEFCA5E66F37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC136D54-03E6-4010-8E04-BEFCA5E66F37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC136D54-03E6-4010-8E04-BEFCA5E66F37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC136D54-03E6-4010-8E04-BEFCA5E66F37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

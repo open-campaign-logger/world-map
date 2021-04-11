@@ -82,3 +82,4 @@ Ensure that the startup command is set to `dotnet CampaignKit.WorldMap.dll --url
 - [Cosmos DB - Query Examples](https://docs.microsoft.com/en-us/azure/cosmos-db/sql-api-dotnet-v3sdk-samples#query-examples)
 - [Azure Connection Strings](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string)
 - [Configuring Logging in Azure App Service](https://ardalis.com/configuring-logging-in-azure-app-services/)
+- [Develop, test, and deploy an Azure Function with Visual Studio](https://docs.microsoft.com/en-us/learn/modules/develop-test-deploy-azure-functions-with-visual-studio/)
