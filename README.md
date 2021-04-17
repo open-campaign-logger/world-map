@@ -83,3 +83,6 @@ Ensure that the startup command is set to `dotnet CampaignKit.WorldMap.dll --url
 - [Azure Connection Strings](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string)
 - [Configuring Logging in Azure App Service](https://ardalis.com/configuring-logging-in-azure-app-services/)
 - [Develop, test, and deploy an Azure Function with Visual Studio](https://docs.microsoft.com/en-us/learn/modules/develop-test-deploy-azure-functions-with-visual-studio/)
+- [Use dependency injections in .Net Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection)
+- [Azure Functions Dependency Injection](https://blog.rasmustc.com/azure-functions-dependency-injection/)
+- [Using JSON and User Secrets configuration with Azure Functions](https://dev.to/cesarcodes/using-json-and-user-secrets-configuration-with-azure-functions-3f7g)
