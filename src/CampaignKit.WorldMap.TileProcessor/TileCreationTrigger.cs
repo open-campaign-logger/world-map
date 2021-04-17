@@ -1,6 +1,6 @@
 using System;
 
-using CampaignKit.WorldMap.TileProcessor.Services;
+using CampaignKit.WorldMap.Core;
 
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
@@ -18,12 +18,13 @@ namespace CampaignKit.WorldMap.TileProcessor
         {
             this._blobStorageService = blobStorageService;
             this._configuration = configuration;
+            this._log = log;
         }
 
         [FunctionName("TileCreationTrigger")]
-        public void Run([QueueTrigger("worldmapqueue", Connection = "")]string myQueueItem, ILogger log)
+        public void Run([QueueTrigger("worldmapqueue", Connection = "")]string myQueueItem)
         {
-            log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
+            _log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
         }
     }
 }

@@ -19,4 +19,10 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CampaignKit.WorldMap.Core\CampaignKit.WorldMap.Core.csproj" />
+  </ItemGroup>
 </Project>

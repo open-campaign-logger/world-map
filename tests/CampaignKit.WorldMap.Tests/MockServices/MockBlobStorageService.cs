@@ -1,4 +1,5 @@
-﻿using CampaignKit.WorldMap.Services;
+﻿using CampaignKit.WorldMap.Core;
+using CampaignKit.WorldMap.Services;
 
 using System;
 using System.Collections.Generic;

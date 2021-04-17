@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using CampaignKit.WorldMap.Core;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {

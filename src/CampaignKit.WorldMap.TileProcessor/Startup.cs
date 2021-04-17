@@ -1,4 +1,4 @@
-﻿ using CampaignKit.WorldMap.TileProcessor.Services;
+﻿using CampaignKit.WorldMap.Core;
 
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;

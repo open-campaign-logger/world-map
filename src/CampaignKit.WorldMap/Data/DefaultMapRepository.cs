@@ -20,6 +20,7 @@ using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
+using CampaignKit.WorldMap.Core;
 using CampaignKit.WorldMap.Entities;
 using CampaignKit.WorldMap.Services;
 
