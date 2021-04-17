@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap", "src\CampaignKit.WorldMap\CampaignKit.WorldMap.csproj", "{BF639E9F-C085-4FC9-9701-AE1924B4C9DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.UI", "src\CampaignKit.WorldMap\CampaignKit.WorldMap.UI.csproj", "{BF639E9F-C085-4FC9-9701-AE1924B4C9DA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.Tests", "tests\CampaignKit.WorldMap.Tests\CampaignKit.WorldMap.Tests.csproj", "{CD62D678-74FE-4B11-B4F3-BD5E72B82BD2}"
 EndProject
@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B6C2D82C-BA53-4AFA-9BAB-829ED709321F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.TileProcessor", "src\CampaignKit.WorldMap.TileProcessor\CampaignKit.WorldMap.TileProcessor.csproj", "{CC136D54-03E6-4010-8E04-BEFCA5E66F37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.Function", "src\CampaignKit.WorldMap.TileProcessor\CampaignKit.WorldMap.Function.csproj", "{CC136D54-03E6-4010-8E04-BEFCA5E66F37}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampaignKit.WorldMap.Core", "src\CampaignKit.WorldMap.Core\CampaignKit.WorldMap.Core.csproj", "{4D70B4FD-8D89-4C72-970D-FA1095117734}"
 EndProject

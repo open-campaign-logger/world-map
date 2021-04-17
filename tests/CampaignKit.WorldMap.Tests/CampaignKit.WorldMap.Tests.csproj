@@ -46,8 +46,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CampaignKit.WorldMap.Core\CampaignKit.WorldMap.Core.csproj" />
-    <ProjectReference Include="..\..\src\CampaignKit.WorldMap.TileProcessor\CampaignKit.WorldMap.TileProcessor.csproj" />
-    <ProjectReference Include="..\..\src\CampaignKit.WorldMap\CampaignKit.WorldMap.csproj" />
+    <ProjectReference Include="..\..\src\CampaignKit.WorldMap.TileProcessor\CampaignKit.WorldMap.Function.csproj" />
+    <ProjectReference Include="..\..\src\CampaignKit.WorldMap\CampaignKit.WorldMap.UI.csproj" />
   </ItemGroup>
 
 </Project>
