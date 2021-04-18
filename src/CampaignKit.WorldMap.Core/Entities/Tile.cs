@@ -75,10 +75,5 @@ namespace CampaignKit.WorldMap.Core.Entities
         /// </value>
         public bool IsRendered { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the tile creation timestamp.
-        /// </summary>
-        /// <value>Time that the tile creation process started.</value>
-        public DateTime CreationTimestamp { get; set; }
     }
 }

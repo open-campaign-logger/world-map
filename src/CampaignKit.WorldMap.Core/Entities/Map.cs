@@ -121,18 +121,6 @@ namespace CampaignKit.WorldMap.Core.Entities
         public string ThumbnailPath { get; set; }
 
         /// <summary>
-        ///     Gets or sets the creation timestamp.
-        /// </summary>
-        /// <value>The creation timestamp.</value>
-        public DateTime CreationTimestamp { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the update timestamp.
-        /// </summary>
-        /// <value>The update timestamp.</value>
-        public DateTime UpdateTimestamp { get; set; }
-
-        /// <summary>
         ///     Gets or sets the tile collection for this map.
         /// </summary>
         /// <value>A collection of child tile entities.</value>

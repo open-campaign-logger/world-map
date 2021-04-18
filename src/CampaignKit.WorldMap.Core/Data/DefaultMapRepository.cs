@@ -66,6 +66,11 @@ namespace CampaignKit.WorldMap.Core.Data
         private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
+        /// The queue storage service
+        /// </summary>
+        private readonly IQueueStorageService _queueStorageService;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
@@ -73,18 +78,21 @@ namespace CampaignKit.WorldMap.Core.Data
         /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="userManagerService">The user manager service.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
+        /// <param name="queueStorageService">The queue storage service.</param>
         public DefaultMapRepository(
             IConfiguration configuration,
             ILogger<DefaultMapRepository> loggerService,
             ITableStorageService tableStorageService,
             IUserManagerService userManagerService,
-            IBlobStorageService blobStorageService)
+            IBlobStorageService blobStorageService,
+            IQueueStorageService queueStorageService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
             _userManagerService = userManagerService ?? throw new ArgumentNullException(nameof(userManagerService));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
+            _queueStorageService = queueStorageService ?? throw new ArgumentNullException(nameof(queueStorageService));
         }
 
         /// <summary>
@@ -207,8 +215,6 @@ namespace CampaignKit.WorldMap.Core.Data
             // ************************************
             //  Create DB entity (Generate Map ID)
             // ************************************
-            map.CreationTimestamp = DateTime.UtcNow;
-            map.UpdateTimestamp = map.CreationTimestamp;
             map.UserId = userid;
             await _tableStorageService.CreateMapRecordAsync(map);
 
@@ -290,7 +296,6 @@ namespace CampaignKit.WorldMap.Core.Data
                         {
                             MapId = map.MapId,
                             ZoomLevel = zoomLevel,
-                            CreationTimestamp = DateTime.UtcNow,
                             IsRendered = false,
                             TileSize = TilePixelSize,
                             X = x,
@@ -301,6 +306,11 @@ namespace CampaignKit.WorldMap.Core.Data
                     }
                 }
             }
+
+            // ****************************************
+            //        Queue Map for Processing
+            // ****************************************
+            await _queueStorageService.QueueMapForProcessing(map);
 
             return map.MapId;
         }

@@ -30,6 +30,11 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
                 services.Remove(tableStorageDescriptor);
                 services.AddSingleton<ITableStorageService, MockTableStorageService>();
 
+                // Replace queue storage service with mock service
+                var queueStorageDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IQueueStorageService));
+                services.Remove(queueStorageDescriptor);
+                services.AddSingleton<IQueueStorageService, MockQueueStorageService>();
+
                 // Add authentication options
                 services.AddAuthentication(options =>
                 {
