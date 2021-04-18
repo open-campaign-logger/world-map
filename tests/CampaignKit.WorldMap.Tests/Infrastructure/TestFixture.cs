@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using CampaignKit.WorldMap.UI;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
@@ -14,6 +15,8 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Testing");
+
+            builder.UseContentRoot("");
 
             builder.ConfigureServices(services =>
             {
