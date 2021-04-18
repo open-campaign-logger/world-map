@@ -24,10 +24,8 @@ namespace CampaignKit.WorldMap.Core.Services
     using System.Threading.Tasks;
 
     using CampaignKit.WorldMap.Core.Entities;
-    using CampaignKit.WorldMap.Core.Services;
 
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
 
     using SixLabors.ImageSharp;
@@ -39,7 +37,7 @@ namespace CampaignKit.WorldMap.Core.Services
     ///     This article was used to model this timed background service.
     ///     https://thinkrethink.net/2018/02/21/asp-net-core-background-processing/.
     /// </summary>
-    public class TileCreationService : BackgroundService
+    public class TileCreationService : ITileCreationService
     {
         /// <summary>
         ///     The stopping cancellation token.
@@ -94,75 +92,11 @@ namespace CampaignKit.WorldMap.Core.Services
         }
 
         /// <summary>
-        /// Triggered when the application host is ready to start the service.
+        /// Creates tiles for the map.
         /// </summary>
-        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public override Task StartAsync(CancellationToken cancellationToken)
-        {
-            // Store the task we're executing
-            executingTask = ExecuteAsync(stoppingCts.Token);
-
-            // If the task is completed then return it,
-            // this will bubble cancellation and failure to the caller
-            if (executingTask.IsCompleted)
-            {
-                return executingTask;
-            }
-
-            // Otherwise it's running
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Triggered when the application host is performing a graceful shutdown.
-        /// </summary>
-        /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            // Stop called without start
-            if (executingTask == null)
-            {
-                return;
-            }
-
-            try
-            {
-                // Signal cancellation to the executing method
-                stoppingCts.Cancel();
-            }
-            finally
-            {
-                // Wait until the task completes or the stop token triggers
-                await Task.WhenAny(executingTask, Task.Delay(
-                    Timeout.Infinite,
-                    cancellationToken));
-            }
-        }
-
-        /// <summary>
-        /// This method is called when the <see cref="T:Microsoft.Extensions.Hosting.IHostedService" /> starts. The implementation should return a task that represents
-        /// the lifetime of the long running operation(s) being performed.
-        /// </summary>
-        /// <param name="stoppingToken">Triggered when <see cref="M:Microsoft.Extensions.Hosting.IHostedService.StopAsync(System.Threading.CancellationToken)" /> is called.</param>
-        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            do
-            {
-                await Process();
-
-                await Task.Delay(5000, stoppingToken); // 5 seconds delay
-            }
-            while (!stoppingToken.IsCancellationRequested);
-        }
-
-        /// <summary>
-        ///     Executes the timed background process for generating tiles.
-        /// </summary>
-        /// <returns>True when processing is completed.</returns>
-        protected async Task<bool> Process()
+        /// <param name="mapId">The id of the map to create tiles for.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public async Task<bool> CreateTiles(string mapId)
         {
             // Query the tiles table to see if there are any unprocessed tiles.
             var tiles = await _tableStorageService.GetUnprocessedTileRecordsAsync();

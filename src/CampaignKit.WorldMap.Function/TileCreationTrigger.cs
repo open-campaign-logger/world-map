@@ -25,6 +25,7 @@ namespace CampaignKit.WorldMap.TileProcessor
         public void Run([QueueTrigger("worldmapqueue", Connection = "")]string myQueueItem)
         {
             _log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
+            var connectionString = _configuration.GetConnectionString("AzureQueueStorage");
         }
     }
 }

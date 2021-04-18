@@ -316,7 +316,7 @@ namespace CampaignKit.WorldMap.UI.Controllers
         public async Task<IActionResult> Index()
         {
             var model = await _mapRepository.FindAll(User, true);
-            model = model.OrderByDescending(m => m.CreationTimestamp);
+            model = model.OrderByDescending(m => m.Timestamp);
             return View(model);
         }
 

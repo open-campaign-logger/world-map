@@ -60,7 +60,7 @@ namespace CampaignKit.WorldMap.UI.Controllers
             // Authenticated User: all public and owned maps.
             var model = (await _mapRepository.FindAll(User, true))
                 .Where(m => !m.MapId.Equals("sample"))
-                .OrderByDescending(m => m.CreationTimestamp)
+                .OrderByDescending(m => m.Timestamp)
                 .Take(3);
 
             return View(model);

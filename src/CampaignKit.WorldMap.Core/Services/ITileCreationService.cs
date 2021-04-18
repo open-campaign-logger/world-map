@@ -16,8 +16,6 @@
 
 namespace CampaignKit.WorldMap.Core.Services
 {
-    using CampaignKit.WorldMap.Core.Entities;
-
     using System.Threading.Tasks;
 
     /// <summary>
@@ -28,9 +26,9 @@ namespace CampaignKit.WorldMap.Core.Services
         /// <summary>
         /// Creates tiles for the map.
         /// </summary>
-        /// <param name="map">The map to create tiles for.</param>
+        /// <param name="mapId">The id of the map to create tiles for.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public Task<bool> CreateTiles(Map map);
+        public Task<bool> CreateTiles(string mapId);
 
     }
 }
