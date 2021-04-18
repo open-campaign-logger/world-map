@@ -15,8 +15,10 @@
 // </copyright>
 
 using System;
+using System.IO;
 
-using CampaignKit.WorldMap.Data;
+using CampaignKit.WorldMap.Core.Data;
+using CampaignKit.WorldMap.UI.Services;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap
+namespace CampaignKit.WorldMap.UI
 {
     /// <summary>
     /// Main application executable.
@@ -94,7 +96,8 @@ namespace CampaignKit.WorldMap
                 try
                 {
                     var repositoryService = services.GetRequiredService<IMapRepository>();
-                    repositoryService.InitRepository().Wait();
+                    var filePathService = services.GetRequiredService<IFilePathService>();
+                    repositoryService.InitRepository(Path.Combine(filePathService.AppDataPath, "Sample.png"), Path.Combine(filePathService.AppDataPath, "Sample.json")).Wait();
                 }
                 catch (Exception ex)
                 {

@@ -16,11 +16,11 @@
 
 using System.ComponentModel.DataAnnotations;
 
-using CampaignKit.WorldMap.Attributes;
+using CampaignKit.WorldMap.UI.Attributes;
 
 using Microsoft.AspNetCore.Http;
 
-namespace CampaignKit.WorldMap.ViewModels
+namespace CampaignKit.WorldMap.UI.ViewModels
 {
     /// <summary>
     ///     Class MapCreateViewModel.

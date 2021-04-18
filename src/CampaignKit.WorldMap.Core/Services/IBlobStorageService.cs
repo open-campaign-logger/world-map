@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.Core
+namespace CampaignKit.WorldMap.Core.Services
 {
     using System.Threading.Tasks;
 

@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.UI.Services
 {
     /// <summary>
     ///  Interface IFilePathService.

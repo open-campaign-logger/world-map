@@ -19,17 +19,17 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Data;
-using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
-using CampaignKit.WorldMap.ViewModels;
+using CampaignKit.WorldMap.Core.Data;
+using CampaignKit.WorldMap.Core.Entities;
+using CampaignKit.WorldMap.Core.Services;
+using CampaignKit.WorldMap.UI.ViewModels;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.Controllers
+namespace CampaignKit.WorldMap.UI.Controllers
 {
     /// <inheritdoc />
     /// <summary>

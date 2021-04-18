@@ -1,5 +1,5 @@
-﻿using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
+﻿using CampaignKit.WorldMap.Core.Entities;
+using CampaignKit.WorldMap.Core.Services;
 using CampaignKit.WorldMap.Tests.Infrastructure;
 
 using System;

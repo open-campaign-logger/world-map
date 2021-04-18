@@ -20,9 +20,8 @@ using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Core;
-using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
+using CampaignKit.WorldMap.Core.Entities;
+using CampaignKit.WorldMap.Core.Services;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,7 +30,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Processing;
 
-namespace CampaignKit.WorldMap.Data
+namespace CampaignKit.WorldMap.Core.Data
 {
     /// <summary>
     ///     Default implementation of the EntityFramework repository for Map data elements.
@@ -67,11 +66,6 @@ namespace CampaignKit.WorldMap.Data
         private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
-        /// The file path service.
-        /// </summary>
-        private readonly IFilePathService _filePathService;
-
-        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
@@ -79,21 +73,18 @@ namespace CampaignKit.WorldMap.Data
         /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="userManagerService">The user manager service.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
-        /// <param name="filePathService">The file path service.</param>
         public DefaultMapRepository(
             IConfiguration configuration,
             ILogger<DefaultMapRepository> loggerService,
             ITableStorageService tableStorageService,
             IUserManagerService userManagerService,
-            IBlobStorageService blobStorageService,
-            IFilePathService filePathService)
+            IBlobStorageService blobStorageService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
             _userManagerService = userManagerService ?? throw new ArgumentNullException(nameof(userManagerService));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
-            _filePathService = filePathService ?? throw new ArgumentNullException(nameof(filePathService));
         }
 
         /// <summary>
@@ -427,18 +418,18 @@ namespace CampaignKit.WorldMap.Data
         /// <summary>
         /// Initializes the repository if required.
         /// </summary>
-        /// <returns>
-        /// True if successful, false otherwise.
-        /// </returns>
-        public async Task<bool> InitRepository()
+        /// <param name="mapImagePath">Path to sample map image file.</param>
+        /// <param name="mapDataPath">Path to sample map json file.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public async Task<bool> InitRepository(string mapImagePath, string mapDataPath)
         {
-            // Ensure sample map has been created
+            //// Ensure sample map has been created
             var sampleMap = await _tableStorageService.GetMapRecordAsync("sample");
 
             if (sampleMap == null)
             {
-                var sampleImage = File.ReadAllBytes(Path.Combine(_filePathService.AppDataPath, "Sample.png"));
-                var sampleJSON = File.ReadAllText(Path.Combine(_filePathService.AppDataPath, "Sample.json"));
+                var sampleImage = File.ReadAllBytes(mapImagePath);
+                var sampleJSON = File.ReadAllText(mapDataPath);
                 var map = new Map()
                 {
                     Copyright = string.Empty,

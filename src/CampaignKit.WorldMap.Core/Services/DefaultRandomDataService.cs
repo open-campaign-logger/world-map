@@ -17,7 +17,7 @@
 using System;
 using System.Text;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Core.Services
 {
     /// <inheritdoc />
     /// <summary>

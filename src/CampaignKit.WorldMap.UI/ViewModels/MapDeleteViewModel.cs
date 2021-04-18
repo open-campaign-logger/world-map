@@ -16,7 +16,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace CampaignKit.WorldMap.ViewModels
+namespace CampaignKit.WorldMap.UI.ViewModels
 {
     /// <summary>
     ///     Class MapDeleteViewModel.

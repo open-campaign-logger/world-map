@@ -24,7 +24,7 @@ using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.Core
+namespace CampaignKit.WorldMap.Core.Services
 {
     /// <summary>
     /// Default Blob storage service.

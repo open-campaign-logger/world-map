@@ -1,4 +1,4 @@
-﻿// <copyright file="IUserManagerService.cs" company="Jochen Linnemann - IT-Service">
+﻿// <copyright file="IRandomDataService.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +14,18 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Core.Services
 {
-    using System.Security.Claims;
-
     /// <summary>
-    ///     Interface IUserManagerService.
+    ///     Interface IRandomDataService.
     /// </summary>
-    public interface IUserManagerService
+    public interface IRandomDataService
     {
         /// <summary>
-        ///     Derives the user's userId from the list of their claims.
+        ///     Gets the random text.
         /// </summary>
-        /// <param name="user">The authorized user.</param>
-        /// <returns>UserId (String) if found otherwise Null.</returns>
-        string GetUserId(ClaimsPrincipal user);
-
-        /// <summary>
-        /// Gets the built in system user.
-        /// </summary>
-        /// <returns>A ClaimsPrincipal object representing the system user.</returns>
-        ClaimsPrincipal GetSystemUser();
+        /// <param name="numberOfCharacters">The number of characters.</param>
+        /// <returns>System.String.</returns>
+        string GetRandomText(int numberOfCharacters);
     }
 }

@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.UI.Services
 {
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;

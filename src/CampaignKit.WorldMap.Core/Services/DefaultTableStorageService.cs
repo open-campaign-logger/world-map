@@ -14,13 +14,13 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Core.Services
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using CampaignKit.WorldMap.Entities;
+    using CampaignKit.WorldMap.Core.Entities;
 
     using Microsoft.Azure.Cosmos.Table;
     using Microsoft.Extensions.Configuration;

@@ -14,19 +14,16 @@
 // limitations under the License.
 // </copyright>
 
-using System;
 using System.IO;
 
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.UI.Services
 {
     /// <summary>
     /// The default file path service.
     /// </summary>
-    /// <seealso cref="CampaignKit.WorldMap.Services.IFilePathService" />
+    /// <seealso cref="CampaignKit.WorldMap.UI.Services.IFilePathService" />
     public class DefaultFilePathService : IFilePathService
     {
         /// <summary>

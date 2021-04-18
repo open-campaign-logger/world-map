@@ -23,8 +23,9 @@ namespace CampaignKit.WorldMap.Services
     using System.Threading;
     using System.Threading.Tasks;
 
-    using CampaignKit.WorldMap.Core;
-    using CampaignKit.WorldMap.Entities;
+    using CampaignKit.WorldMap.Core.Entities;
+    using CampaignKit.WorldMap.Core.Services;
+
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;

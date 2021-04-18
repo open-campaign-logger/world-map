@@ -1,12 +1,11 @@
-﻿using CampaignKit.WorldMap.Services;
-using CampaignKit.WorldMap.Tests.MockServices;
+﻿using CampaignKit.WorldMap.Tests.MockServices;
+using CampaignKit.WorldMap.Core.Services;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
-using CampaignKit.WorldMap.Core;
 
 namespace CampaignKit.WorldMap.Tests.Infrastructure
 {
@@ -27,11 +26,6 @@ namespace CampaignKit.WorldMap.Tests.Infrastructure
                 var tableStorageDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(ITableStorageService));
                 services.Remove(tableStorageDescriptor);
                 services.AddSingleton<ITableStorageService, MockTableStorageService>();
-
-                // Replace tile creation service with mock service
-                var tileServiceDescriptor = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IHostedService) && descriptor.ImplementationType == typeof(TileCreationService));
-                services.Remove(tileServiceDescriptor);
-                services.AddSingleton<IHostedService, MockTileCreationService>();
 
                 // Add authentication options
                 services.AddAuthentication(options =>

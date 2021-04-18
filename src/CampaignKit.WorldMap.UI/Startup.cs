@@ -18,9 +18,9 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Core;
-using CampaignKit.WorldMap.Data;
-using CampaignKit.WorldMap.Services;
+using CampaignKit.WorldMap.Core.Data;
+using CampaignKit.WorldMap.Core.Services;
+using CampaignKit.WorldMap.UI.Services;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -32,7 +32,7 @@ using Microsoft.Extensions.Hosting;
 
 using Newtonsoft.Json;
 
-namespace CampaignKit.WorldMap
+namespace CampaignKit.WorldMap.UI
 {
     /// <summary>
     ///     Class Startup.
@@ -170,7 +170,6 @@ namespace CampaignKit.WorldMap
         {
             services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
-            services.AddSingleton<IHostedService, TileCreationService>();
         }
     }
 }

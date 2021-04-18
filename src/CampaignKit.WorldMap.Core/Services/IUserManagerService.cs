@@ -1,4 +1,4 @@
-﻿// <copyright file="IProgressService.cs" company="Jochen Linnemann - IT-Service">
+﻿// <copyright file="IUserManagerService.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,27 +14,26 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Core.Services
 {
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    using CampaignKit.WorldMap.Data;
-
-    using Microsoft.Extensions.Logging;
+    using System.Security.Claims;
 
     /// <summary>
-    ///     Interface IProgressService.
+    ///     Interface IUserManagerService.
     /// </summary>
-    public interface IProgressService
+    public interface IUserManagerService
     {
         /// <summary>
-        ///     Gets the map creation progress.
-        ///     0.0 = 0% .. 1.0 = 100%.
+        ///     Derives the user's userId from the list of their claims.
         /// </summary>
-        /// <param name="mapId">The map identifier.</param>
-        /// <returns>System.Double.</returns>
-        Task<double> GetMapProgress(string mapId);
+        /// <param name="user">The authorized user.</param>
+        /// <returns>UserId (String) if found otherwise Null.</returns>
+        string GetUserId(ClaimsPrincipal user);
+
+        /// <summary>
+        /// Gets the built in system user.
+        /// </summary>
+        /// <returns>A ClaimsPrincipal object representing the system user.</returns>
+        ClaimsPrincipal GetSystemUser();
     }
 }

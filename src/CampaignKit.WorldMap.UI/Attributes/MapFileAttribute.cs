@@ -20,7 +20,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace CampaignKit.WorldMap.Attributes
+namespace CampaignKit.WorldMap.UI.Attributes
 {
     /// <summary>
     /// This custom validation attribute decorates a model field with the following jQuery validation attributes:

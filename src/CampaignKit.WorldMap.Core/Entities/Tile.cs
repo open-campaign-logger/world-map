@@ -18,7 +18,7 @@ using System;
 
 using Microsoft.Azure.Cosmos.Table;
 
-namespace CampaignKit.WorldMap.Entities
+namespace CampaignKit.WorldMap.Core.Entities
 {
     /// <summary>
     ///     Tile entity.

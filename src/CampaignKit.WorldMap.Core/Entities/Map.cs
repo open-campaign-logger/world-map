@@ -20,7 +20,7 @@ using System.ComponentModel;
 
 using Microsoft.Azure.Cosmos.Table;
 
-namespace CampaignKit.WorldMap.Entities
+namespace CampaignKit.WorldMap.Core.Entities
 {
     /// <summary>Map Entity.</summary>
     public class Map : TableEntity

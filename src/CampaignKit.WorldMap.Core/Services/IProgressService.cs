@@ -1,4 +1,4 @@
-﻿// <copyright file="IRandomDataService.cs" company="Jochen Linnemann - IT-Service">
+﻿// <copyright file="IProgressService.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +14,21 @@
 // limitations under the License.
 // </copyright>
 
-namespace CampaignKit.WorldMap.Services
+namespace CampaignKit.WorldMap.Core.Services
 {
+    using System.Threading.Tasks;
+
     /// <summary>
-    ///     Interface IRandomDataService.
+    ///     Interface IProgressService.
     /// </summary>
-    public interface IRandomDataService
+    public interface IProgressService
     {
         /// <summary>
-        ///     Gets the random text.
+        ///     Gets the map creation progress.
+        ///     0.0 = 0% .. 1.0 = 100%.
         /// </summary>
-        /// <param name="numberOfCharacters">The number of characters.</param>
-        /// <returns>System.String.</returns>
-        string GetRandomText(int numberOfCharacters);
+        /// <param name="mapId">The map identifier.</param>
+        /// <returns>System.Double.</returns>
+        Task<double> GetMapProgress(string mapId);
     }
 }

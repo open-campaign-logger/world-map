@@ -17,12 +17,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Data;
+using CampaignKit.WorldMap.Core.Data;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CampaignKit.WorldMap.Controllers
+namespace CampaignKit.WorldMap.UI.Controllers
 {
     /// <inheritdoc />
     /// <summary>

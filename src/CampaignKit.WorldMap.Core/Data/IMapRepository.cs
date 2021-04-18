@@ -19,9 +19,9 @@ using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-using CampaignKit.WorldMap.Entities;
+using CampaignKit.WorldMap.Core.Entities;
 
-namespace CampaignKit.WorldMap.Data
+namespace CampaignKit.WorldMap.Core.Data
 {
     /// <summary>
     ///     EntityFramework interface for <c>Map</c> data elements.
@@ -76,7 +76,9 @@ namespace CampaignKit.WorldMap.Data
         /// <summary>
         /// Initializes the repository if required.
         /// </summary>
+        /// <param name="mapImagePath">Path to sample map image file.</param>
+        /// <param name="mapDataPath">Path to sample map json file.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        Task<bool> InitRepository();
+        Task<bool> InitRepository(string mapImagePath, string mapDataPath);
     }
 }
