@@ -40,6 +40,17 @@ namespace CampaignKit.WorldMap.Core.Services
         /// </summary>
         private readonly ILogger _loggerService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultQueueStorageService"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <param name="loggerService">The logger service.</param>
+        public DefaultQueueStorageService(IConfiguration configuration, ILogger<DefaultTableStorageService> loggerService)
+        {
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
+        }
+
         public async Task<bool> QueueMapForProcessing(Map map)
         {
             // Create a BlobServiceClient object which will be used to create a container client
@@ -49,7 +60,7 @@ namespace CampaignKit.WorldMap.Core.Services
             try
             {
                 var queueClient = queueServiceClient.GetQueueClient("worldmapqueue");
-                await queueClient.SendMessageAsync(map.MapId);
+                await queueClient.SendMessageAsync(System.Convert.ToBase64String(Encoding.UTF8.GetBytes(map.MapId)));
             }
             catch (Azure.RequestFailedException ex)
             {
