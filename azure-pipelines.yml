@@ -31,7 +31,7 @@ steps:
     arguments: '--configuration $(buildConfiguration)'
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/src/CampaignKit.WorldMap/bin/Release/net5.0'
+    SourceFolder: '$(System.DefaultWorkingDirectory)/src/CampaignKit.WorldMap.UI/bin/Release/net5.0'
     Contents: 'publish.zip'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 - task: PublishBuildArtifacts@1
