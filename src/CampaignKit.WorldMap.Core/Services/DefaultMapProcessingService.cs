@@ -1,4 +1,4 @@
-// <copyright file="TileCreationService.cs" company="Jochen Linnemann - IT-Service">
+// <copyright file="DefaultMapProcessingService.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,13 +37,8 @@ namespace CampaignKit.WorldMap.Core.Services
     ///     This article was used to model this timed background service.
     ///     https://thinkrethink.net/2018/02/21/asp-net-core-background-processing/.
     /// </summary>
-    public class TileCreationService : ITileCreationService
+    public class DefaultMapProcessingService : IMapProcessingService
     {
-        /// <summary>
-        ///     The stopping cancellation token.
-        /// </summary>
-        private readonly CancellationTokenSource stoppingCts = new CancellationTokenSource();
-
         /// <summary>
         /// The application configuration.
         /// </summary>
@@ -75,14 +70,14 @@ namespace CampaignKit.WorldMap.Core.Services
         private Task executingTask;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TileCreationService" /> class.
+        ///     Initializes a new instance of the <see cref="DefaultMapProcessingService" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
         /// <param name="serviceProvider">The service provider.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
         /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="loggerService">The logger service.</param>
-        public TileCreationService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, ILogger<TileCreationService> loggerService)
+        public DefaultMapProcessingService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, ILogger<DefaultMapProcessingService> loggerService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
@@ -96,7 +91,7 @@ namespace CampaignKit.WorldMap.Core.Services
         /// </summary>
         /// <param name="mapId">The id of the map to create tiles for.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public async Task<bool> CreateTiles(string mapId)
+        public async Task<bool> ProcessMap(string mapId)
         {
             // Query the tiles table to see if there are any unprocessed tiles.
             var tiles = await _tableStorageService.GetUnprocessedTileRecordsAsync();
