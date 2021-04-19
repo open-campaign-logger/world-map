@@ -20,7 +20,6 @@ namespace CampaignKit.WorldMap.Core.Services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using CampaignKit.WorldMap.Core.Entities;
@@ -63,11 +62,6 @@ namespace CampaignKit.WorldMap.Core.Services
         /// The table storage service.
         /// </summary>
         private readonly ITableStorageService _tableStorageService;
-
-        /// <summary>
-        ///     The executing task.
-        /// </summary>
-        private Task executingTask;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapProcessingService" /> class.

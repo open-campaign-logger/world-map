@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Threading.Tasks;
 
 using CampaignKit.WorldMap.Core.Services;
 
@@ -27,9 +28,9 @@ namespace CampaignKit.WorldMap.TileProcessor
     public class ProcessMapTrigger
     {
         /// <summary>
-        /// The tile creation service.
+        /// The map processing service.
         /// </summary>
-        private readonly ITileCreationService _tileCreationService;
+        private readonly IMapProcessingService _mapProcessingService;
 
         /// <summary>
         /// The application configuration.
@@ -46,15 +47,15 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="log">The log.</param>
-        /// <param name="tileCreationService">The tile creation service.</param>
+        /// <param name="mapProcessingService">The map processing service.</param>
         public ProcessMapTrigger(
             IConfiguration configuration, 
             ILogger<ProcessMapTrigger> log,
-            ITileCreationService tileCreationService)
+            IMapProcessingService mapProcessingService)
         {
             this._configuration = configuration;
             this._log = log;
-            this._tileCreationService = tileCreationService;
+            this._mapProcessingService = mapProcessingService;
         }
 
         /// <summary>
@@ -62,8 +63,20 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// </summary>
         /// <param name="myQueueItem">My queue item.</param>
         [FunctionName("ProcessMapTrigger")]
-        public void Run([QueueTrigger("worldmapqueue", Connection = "")]string myQueueItem)
+        public async Task Run([QueueTrigger("worldmapqueue", Connection = "")]string myQueueItem)
         {
+            try
+            {
+                var result = await _mapProcessingService.ProcessMap(myQueueItem);
+                if (!result)
+                {
+                    throw new Exception("Failed to process map.");
+                }
+            }
+            catch (Exception e)
+            {
+                _log.LogError("Unable to process map: {0}", e.Message);
+            }
             _log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
         }
     }
