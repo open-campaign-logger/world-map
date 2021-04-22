@@ -14,10 +14,10 @@
 // limitations under the License.
 // </copyright>
 
+using System.Threading.Tasks;
+
 namespace CampaignKit.WorldMap.Core.Services
 {
-    using System.Threading.Tasks;
-
     /// <summary>
     ///     Interface IProgressService.
     /// </summary>
