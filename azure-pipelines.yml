@@ -1,44 +1,41 @@
-# ASP.NET Core
-# Build and test ASP.NET Core projects targeting .NET Core.
-# Add steps that run tests, create a NuGet package, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
-- develop
-
+  - develop
 pool:
-  vmImage: 'ubuntu-latest'
- 
+  vmImage: ubuntu-latest
 variables:
-  buildConfiguration: 'Release'
-
+  buildConfiguration: Release
 steps:
-- checkout: self
-  submodules: 'true'
-- task: UseDotNet@2
-  inputs:
-    version: '5.0.x'
-    includePreviewVersions: true # Required for preview versions
-- task: UseDotNet@2
-  inputs:
-    version: '3.1.0'
-- task: DotNetCoreCLI@2
-  inputs: 
-    command: 'test'
-    projects: '**/*tests/CampaignKit.WorldMap.Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration)'
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: true
-    arguments: '--configuration $(buildConfiguration)'
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)/src/CampaignKit.WorldMap.UI/bin/Release/net5.0'
-    Contents: 'publish.zip'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+  - checkout: self
+    submodules: 'true'
+  - task: UseDotNet@2
+    displayName: Install .NET Core 5.0 SDK
+    inputs:    
+      packageType: sdk
+      version: 5.0.x
+      includePreviewVersions: true
+  - task: UseDotNet@2
+    displayName: Install .NET Core 3.1 SDK
+    inputs:
+      packageType: sdk
+      version: 3.1.x
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: test
+      projects: '**/*tests/CampaignKit.WorldMap.Tests/*.csproj'
+      arguments: '--configuration $(buildConfiguration)'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: publish
+      publishWebProjects: true
+      arguments: '--configuration $(buildConfiguration)'
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: >-
+        $(System.DefaultWorkingDirectory)/src/CampaignKit.WorldMap.UI/bin/Release/net5.0
+      Contents: publish.zip
+      TargetFolder: $(Build.ArtifactStagingDirectory)
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: $(Build.ArtifactStagingDirectory)
+      ArtifactName: drop
+      publishLocation: Container
