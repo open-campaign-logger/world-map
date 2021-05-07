@@ -32,11 +32,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.4" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.5" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <PrivateAssets>all</PrivateAssets>
@@ -45,7 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CampaignKit.WorldMap\CampaignKit.WorldMap.csproj" />
+    <ProjectReference Include="..\..\src\CampaignKit.WorldMap.Core\CampaignKit.WorldMap.Core.csproj" />
+    <ProjectReference Include="..\..\src\CampaignKit.WorldMap.Function\CampaignKit.WorldMap.Function.csproj" />
+    <ProjectReference Include="..\..\src\CampaignKit.WorldMap.UI\CampaignKit.WorldMap.UI.csproj" />
   </ItemGroup>
 
 </Project>

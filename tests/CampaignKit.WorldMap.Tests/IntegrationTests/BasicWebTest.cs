@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
-using CampaignKit.WorldMap.Tests.Infrastructure;
 
 using Xunit;
 

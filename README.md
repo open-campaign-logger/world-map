@@ -5,7 +5,11 @@ Service for managing world maps and associate them with Campaign Logger log entr
 # Development Environment
 
 ## SDKs
-- [.Net 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
+
+- CampaignKit.WorldMap.UI
+  - [.Net 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
+- CampaignKit.WorldMap.Core and CampaignKit.WorldMap.Functions
+  - [.Net 3.1 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
 
 ## Azure Tools
 - [Microsoft Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
@@ -31,7 +35,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 ## Azure Storage Emulator
 The Azure Storage Emulator is used by the application to simulate reading/writing from Azure storage in the local environment.  See: [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
 
-Setting up blob containers and tables.
+Setting up blob containers, message queues and tables.
 ![Azure Storage Emulator](./AzureStorageEmulator.png)
 
 Enabling public access to blobs.
@@ -41,20 +45,28 @@ Enabling public access to blobs.
 - Connection strings in `appsettings.Development.json` can be overwritten locally for testing against other sources.  Use the .Net Core User Secrets manager to make these overrides. See: [Working with User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=windows).
 - To setup connection string overrides locally:
   - Open **Tools > NuGet Package Manager > NuGet Package Manager Console**
-  - `cd src\CampaignKit.WorldMap`
+  - `cd src\CampaignKit.WorldMap.UI`
   - `dotnet user-secrets init`
   - `dotnet user-secrets set "ConnectionStrings:AzureBlobStorage" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureQueueStorage" "<YOUR CUSTOM CONNECTION STRING>"`
   - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageMaps" "<YOUR CUSTOM CONNECTION STRING>"`
   - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageTiles" "<YOUR CUSTOM CONNECTION STRING>"`
   - `dotnet user-secrets set "AzureBlobBaseURL" "<YOUR CUSTOM AZURE BLOB BASE URL>"`
-- To convert an Azure SAS URI into a connection string:
+  - `cd ..\CampaignKit.WorldMap.Function`
+  - `dotnet user-secrets init`
+  - `dotnet user-secrets set "ConnectionStrings:AzureBlobStorage" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureQueueStorage" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageMaps" "<YOUR CUSTOM CONNECTION STRING>"`
+  - `dotnet user-secrets set "ConnectionStrings:AzureTableStorageTiles" "<YOUR CUSTOM CONNECTION STRING>"`
+
+To convert an Azure SAS URI into a connection string:
   - Your URI will have the following format: `https://<ACCOUNT>.<blob/table>.core.windows.net/<RESOURCE>?<SAS String>`
   - Reformat it as follows: `<BlobEndpoint\TableEndpoint>=https://<ACCOUNT>.<blob/table>.core.windows.net/;SharedAccessSignature=<SAS String>`
   - Note that the `<RESOURCE>` and `?` elements were dropped.
 
 # Deployment
 
-Ensure that the startup command is set to `dotnet CampaignKit.WorldMap.dll --urls "http://+:8080"`
+Ensure that the startup command is set to `dotnet CampaignKit.WorldMap.UI.dll --urls "http://+:8080"`
 
 # Reference Material
 
@@ -82,3 +94,7 @@ Ensure that the startup command is set to `dotnet CampaignKit.WorldMap.dll --url
 - [Cosmos DB - Query Examples](https://docs.microsoft.com/en-us/azure/cosmos-db/sql-api-dotnet-v3sdk-samples#query-examples)
 - [Azure Connection Strings](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string)
 - [Configuring Logging in Azure App Service](https://ardalis.com/configuring-logging-in-azure-app-services/)
+- [Develop, test, and deploy an Azure Function with Visual Studio](https://docs.microsoft.com/en-us/learn/modules/develop-test-deploy-azure-functions-with-visual-studio/)
+- [Use dependency injections in .Net Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection)
+- [Azure Functions Dependency Injection](https://blog.rasmustc.com/azure-functions-dependency-injection/)
+- [Using JSON and User Secrets configuration with Azure Functions](https://dev.to/cesarcodes/using-json-and-user-secrets-configuration-with-azure-functions-3f7g)

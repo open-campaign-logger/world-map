@@ -1,5 +1,5 @@
-﻿using CampaignKit.WorldMap.Entities;
-using CampaignKit.WorldMap.Services;
+﻿using CampaignKit.WorldMap.Core.Entities;
+using CampaignKit.WorldMap.Core.Services;
 using CampaignKit.WorldMap.Tests.Infrastructure;
 
 using System;
@@ -74,7 +74,6 @@ namespace CampaignKit.WorldMap.Tests.MockServices
                 AdjustedSize = 4000,
                 ContentType = "image/png",
                 Copyright = "Copyright 2017 Jochen Linnemann ",
-                CreationTimestamp = DateTime.Today.AddDays(-2),
                 FileExtension = ".png",
                 MaxZoomLevel = 4,
                 Name = "Sample",
