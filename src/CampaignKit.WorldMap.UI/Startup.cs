@@ -64,7 +64,7 @@ namespace CampaignKit.WorldMap.UI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             // Json conversion settings
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings { Formatting = Formatting.Indented };
