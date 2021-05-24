@@ -29,9 +29,12 @@ Service for managing world maps and associate them with Campaign Logger log entr
 - [GitHub](https://marketplace.visualstudio.com/items?itemName=GitHub.GitHubExtensionforVisualStudio)
 - [Web Compiler](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.WebCompiler)
 
-## Node and NPM
-- [NodeJS](https://nodejs.org/en/download/)
-
+## Docker
+- [Docker](https://docs.docker.com/docker-for-windows/install/)
+- [Container Tools Build Properties](https://docs.microsoft.com/en-us/visualstudio/containers/container-msbuild-properties?view=vs-2019)
+- [Container Tools Launch Settings](https://docs.microsoft.com/en-us/visualstudio/containers/container-launch-settings?view=vs-2019)
+- [Server Environment Variables](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-5.0#server-urls)
+ 
 ## Azure Storage Emulator
 The Azure Storage Emulator is used by the application to simulate reading/writing from Azure storage in the local environment.  See: [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
 
@@ -63,6 +66,12 @@ To convert an Azure SAS URI into a connection string:
   - Your URI will have the following format: `https://<ACCOUNT>.<blob/table>.core.windows.net/<RESOURCE>?<SAS String>`
   - Reformat it as follows: `<BlobEndpoint\TableEndpoint>=https://<ACCOUNT>.<blob/table>.core.windows.net/;SharedAccessSignature=<SAS String>`
   - Note that the `<RESOURCE>` and `?` elements were dropped.
+
+# Running the Application Natively
+
+
+# Running the Application in Docker
+
 
 # Deployment
 
