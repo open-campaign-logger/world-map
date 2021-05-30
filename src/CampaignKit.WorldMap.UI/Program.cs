@@ -51,27 +51,6 @@ namespace CampaignKit.WorldMap.UI
         /// <returns>Program initialization utility.</returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration((hostingContext, builder) =>
-                {
-                    builder.Sources.Clear();
-
-                    var env = hostingContext.HostingEnvironment;
-
-                    builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                          .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
-
-                    builder.AddEnvironmentVariables();
-
-                    if (args != null)
-                    {
-                        builder.AddCommandLine(args);
-                    }
-
-                    if (hostingContext.HostingEnvironment.IsDevelopment())
-                    {
-                        builder.AddUserSecrets<Program>();
-                    }
-                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
