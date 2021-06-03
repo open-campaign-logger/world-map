@@ -25,12 +25,12 @@ using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.TileProcessor
 {
-    public class ProcessMapTrigger
+    public class ProcessTileTrigger
     {
         /// <summary>
         /// The map processing service.
         /// </summary>
-        private readonly IMapProcessingService _mapProcessingService;
+        private readonly ITileProcessingService _mapProcessingService;
 
         /// <summary>
         /// The application configuration.
@@ -40,18 +40,18 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger<ProcessMapTrigger> _log;
+        private readonly ILogger<ProcessTileTrigger> _log;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProcessMapTrigger"/> class.
+        /// Initializes a new instance of the <see cref="ProcessTileTrigger"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="log">The log.</param>
         /// <param name="mapProcessingService">The map processing service.</param>
-        public ProcessMapTrigger(
+        public ProcessTileTrigger(
             IConfiguration configuration, 
-            ILogger<ProcessMapTrigger> log,
-            IMapProcessingService mapProcessingService)
+            ILogger<ProcessTileTrigger> log,
+            ITileProcessingService mapProcessingService)
         {
             this._configuration = configuration;
             this._log = log;
@@ -59,25 +59,25 @@ namespace CampaignKit.WorldMap.TileProcessor
         }
 
         /// <summary>
-        /// Runs the specified my queue item.
+        /// Executes the function for the specified queue item.
         /// </summary>
-        /// <param name="myQueueItem">My queue item.</param>
-        [FunctionName("ProcessMapTrigger")]
+        /// <param name="myQueueItem">The queue item.</param>
+        [FunctionName("ProcessTileTrigger")]
         public async Task Run([QueueTrigger("worldmapqueue", Connection = "")]string myQueueItem)
         {
             try
             {
-                var result = await _mapProcessingService.ProcessMap(myQueueItem);
+                var result = await _mapProcessingService.ProcessTile(myQueueItem);
                 if (!result)
                 {
-                    throw new Exception("Failed to process map.");
+                    throw new Exception("Failed to process tile.");
                 }
             }
             catch (Exception e)
             {
-                _log.LogError("Unable to process map: {0}", e.Message);
+                _log.LogError("Unable to process tile: {0}", e.Message);
             }
-            _log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
+            _log.LogInformation($"ProcessTileTrigger successfully processed tile: {0}", myQueueItem);
         }
     }
 }

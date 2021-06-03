@@ -35,15 +35,6 @@ namespace CampaignKit.WorldMap.Core.Entities
         public string MapId { get; set; }
 
         /// <summary>
-        /// Gets or sets the identifier.
-        ///
-        /// Azure Table Storage: RowKey.
-        ///
-        /// </summary>
-        /// <value>The identifier.</value>
-        public string TileId { get; set; }
-
-        /// <summary>
         ///     Gets or sets the size of the tile in bytes.
         /// </summary>
         /// <value>The size of the tile.</value>

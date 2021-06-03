@@ -22,7 +22,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -51,7 +50,7 @@ namespace CampaignKit.WorldMap.Core.Services
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
-        public async Task<bool> QueueMapForProcessing(Map map)
+        public async Task<bool> QueueTileForProcessing(Tile tile)
         {
             // Create a BlobServiceClient object which will be used to create a container client
             QueueServiceClient queueServiceClient = new QueueServiceClient(_configuration.GetConnectionString("AzureQueueStorage"));
@@ -60,11 +59,11 @@ namespace CampaignKit.WorldMap.Core.Services
             try
             {
                 var queueClient = queueServiceClient.GetQueueClient("worldmapqueue");
-                await queueClient.SendMessageAsync(System.Convert.ToBase64String(Encoding.UTF8.GetBytes(map.MapId)));
+                await queueClient.SendMessageAsync(System.Convert.ToBase64String(Encoding.UTF8.GetBytes(tile.RowKey)));
             }
             catch (Azure.RequestFailedException ex)
             {
-                _loggerService.LogError("Unable to queue map for processing: {0}.  Error message: {2}.", map.MapId, ex.Message);
+                _loggerService.LogError("Unable to queue tile for processing: {0}.  Error message: {2}.", tile.RowKey, ex.Message);
                 return false;
             }
 

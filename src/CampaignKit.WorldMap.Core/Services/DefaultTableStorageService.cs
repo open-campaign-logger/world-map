@@ -130,7 +130,7 @@ namespace CampaignKit.WorldMap.Core.Services
                 // Execute the operation
                 await cloudTable.ExecuteAsync(operation);
 
-                return tile.TileId;
+                return tile.RowKey;
             }
             catch (StorageException ex)
             {
@@ -436,11 +436,11 @@ namespace CampaignKit.WorldMap.Core.Services
         /// <summary>
         /// Gets a tile record asynchronously.
         /// </summary>
-        /// <param name="tileId">The tile's unique id.</param>
+        /// <param name="rowKey">The tile's unique id.</param>
         /// <returns>
         /// The tile if found, null otherwise.
         /// </returns>
-        private Tile GetTileRecord(string tileId)
+        private Tile GetTileRecord(string rowKey)
         {
             try
             {
@@ -454,7 +454,7 @@ namespace CampaignKit.WorldMap.Core.Services
 
                 // Query the tile record
                 var tileQuery = from t in cloudTable.CreateQuery<Tile>()
-                               where t.TileId == tileId
+                               where t.RowKey == rowKey
                                select t;
                 var tileList = tileQuery.ToList();
                 if (tileList.Count == 0)

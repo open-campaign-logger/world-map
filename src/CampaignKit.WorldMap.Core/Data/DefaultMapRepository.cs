@@ -303,14 +303,10 @@ namespace CampaignKit.WorldMap.Core.Data
                         };
                         map.Tiles.Add(tile);
                         await _tableStorageService.CreateTileRecordAsync(tile);
+                        await _queueStorageService.QueueTileForProcessing(tile);
                     }
                 }
             }
-
-            // ****************************************
-            //        Queue Map for Processing
-            // ****************************************
-            await _queueStorageService.QueueMapForProcessing(map);
 
             return map.MapId;
         }

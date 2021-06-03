@@ -38,6 +38,14 @@ namespace CampaignKit.WorldMap.Core.Services
         public Task<bool> FolderExistsAsync(string folderName);
 
         /// <summary>
+        /// Checks if the blob exists.
+        /// </summary>
+        /// <param name="folderName">Unique name of the Azure blob folder.</param>
+        /// <param name="blobName">Unique name of the Azure blob.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public Task<bool> BlobExistsAsync(string folderName, string blobName);
+
+        /// <summary>
         /// Creates the Azure Blob asynchronously.
         /// </summary>
         /// <param name="folderName">Name of the Azure Blob folder.</param>

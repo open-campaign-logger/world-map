@@ -26,7 +26,7 @@ namespace CampaignKit.WorldMap.TileProcessor
             builder.Services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             builder.Services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
             builder.Services.AddSingleton<IQueueStorageService, DefaultQueueStorageService>();
-            builder.Services.AddSingleton<IMapProcessingService, DefaultMapProcessingService>();
+            builder.Services.AddSingleton<ITileProcessingService, DefaultTileProcessingService>();
 
         }
     }
