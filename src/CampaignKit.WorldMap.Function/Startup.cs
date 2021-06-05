@@ -1,5 +1,4 @@
-﻿using CampaignKit.WorldMap.Core;
-using CampaignKit.WorldMap.Core.Services;
+﻿using CampaignKit.WorldMap.Core.Services;
 
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -26,7 +25,7 @@ namespace CampaignKit.WorldMap.TileProcessor
             builder.Services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             builder.Services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
             builder.Services.AddSingleton<IQueueStorageService, DefaultQueueStorageService>();
-            builder.Services.AddSingleton<ITileProcessingService, DefaultTileProcessingService>();
+            builder.Services.AddSingleton<IMapProcessingService, DefaultMapProcessingService>();
 
         }
     }

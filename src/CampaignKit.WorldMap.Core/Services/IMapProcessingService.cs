@@ -21,13 +21,20 @@ namespace CampaignKit.WorldMap.Core.Services
     /// <summary>
     /// Tile Processing Service Interface
     /// </summary>
-    public interface ITileProcessingService
+    public interface IMapProcessingService
     {
         /// <summary>
-        /// Creates a tile for a map.
+        /// Process a tile record.
         /// </summary>
-        /// <param name="tileId">The id of the tile to create.</param>
+        /// <param name="tileId">The id of the tile to process.</param>
         /// <returns>True if successful, false otherwise.</returns>
         public Task<bool> ProcessTile(string tileId);
+
+        /// <summary>
+        /// Process a map record.
+        /// </summary>
+        /// <param name="mapId">The id of the map to process.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public Task<bool> ProcessMap(string mapId);
     }
 }

@@ -33,7 +33,7 @@ namespace CampaignKit.WorldMap.Core.Services
     /// <summary>
     /// Default tile processing service.
     /// </summary>
-    public class DefaultTileProcessingService : ITileProcessingService
+    public class DefaultMapProcessingService : IMapProcessingService
     {
         /// <summary>
         /// The application configuration.
@@ -61,27 +61,91 @@ namespace CampaignKit.WorldMap.Core.Services
         private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="DefaultTileProcessingService" /> class.
+        /// The queue storage service
+        /// </summary>
+        private IQueueStorageService _queueStorageService;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="DefaultMapProcessingService" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
         /// <param name="serviceProvider">The service provider.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
         /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="loggerService">The logger service.</param>
-        public DefaultTileProcessingService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, ILogger<DefaultTileProcessingService> loggerService)
+        public DefaultMapProcessingService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, IQueueStorageService queueStorageService, ILogger<DefaultMapProcessingService> loggerService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
             _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            _queueStorageService = queueStorageService ?? throw new ArgumentNullException(nameof(queueStorageService));
         }
 
         /// <summary>
-        /// Creates a tile for a map.
+        /// Process a map record.
         /// </summary>
-        /// <param name="tileId">The id of the tile to create.</param>
-        /// <returns>True if successful, false otherwise.</returns>
+        /// <param name="mapId">The id of the map to process.</param>
+        /// <returns>
+        /// True if successful, false otherwise.
+        /// </returns>
+        public async Task<bool> ProcessMap(string mapId)
+        {
+
+            // Retrieve the unprocessed tile from the database
+            _loggerService.LogDebug("Retrieving map: {0}", mapId);
+            var map = await _tableStorageService.GetMapRecordAsync(mapId);
+            if (map == null)
+            {
+                _loggerService.LogError("Unable to retrieve map: {0}", mapId);
+                return false;
+            }
+
+            // Calculate Folder Paths for the Map
+            var mapFolderName = $"map{map.MapId}";
+            var masterImageName = "master-file.png";
+
+            // Load master file into memory
+            _loggerService.LogDebug("Loading master file: {0}/{1}", mapFolderName, masterImageName);
+            var masterImage = await _blobStorageService.ReadBlobAsync(mapFolderName, masterImageName);
+
+            // Get one tile from each zoom level
+            var zoomLevelTileSamples = map.Tiles.GroupBy(x => x.ZoomLevel).Select(x => x.FirstOrDefault());
+
+            // Create zoom level base file
+            foreach (var tile in zoomLevelTileSamples)
+            {
+                var zoomLevelBaseImageName = $"{tile.ZoomLevel}_zoom-level.png";
+                _loggerService.LogDebug("Creating zoom level base image: {0}/{1}.", mapFolderName, zoomLevelBaseImageName);
+                var tilePixelSize = tile.TileSize;
+                var numberOfTilesPerDimension = (int)Math.Pow(2, tile.ZoomLevel);
+                await CreateZoomLevelBaseImage(
+                    numberOfTilesPerDimension,
+                    masterImage,
+                    tile.ZoomLevel,
+                    tilePixelSize,
+                    mapFolderName,
+                    zoomLevelBaseImageName);
+            }
+
+            // Queue up tiles for processing
+            foreach (var tile in map.Tiles)
+            {
+                await _queueStorageService.QueueTileForProcessing(tile);
+            }
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// Process a tile record.
+        /// </summary>
+        /// <param name="tileId">The id of the tile to process.</param>
+        /// <returns>
+        /// True if successful, false otherwise.
+        /// </returns>
         public async Task<bool> ProcessTile(string tileId)
         {
 
@@ -102,25 +166,7 @@ namespace CampaignKit.WorldMap.Core.Services
 
             // Create zoom level base file (if required)
             var zoomLevelBaseImageName = $"{tile.ZoomLevel}_zoom-level.png";
-            byte[] zoomLevelBaseImage;
-            _loggerService.LogDebug("Determining if zoom level base image exists: {0}/{1}.", mapFolderName, zoomLevelBaseImageName);
-            var zoomLevelBaseImageExists = await _blobStorageService.BlobExistsAsync(mapFolderName, zoomLevelBaseImageName);
-            if (!zoomLevelBaseImageExists)
-            {
-                _loggerService.LogDebug("Creating zoom level base image: {0}/{1}.", mapFolderName, zoomLevelBaseImageName);
-                var tilePixelSize = tile.TileSize;
-                var numberOfTilesPerDimension = (int)Math.Pow(2, tile.ZoomLevel);
-                zoomLevelBaseImage = await CreateZoomLevelBaseImage(
-                        numberOfTilesPerDimension,
-                        masterImage,
-                        tile.ZoomLevel,
-                        tilePixelSize,
-                        mapFolderName,
-                        zoomLevelBaseImageName);
-            } else
-            {
-                zoomLevelBaseImage = await _blobStorageService.ReadBlobAsync(mapFolderName, zoomLevelBaseImageName);
-            }
+            byte[] zoomLevelBaseImage = await _blobStorageService.ReadBlobAsync(mapFolderName, zoomLevelBaseImageName);
 
             // Create zoom level tile
             var tileImageName = $"{tile.ZoomLevel}_{tile.X}_{tile.Y}.png";

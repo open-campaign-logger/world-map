@@ -50,15 +50,35 @@ namespace CampaignKit.WorldMap.Core.Services
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
-        public async Task<bool> QueueTileForProcessing(Tile tile)
+        public async Task<bool> QueueMapForProcessing(Map map)
         {
-            // Create a BlobServiceClient object which will be used to create a container client
+            // Create a QueueServiceClient object which will be used to create a container client
             QueueServiceClient queueServiceClient = new QueueServiceClient(_configuration.GetConnectionString("AzureQueueStorage"));
 
             // Create the container and return a container client object
             try
             {
                 var queueClient = queueServiceClient.GetQueueClient("worldmapqueue");
+                await queueClient.SendMessageAsync(System.Convert.ToBase64String(Encoding.UTF8.GetBytes(map.RowKey)));
+            }
+            catch (Azure.RequestFailedException ex)
+            {
+                _loggerService.LogError("Unable to queue map for processing: {0}.  Error message: {2}.", map.RowKey, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> QueueTileForProcessing(Tile tile)
+        {
+            // Create a QueueServiceClient object which will be used to create a container client
+            QueueServiceClient queueServiceClient = new QueueServiceClient(_configuration.GetConnectionString("AzureQueueStorage"));
+
+            // Create the container and return a container client object
+            try
+            {
+                var queueClient = queueServiceClient.GetQueueClient("worldmaptilequeue");
                 await queueClient.SendMessageAsync(System.Convert.ToBase64String(Encoding.UTF8.GetBytes(tile.RowKey)));
             }
             catch (Azure.RequestFailedException ex)

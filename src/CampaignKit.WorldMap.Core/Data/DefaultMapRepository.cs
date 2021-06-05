@@ -279,9 +279,6 @@ namespace CampaignKit.WorldMap.Core.Data
             //        Create Tile Entities
             // ****************************************
 
-            // Calculate number of zoom levels and steps required
-            map.Tiles = new List<Tile>();
-
             // Iterate through zoom levels to create required tiles
             for (var zoomLevel = 0; zoomLevel <= map.MaxZoomLevel; zoomLevel++)
             {
@@ -301,13 +298,12 @@ namespace CampaignKit.WorldMap.Core.Data
                             X = x,
                             Y = y,
                         };
-                        map.Tiles.Add(tile);
                         await _tableStorageService.CreateTileRecordAsync(tile);
-                        await _queueStorageService.QueueTileForProcessing(tile);
                     }
                 }
             }
 
+            await _queueStorageService.QueueMapForProcessing(map);
             return map.MapId;
         }
 

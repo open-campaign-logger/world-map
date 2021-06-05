@@ -1,4 +1,4 @@
-﻿// <copyright file="ProcessMapTrigger.cs" company="Jochen Linnemann - IT-Service">
+// <copyright file="ProcessMapTrigger.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CampaignKit.WorldMap.TileProcessor
 {
-    public class ProcessTileTrigger
+    public class ProcessMapTrigger
     {
         /// <summary>
         /// The map processing service.
@@ -43,13 +43,13 @@ namespace CampaignKit.WorldMap.TileProcessor
         private readonly ILogger<ProcessTileTrigger> _log;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProcessTileTrigger"/> class.
+        /// Initializes a new instance of the <see cref="ProcessMapTrigger"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="log">The log.</param>
         /// <param name="mapProcessingService">The map processing service.</param>
-        public ProcessTileTrigger(
-            IConfiguration configuration,
+        public ProcessMapTrigger(
+            IConfiguration configuration, 
             ILogger<ProcessTileTrigger> log,
             IMapProcessingService mapProcessingService)
         {
@@ -62,22 +62,22 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// Executes the function for the specified queue item.
         /// </summary>
         /// <param name="myQueueItem">The queue item.</param>
-        [FunctionName("ProcessTileTrigger")]
-        public async Task Run([QueueTrigger("worldmaptilequeue", Connection = "ConnectionStrings:AzureQueueStorage")] string myQueueItem)
+        [FunctionName("ProcessMapTrigger")]
+        public async Task Run([QueueTrigger("worldmapqueue", Connection = "ConnectionStrings:AzureQueueStorage")]string myQueueItem)
         {
             try
             {
-                var result = await _mapProcessingService.ProcessTile(myQueueItem);
+                var result = await _mapProcessingService.ProcessMap(myQueueItem);
                 if (!result)
                 {
-                    throw new Exception("Failed to process tile.");
+                    throw new Exception("Failed to process map.");
                 }
             }
             catch (Exception e)
             {
-                _log.LogError("Unable to process tile: {0}", e.Message);
+                _log.LogError("Unable to process map: {0}", e.Message);
             }
-            _log.LogInformation($"ProcessTileTrigger successfully processed tile: {0}", myQueueItem);
+            _log.LogInformation($"ProcessMapTrigger successfully processed map: {0}", myQueueItem);
         }
     }
 }

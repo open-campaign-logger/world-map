@@ -38,7 +38,8 @@ The Azure Storage Emulator is used by the application to simulate reading/writin
 Ensure that the following Azure Storage items have been created:
 - **world-map** blob container
   - public read access for blobs only
-- **worldmapqueue** message queue
+- **worldmapqueue** message queue for maps
+- **worldmaptilequeue** message queue for map tiles
 - **worldmapmaps** table
 - **worldmaptiles** table
  
