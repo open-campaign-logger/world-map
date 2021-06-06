@@ -31,10 +31,7 @@ namespace CampaignKit.WorldMap.Core.Services
     using SixLabors.ImageSharp.Processing;
 
     /// <summary>
-    ///     A timed background service that queries the Tiles table and processes
-    ///     tiles that haven't been created yet.
-    ///     This article was used to model this timed background service.
-    ///     https://thinkrethink.net/2018/02/21/asp-net-core-background-processing/.
+    /// Default tile processing service.
     /// </summary>
     public class DefaultMapProcessingService : IMapProcessingService
     {
@@ -64,6 +61,11 @@ namespace CampaignKit.WorldMap.Core.Services
         private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
+        /// The queue storage service
+        /// </summary>
+        private IQueueStorageService _queueStorageService;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapProcessingService" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
@@ -71,86 +73,105 @@ namespace CampaignKit.WorldMap.Core.Services
         /// <param name="blobStorageService">The blob storage service.</param>
         /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="loggerService">The logger service.</param>
-        public DefaultMapProcessingService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, ILogger<DefaultMapProcessingService> loggerService)
+        public DefaultMapProcessingService(IConfiguration configuration, IServiceProvider serviceProvider, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, IQueueStorageService queueStorageService, ILogger<DefaultMapProcessingService> loggerService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
             _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            _queueStorageService = queueStorageService ?? throw new ArgumentNullException(nameof(queueStorageService));
         }
 
         /// <summary>
-        /// Creates tiles for the map.
+        /// Process a map record.
         /// </summary>
-        /// <param name="mapId">The id of the map to create tiles for.</param>
-        /// <returns>True if successful, false otherwise.</returns>
+        /// <param name="mapId">The id of the map to process.</param>
+        /// <returns>
+        /// True if successful, false otherwise.
+        /// </returns>
         public async Task<bool> ProcessMap(string mapId)
         {
-            // Query the tiles table to see if there are any unprocessed tiles.
-            var tiles = await _tableStorageService.GetUnprocessedTileRecordsAsync();
 
-            if (tiles.Count > 0)
+            // Retrieve the unprocessed tile from the database
+            _loggerService.LogDebug("Retrieving map: {0}", mapId);
+            var map = await _tableStorageService.GetMapRecordAsync(mapId);
+            if (map == null)
             {
-                _loggerService.LogDebug("{0} tiles waiting to be processed.", tiles.Count);
-
-                // Process each map with unprocessed tiles
-                var mapList = tiles.Select(o => o.MapId).Distinct();
-                foreach (var map in mapList)
-                {
-                    _loggerService.LogDebug("Processing tiles for map: {0}.", map);
-
-                    // Calculate Folder Paths for the Map
-                    var folderName = $"map{map}";
-                    var masterBlob = await _blobStorageService.ReadBlobAsync(folderName, "master-file.png");
-
-                    // Process each map zoom level with unprocessed tiles
-                    var zoomList = tiles.Where(t => t.MapId == map).Select(o => o.ZoomLevel).Distinct();
-                    foreach (var zoomLevel in zoomList)
-                    {
-                        // Select Tiles for Processing
-                        var tilesToProcess = tiles.Where(t => t.MapId == map).Where(t => t.ZoomLevel == zoomLevel);
-
-                        // Calculate Tile Size
-                        var tilePixelSize = tiles[0].TileSize;
-
-                        // Calculate the number of tiles required for this zoom level
-                        var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
-
-                        // Create zoom level base file (sync)
-                        _loggerService.LogDebug("Creating zoom level base image for zoom level: {0}.", zoomLevel);
-                        var zoomLevelBlob
-                            = await CreateZoomLevelBaseFile(
-                                numberOfTilesPerDimension,
-                                masterBlob,
-                                zoomLevel,
-                                tilePixelSize,
-                                folderName,
-                                $"{zoomLevel}_zoom-level.png");
-
-                        // Create collection for tile creation tasks
-                        var tasks = new List<Task<bool>>();
-                        tasks.Clear();
-
-                        // Cycle through the tiles selected for the current map and zoom and process them
-                        foreach (var tile in tilesToProcess)
-                        {
-                            var blobName = $"{zoomLevel}_{tile.X}_{tile.Y}.png";
-                            _loggerService.LogDebug("Creating zoom level tile: {0}.", blobName);
-                            tasks.Add(Task.Run(() => CreateZoomLevelTileFile(zoomLevelBlob, tile, folderName, blobName)));
-                        }
-
-                        // Wait for all tile creation tasks to complete
-                        var results = await Task.WhenAll(tasks);
-                    }
-                }
-
-                // Delete all processed tile records
-                foreach (var tile in tiles)
-                {
-                    await _tableStorageService.DeleteTileRecordAsync(tile);
-                }
+                _loggerService.LogError("Unable to retrieve map: {0}", mapId);
+                return false;
             }
+
+            // Calculate Folder Paths for the Map
+            var mapFolderName = $"map{map.MapId}";
+            var masterImageName = "master-file.png";
+
+            // Load master file into memory
+            _loggerService.LogDebug("Loading master file: {0}/{1}", mapFolderName, masterImageName);
+            var masterImage = await _blobStorageService.ReadBlobAsync(mapFolderName, masterImageName);
+
+            // Get one tile from each zoom level
+            var zoomLevelTileSamples = map.Tiles.GroupBy(x => x.ZoomLevel).Select(x => x.FirstOrDefault());
+
+            // Create zoom level base file
+            foreach (var tile in zoomLevelTileSamples)
+            {
+                var zoomLevelBaseImageName = $"{tile.ZoomLevel}_zoom-level.png";
+                _loggerService.LogDebug("Creating zoom level base image: {0}/{1}.", mapFolderName, zoomLevelBaseImageName);
+                var tilePixelSize = tile.TileSize;
+                var numberOfTilesPerDimension = (int)Math.Pow(2, tile.ZoomLevel);
+                await CreateZoomLevelBaseImage(
+                    numberOfTilesPerDimension,
+                    masterImage,
+                    tile.ZoomLevel,
+                    tilePixelSize,
+                    mapFolderName,
+                    zoomLevelBaseImageName);
+            }
+
+            // Queue up tiles for processing
+            foreach (var tile in map.Tiles)
+            {
+                await _queueStorageService.QueueTileForProcessing(tile);
+            }
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// Process a tile record.
+        /// </summary>
+        /// <param name="tileId">The id of the tile to process.</param>
+        /// <returns>
+        /// True if successful, false otherwise.
+        /// </returns>
+        public async Task<bool> ProcessTile(string tileId)
+        {
+
+            // Retrieve the unprocessed tile from the database
+            _loggerService.LogDebug("Retrieving tile: {0}", tileId);
+            var tile = await _tableStorageService.GetTileRecordAsync(tileId);
+            if (tile == null)
+            {
+                _loggerService.LogError("Unable to retrieve tile: {0}", tileId);
+                return false;
+            }
+
+            // Calculate Folder Paths for the Map
+            var mapFolderName = $"map{tile.MapId}";
+            var masterImageName = "master-file.png";
+            _loggerService.LogDebug("Loading master file: {0}/{1}", mapFolderName, masterImageName);
+            var masterImage = await _blobStorageService.ReadBlobAsync(mapFolderName, masterImageName);
+
+            // Create zoom level base file (if required)
+            var zoomLevelBaseImageName = $"{tile.ZoomLevel}_zoom-level.png";
+            byte[] zoomLevelBaseImage = await _blobStorageService.ReadBlobAsync(mapFolderName, zoomLevelBaseImageName);
+
+            // Create zoom level tile
+            var tileImageName = $"{tile.ZoomLevel}_{tile.X}_{tile.Y}.png";
+            _loggerService.LogDebug("Creating tile: {0}/{1}.", mapFolderName, tileImageName);
+            await CreateTileImage(zoomLevelBaseImage, tile, mapFolderName, tileImageName);
 
             return true;
         }
@@ -165,7 +186,7 @@ namespace CampaignKit.WorldMap.Core.Services
         /// <param name="folderName">The blob container name.</param>
         /// <param name="blobName">The name of the blob.</param>
         /// <returns>byte[] of zoom level base file.</returns>
-        private async Task<byte[]> CreateZoomLevelBaseFile(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize, string folderName, string blobName)
+        private async Task<byte[]> CreateZoomLevelBaseImage(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize, string folderName, string blobName)
         {
             using (var masterBaseImage = Image.Load(masterBlob))
             {
@@ -196,7 +217,7 @@ namespace CampaignKit.WorldMap.Core.Services
         /// <param name="folderName">The blob container name.</param>
         /// <param name="blobName">The name of the blob.</param>
         /// <returns>True when complete.</returns>
-        private async Task<bool> CreateZoomLevelTileFile(byte[] zoomLevelBlob, Tile tile, string folderName, string blobName)
+        private async Task<bool> CreateTileImage(byte[] zoomLevelBlob, Tile tile, string folderName, string blobName)
         {
             using (var zoomLevelImage = Image.Load(zoomLevelBlob))
             {

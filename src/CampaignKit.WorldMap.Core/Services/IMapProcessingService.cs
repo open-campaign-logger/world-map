@@ -19,14 +19,21 @@ using System.Threading.Tasks;
 namespace CampaignKit.WorldMap.Core.Services
 {
     /// <summary>
-    /// Map Processing Service Interface
+    /// Tile Processing Service Interface
     /// </summary>
     public interface IMapProcessingService
     {
         /// <summary>
-        /// Creates tiles for the map.
+        /// Process a tile record.
         /// </summary>
-        /// <param name="mapId">The id of the map to create tiles for.</param>
+        /// <param name="tileId">The id of the tile to process.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public Task<bool> ProcessTile(string tileId);
+
+        /// <summary>
+        /// Process a map record.
+        /// </summary>
+        /// <param name="mapId">The id of the map to process.</param>
         /// <returns>True if successful, false otherwise.</returns>
         public Task<bool> ProcessMap(string mapId);
     }

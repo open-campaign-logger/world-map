@@ -23,10 +23,17 @@ namespace CampaignKit.WorldMap.Core.Services
     public interface IQueueStorageService
     {
 
-        /// <summary>Queues the map for processing.</summary>
-        /// <param name="map">The map.</param>
+        /// <summary>Queues the tile for processing.</summary>
+        /// <param name="tile">The tile to be processed.</param>
         /// <returns>
-        ///   True if successful, false othewise.
+        ///   True if successful, false otherwise.
+        /// </returns>
+        public Task<bool> QueueTileForProcessing(Tile tile);
+
+        /// <summary>Queues the map for processing.</summary>
+        /// <param name="map">The map to be processed.</param>
+        /// <returns>
+        ///   True if successful, false otherwise.
         /// </returns>
         public Task<bool> QueueMapForProcessing(Map map);
 

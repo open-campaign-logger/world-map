@@ -7,6 +7,11 @@ namespace CampaignKit.WorldMap.Tests.MockServices
 {
     public class MockBlobStorageService : IBlobStorageService
     {
+        public Task<bool> BlobExistsAsync(string folderName, string blobName)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<bool> CreateBlobAsync(string folderName, string blobName, byte[] blob)
         {
             throw new NotImplementedException();

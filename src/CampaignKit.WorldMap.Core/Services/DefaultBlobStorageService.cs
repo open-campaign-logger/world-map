@@ -176,7 +176,32 @@ namespace CampaignKit.WorldMap.Core.Services
             }
             catch (Azure.RequestFailedException ex)
             {
-                _loggerService.LogError("Unable to create Azure container: {0}.  Error message: {1}.", folderName, ex.Message);
+                _loggerService.LogError("Unable to determine if folder exists: {0}.  Error message: {1}.", folderName, ex.Message);
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Checks if the blob exists.
+        /// </summary>
+        /// <param name="folderName">Unique name of the Azure blob folder.</param>
+        /// <param name="blobName">Unique name of the Azure blob.</param>
+        /// <returns>True if successful, false otherwise.</returns>
+        public async Task<bool> BlobExistsAsync(string folderName, string blobName)
+        {
+            // Create a BlobServiceClient object which will be used to create a container client
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
+
+            // Create the container and return a container client object
+            try
+            {
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient("world-map");
+                var blobClient = blobContainerClient.GetBlobClient($"{folderName}/{blobName}");
+                return await blobClient.ExistsAsync();
+            }
+            catch (Azure.RequestFailedException ex)
+            {
+                _loggerService.LogError("Unable to determine if blob exists: {0}/{1}.  Error message: {2}.", folderName, blobName, ex.Message);
                 return false;
             }
         }

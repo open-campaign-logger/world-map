@@ -14,5 +14,10 @@ namespace CampaignKit.WorldMap.Tests.MockServices
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> QueueTileForProcessing(Tile tile)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

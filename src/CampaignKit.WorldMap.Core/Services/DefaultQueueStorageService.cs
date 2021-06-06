@@ -22,7 +22,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -53,18 +52,38 @@ namespace CampaignKit.WorldMap.Core.Services
 
         public async Task<bool> QueueMapForProcessing(Map map)
         {
-            // Create a BlobServiceClient object which will be used to create a container client
+            // Create a QueueServiceClient object which will be used to create a container client
             QueueServiceClient queueServiceClient = new QueueServiceClient(_configuration.GetConnectionString("AzureQueueStorage"));
 
             // Create the container and return a container client object
             try
             {
                 var queueClient = queueServiceClient.GetQueueClient("worldmapqueue");
-                await queueClient.SendMessageAsync(System.Convert.ToBase64String(Encoding.UTF8.GetBytes(map.MapId)));
+                await queueClient.SendMessageAsync(System.Convert.ToBase64String(Encoding.UTF8.GetBytes(map.RowKey)));
             }
             catch (Azure.RequestFailedException ex)
             {
-                _loggerService.LogError("Unable to queue map for processing: {0}.  Error message: {2}.", map.MapId, ex.Message);
+                _loggerService.LogError("Unable to queue map for processing: {0}.  Error message: {2}.", map.RowKey, ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> QueueTileForProcessing(Tile tile)
+        {
+            // Create a QueueServiceClient object which will be used to create a container client
+            QueueServiceClient queueServiceClient = new QueueServiceClient(_configuration.GetConnectionString("AzureQueueStorage"));
+
+            // Create the container and return a container client object
+            try
+            {
+                var queueClient = queueServiceClient.GetQueueClient("worldmaptilequeue");
+                await queueClient.SendMessageAsync(System.Convert.ToBase64String(Encoding.UTF8.GetBytes(tile.RowKey)));
+            }
+            catch (Azure.RequestFailedException ex)
+            {
+                _loggerService.LogError("Unable to queue tile for processing: {0}.  Error message: {2}.", tile.RowKey, ex.Message);
                 return false;
             }
 
