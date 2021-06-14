@@ -40,7 +40,7 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger<ProcessTileTrigger> _log;
+        private readonly ILogger<ProcessMapTrigger> _log;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessMapTrigger"/> class.
@@ -50,7 +50,7 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// <param name="mapProcessingService">The map processing service.</param>
         public ProcessMapTrigger(
             IConfiguration configuration, 
-            ILogger<ProcessTileTrigger> log,
+            ILogger<ProcessMapTrigger> log,
             IMapProcessingService mapProcessingService)
         {
             this._configuration = configuration;
@@ -77,7 +77,7 @@ namespace CampaignKit.WorldMap.TileProcessor
             {
                 _log.LogError("Unable to process map: {0}", e.Message);
             }
-            _log.LogInformation($"ProcessMapTrigger successfully processed map: {0}", myQueueItem);
+            _log.LogInformation("ProcessMapTrigger successfully processed map: {0}", myQueueItem);
         }
     }
 }

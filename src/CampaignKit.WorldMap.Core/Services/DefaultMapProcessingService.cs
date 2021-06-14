@@ -20,6 +20,7 @@ namespace CampaignKit.WorldMap.Core.Services
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net.Http;
     using System.Threading.Tasks;
 
     using CampaignKit.WorldMap.Core.Entities;
@@ -106,33 +107,34 @@ namespace CampaignKit.WorldMap.Core.Services
             var mapFolderName = $"map{map.MapId}";
             var masterImageName = "master-file.png";
 
-            // Load master file into memory
-            _loggerService.LogDebug("Loading master file: {0}/{1}", mapFolderName, masterImageName);
-            var masterImage = await _blobStorageService.ReadBlobAsync(mapFolderName, masterImageName);
-
-            // Get one tile from each zoom level
-            var zoomLevelTileSamples = map.Tiles.GroupBy(x => x.ZoomLevel).Select(x => x.FirstOrDefault());
-
-            // Create zoom level base file
-            foreach (var tile in zoomLevelTileSamples)
+            // Load the master image into a disposable object.
+            _loggerService.LogInformation("Loading master image: {0}/{1}", mapFolderName, masterImageName);
+            using (var masterImage = Image.Load(await _blobStorageService.ReadBlobAsync(mapFolderName, masterImageName)))
             {
-                var zoomLevelBaseImageName = $"{tile.ZoomLevel}_zoom-level.png";
-                _loggerService.LogDebug("Creating zoom level base image: {0}/{1}.", mapFolderName, zoomLevelBaseImageName);
-                var tilePixelSize = tile.TileSize;
-                var numberOfTilesPerDimension = (int)Math.Pow(2, tile.ZoomLevel);
-                await CreateZoomLevelBaseImage(
-                    numberOfTilesPerDimension,
-                    masterImage,
-                    tile.ZoomLevel,
-                    tilePixelSize,
-                    mapFolderName,
-                    zoomLevelBaseImageName);
+                // Get one tile from each zoom level
+                var zoomLevelTileSamples = map.Tiles.GroupBy(x => x.ZoomLevel).Select(x => x.FirstOrDefault());
+
+                // Create zoom level base file
+                foreach (var tile in zoomLevelTileSamples)
+                {
+                    var zoomLevelBaseImageName = $"{tile.ZoomLevel}_zoom-level.png";
+                    _loggerService.LogInformation("Creating zoom level base image: {0}/{1}.", mapFolderName, zoomLevelBaseImageName);
+                    var tilePixelSize = tile.TileSize;
+                    var numberOfTilesPerDimension = (int)Math.Pow(2, tile.ZoomLevel);
+                    await CreateZoomLevelBaseImage(
+                        numberOfTilesPerDimension,
+                        masterImage,
+                        tile.ZoomLevel,
+                        tilePixelSize,
+                        mapFolderName,
+                        zoomLevelBaseImageName);
+                }
             }
 
-            // Queue up tiles for processing
+            // Process Tiles
             foreach (var tile in map.Tiles)
             {
-                await _queueStorageService.QueueTileForProcessing(tile);
+                await ProcessTile(tile.RowKey);
             }
 
             return true;
@@ -158,20 +160,17 @@ namespace CampaignKit.WorldMap.Core.Services
                 return false;
             }
 
-            // Calculate Folder Paths for the Map
+            // Load the zoom level image into a disposable object.
             var mapFolderName = $"map{tile.MapId}";
-            var masterImageName = "master-file.png";
-            _loggerService.LogDebug("Loading master file: {0}/{1}", mapFolderName, masterImageName);
-            var masterImage = await _blobStorageService.ReadBlobAsync(mapFolderName, masterImageName);
-
-            // Create zoom level base file (if required)
             var zoomLevelBaseImageName = $"{tile.ZoomLevel}_zoom-level.png";
-            byte[] zoomLevelBaseImage = await _blobStorageService.ReadBlobAsync(mapFolderName, zoomLevelBaseImageName);
-
-            // Create zoom level tile
-            var tileImageName = $"{tile.ZoomLevel}_{tile.X}_{tile.Y}.png";
-            _loggerService.LogDebug("Creating tile: {0}/{1}.", mapFolderName, tileImageName);
-            await CreateTileImage(zoomLevelBaseImage, tile, mapFolderName, tileImageName);
+            _loggerService.LogInformation("Loading zoom level image: {0}/{1}", mapFolderName, zoomLevelBaseImageName);
+            using (var zoomLevelBaseImage = Image.Load(await _blobStorageService.ReadBlobAsync(mapFolderName, zoomLevelBaseImageName)))
+            {
+                // Create zoom level tile
+                var tileImageName = $"{tile.ZoomLevel}_{tile.X}_{tile.Y}.png";
+                _loggerService.LogInformation("Creating tile: {0}/{1}.", mapFolderName, tileImageName);
+                await CreateTileImage(zoomLevelBaseImage, tile, mapFolderName, tileImageName);
+            }
 
             return true;
         }
@@ -180,31 +179,29 @@ namespace CampaignKit.WorldMap.Core.Services
         /// Creates the zoom level base file.
         /// </summary>
         /// <param name="numberOfTilesPerDimension">The number of tiles per dimension.</param>
-        /// <param name="masterBlob">The master image.</param>
+        /// <param name="masterImage">The master image.</param>
         /// <param name="zoomLevel">The zoom level.</param>
         /// <param name="tilePixelSize">Tile pixel size.</param>
         /// <param name="folderName">The blob container name.</param>
         /// <param name="blobName">The name of the blob.</param>
-        /// <returns>byte[] of zoom level base file.</returns>
-        private async Task<byte[]> CreateZoomLevelBaseImage(int numberOfTilesPerDimension, byte[] masterBlob, int zoomLevel, int tilePixelSize, string folderName, string blobName)
+        private async Task CreateZoomLevelBaseImage(int numberOfTilesPerDimension, Image masterImage, int zoomLevel, int tilePixelSize, string folderName, string blobName)
         {
-            using (var masterBaseImage = Image.Load(masterBlob))
+            var size = numberOfTilesPerDimension * tilePixelSize;
+
+            // Mutate a deep clone of the original image
+            // This code will dispose of the imageCopy from memory when complete.
+            using (var imageCopy = masterImage.Clone(context => context.Resize(new ResizeOptions
             {
-                var size = numberOfTilesPerDimension * tilePixelSize;
-
-                masterBaseImage.Mutate(context => context.Resize(new ResizeOptions
-                {
-                    Mode = ResizeMode.Pad,
-                    Position = AnchorPositionMode.Center,
-                    Size = new Size(size, size),
-                }));
-
+                Mode = ResizeMode.Pad,
+                Position = AnchorPositionMode.Center,
+                Size = new Size(size, size),
+            })))
+            {
                 using (var ms = new MemoryStream())
                 {
-                    await masterBaseImage.SaveAsPngAsync(ms);
+                    await imageCopy.SaveAsPngAsync(ms);
                     var blob = ms.ToArray();
                     await _blobStorageService.CreateBlobAsync(folderName, blobName, blob);
-                    return blob;
                 }
             }
         }
@@ -216,23 +213,21 @@ namespace CampaignKit.WorldMap.Core.Services
         /// <param name="tile">The tile to be created.</param>
         /// <param name="folderName">The blob container name.</param>
         /// <param name="blobName">The name of the blob.</param>
-        /// <returns>True when complete.</returns>
-        private async Task<bool> CreateTileImage(byte[] zoomLevelBlob, Tile tile, string folderName, string blobName)
+        private async Task CreateTileImage(Image zoomLevelImage, Tile tile, string folderName, string blobName)
         {
-            using (var zoomLevelImage = Image.Load(zoomLevelBlob))
+
+            using (var imageCopy = zoomLevelImage.Clone(context => context.Crop(
+            new Rectangle(tile.X * tile.TileSize, tile.Y * tile.TileSize, tile.TileSize, tile.TileSize))))
             {
-                zoomLevelImage.Mutate(context => context.Crop(
-                new Rectangle(tile.X * tile.TileSize, tile.Y * tile.TileSize, tile.TileSize, tile.TileSize)));
                 using (var ms = new MemoryStream())
                 {
-                    await zoomLevelImage.SaveAsPngAsync(ms);
+                    await imageCopy.SaveAsPngAsync(ms);
                     await _blobStorageService.CreateBlobAsync(folderName, blobName, ms.ToArray());
                 }
-
-                tile.IsRendered = true;
-                await _tableStorageService.UpdateTileRecordAsync(tile);
-                return true;
             }
+
+            tile.IsRendered = true;
+            await _tableStorageService.UpdateTileRecordAsync(tile);
         }
     }
 }
