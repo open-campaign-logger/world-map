@@ -96,5 +96,13 @@ namespace CampaignKit.WorldMap.Core.Services
         /// </summary>
         /// <returns>List of unprocessed tiles, empty list of no tiles require processing.</returns>
         public Task<List<Tile>> GetUnprocessedTileRecordsAsync();
+
+        /// <summary>
+        /// Delete processed tile records asynchronously.
+        /// </summary>
+        /// <param name="numberOfDays">Only delete processed tile records that are this number of days old.</param>
+        /// <param name="maxNumberOfRecords">Maximum number of records to delete.</param>
+        /// <returns>Number of records deleted.</returns>
+        public Task<int> DeleteProcessedTileRecordsAsync(int numberOfDays, int maxNumberOfRecords);
     }
 }
