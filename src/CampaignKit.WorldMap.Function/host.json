@@ -8,7 +8,7 @@
       }
     },
     "logLevel": {
-      "CampaignKit.WorldMap.TileProcessor.TileCreationTrigger": "Debug"
+      "CampaignKit.WorldMap.ProcessMapTrigger": "Information"
     }
   },
   "retry": {

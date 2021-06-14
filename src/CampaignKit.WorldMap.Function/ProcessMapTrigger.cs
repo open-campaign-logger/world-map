@@ -23,7 +23,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.TileProcessor
+namespace CampaignKit.WorldMap.Function
 {
     public class ProcessMapTrigger
     {
