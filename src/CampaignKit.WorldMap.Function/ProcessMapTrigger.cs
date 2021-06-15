@@ -14,17 +14,20 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Threading.Tasks;
-
 using CampaignKit.WorldMap.Core.Services;
 
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.TileProcessor
+using System;
+using System.Threading.Tasks;
+
+namespace CampaignKit.WorldMap.Function
 {
+    /// <summary>
+    /// Triggers when an enter is entered in the worldmapqueue
+    /// </summary>
     public class ProcessMapTrigger
     {
         /// <summary>
@@ -40,7 +43,7 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger<ProcessTileTrigger> _log;
+        private readonly ILogger<ProcessMapTrigger> _log;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProcessMapTrigger"/> class.
@@ -49,8 +52,8 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// <param name="log">The log.</param>
         /// <param name="mapProcessingService">The map processing service.</param>
         public ProcessMapTrigger(
-            IConfiguration configuration, 
-            ILogger<ProcessTileTrigger> log,
+            IConfiguration configuration,
+            ILogger<ProcessMapTrigger> log,
             IMapProcessingService mapProcessingService)
         {
             this._configuration = configuration;
@@ -63,7 +66,7 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// </summary>
         /// <param name="myQueueItem">The queue item.</param>
         [FunctionName("ProcessMapTrigger")]
-        public async Task Run([QueueTrigger("worldmapqueue", Connection = "ConnectionStrings:AzureQueueStorage")]string myQueueItem)
+        public async Task Run([QueueTrigger("worldmapqueue", Connection = "ConnectionStrings:AzureQueueStorage")] string myQueueItem)
         {
             try
             {
@@ -72,12 +75,12 @@ namespace CampaignKit.WorldMap.TileProcessor
                 {
                     throw new Exception("Failed to process map.");
                 }
+                _log.LogInformation("ProcessMapTrigger successfully processed map: {0}", myQueueItem);
             }
             catch (Exception e)
             {
                 _log.LogError("Unable to process map: {0}", e.Message);
             }
-            _log.LogInformation($"ProcessMapTrigger successfully processed map: {0}", myQueueItem);
         }
     }
 }

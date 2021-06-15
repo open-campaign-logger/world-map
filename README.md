@@ -39,7 +39,6 @@ Ensure that the following Azure Storage items have been created:
 - **world-map** blob container
   - public read access for blobs only
 - **worldmapqueue** message queue for maps
-- **worldmaptilequeue** message queue for map tiles
 - **worldmapmaps** table
 - **worldmaptiles** table
  
@@ -50,12 +49,32 @@ Enabling public access to blobs.
 ![Azure Blob Public Access Level](AzureBlobPublicAccessLevel.png)
 
 # Running and Debugging the Application Natively
+
+## Docker Desktop
 1. Start Docker Desktop
 2. Click "Start" to begin debugging.  This will build and run two Docker images:
   - CampaignKit.WorldMap.UI and
   - CampaignKit.WorldMap.Function
 
 ![Docker Running World-Map Projects](./DockerRunningWorldMapProjects.png)
+
+## User Secrets
+Both the **CampaignKit.WorldMap.Function** and **CampaignKit.WorldMap.UI** projects make use of ASP.Net Core's user secrets functionality to override values in **local.settings.json** and **appsettings.json** respectively.  Visual Studio has built in support for user secrets that you can use to provide configuration overrides during development.
+
+![Visual Studio Support for User Secrets](./UserSecrets.png)
+
+Once you open your user secrets file you can provide local configuration overrides that don't get stored in the code repository.
+
+```
+{
+  "ConnectionStrings:AzureTableStorageTiles": "TableEndpoint=https://clst03.table.core.windows.net/;SharedAccessSignature=...",
+  "ConnectionStrings:AzureTableStorageMaps": "TableEndpoint=https://clst03.table.core.windows.net/;SharedAccessSignature=...",
+  "ConnectionStrings:AzureQueueStorage": "QueueEndpoint=https://clst03.queue.core.windows.net/;SharedAccessSignature=...",
+  "ConnectionStrings:AzureBlobStorage": "BlobEndpoint=https://clst03.blob.core.windows.net/;SharedAccessSignature=...",
+  "AzureBlobBaseURL": "https://clst03.blob.core.windows.net/world-map"
+}
+```
+
 
 # Reference Material
 
@@ -87,3 +106,7 @@ Enabling public access to blobs.
 - [Use dependency injections in .Net Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection)
 - [Azure Functions Dependency Injection](https://blog.rasmustc.com/azure-functions-dependency-injection/)
 - [Using JSON and User Secrets configuration with Azure Functions](https://dev.to/cesarcodes/using-json-and-user-secrets-configuration-with-azure-functions-3f7g)
+
+## ASP.Net Core
+- [ASP.Net User Secrets](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=windows)
+- [Visual Studio Support for User Secrets](https://www.mssqltips.com/sqlservertip/6348/securely-manage-database-credentials-using-visual-studio-manage-user-secrets/)

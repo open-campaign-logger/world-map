@@ -1,4 +1,4 @@
-﻿// <copyright file="ProcessMapTrigger.cs" company="Jochen Linnemann - IT-Service">
+// <copyright file="CleanupTrigger.cs" company="Jochen Linnemann - IT-Service">
 // Copyright (c) 2017-2021 Jochen Linnemann, Cory Gill.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,23 +14,25 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-using System.Threading.Tasks;
-
 using CampaignKit.WorldMap.Core.Services;
 
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CampaignKit.WorldMap.TileProcessor
+using System;
+using System.Threading.Tasks;
+
+namespace CampaignKit.WorldMap.Function
 {
-    public class ProcessTileTrigger
+    /// <summary>
+    /// Triggers once a day to cleanup processed tile records.
+    /// </summary>
+    public class CleanupTrigger
     {
-        /// <summary>
         /// The map processing service.
         /// </summary>
-        private readonly IMapProcessingService _mapProcessingService;
+        private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
         /// The application configuration.
@@ -40,44 +42,45 @@ namespace CampaignKit.WorldMap.TileProcessor
         /// <summary>
         /// The application logging service.
         /// </summary>
-        private readonly ILogger<ProcessTileTrigger> _log;
+        private readonly ILogger<CleanupTrigger> _log;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProcessTileTrigger"/> class.
+        /// Initializes a new instance of the <see cref="CleanupTrigger"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="log">The log.</param>
-        /// <param name="mapProcessingService">The map processing service.</param>
-        public ProcessTileTrigger(
+        /// <param name="tableStorageService">The table storage service.</param>
+        public CleanupTrigger(
             IConfiguration configuration,
-            ILogger<ProcessTileTrigger> log,
-            IMapProcessingService mapProcessingService)
+            ILogger<CleanupTrigger> log,
+            ITableStorageService tableStorageService)
         {
-            this._configuration = configuration;
-            this._log = log;
-            this._mapProcessingService = mapProcessingService;
+            _configuration = configuration;
+            _log = log;
+            _tableStorageService = tableStorageService;
         }
 
         /// <summary>
-        /// Executes the function for the specified queue item.
+        /// Runs the specified my timer.
         /// </summary>
-        /// <param name="myQueueItem">The queue item.</param>
-        [FunctionName("ProcessTileTrigger")]
-        public async Task Run([QueueTrigger("worldmaptilequeue", Connection = "ConnectionStrings:AzureQueueStorage")] string myQueueItem)
+        /// <param name="myTimer">My timer.</param>
+        [FunctionName("CleanupTrigger")]
+        public async Task Run([TimerTrigger("0 */30 * * * * ")] TimerInfo myTimer)
         {
             try
             {
-                var result = await _mapProcessingService.ProcessTile(myQueueItem);
-                if (!result)
+                var result = await _tableStorageService.DeleteProcessedTileRecordsAsync(1, 500);
+                if (result < 0)
                 {
-                    throw new Exception("Failed to process tile.");
+                    throw new Exception("Failed to delete procesed tiles.");
                 }
+                _log.LogInformation("Successfully delete {0} processed tiles.", result);
             }
             catch (Exception e)
             {
-                _log.LogError("Unable to process tile: {0}", e.Message);
+                _log.LogError("Unable to delete processed tiles: {0}", e.Message);
             }
-            _log.LogInformation($"ProcessTileTrigger successfully processed tile: {0}", myQueueItem);
+            _log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
         }
     }
 }

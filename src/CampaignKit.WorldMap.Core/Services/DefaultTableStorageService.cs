@@ -190,6 +190,50 @@ namespace CampaignKit.WorldMap.Core.Services
             }
         }
 
+
+        /// <summary>
+        /// Delete processed tile records asynchronously.
+        /// </summary>
+        /// <param name="numberOfDays">Only delete processed tile records that are this number of days old.</param>
+        /// <param name="maxNumberOfRecords">Maximum number of records to delete.</param>
+        /// <returns>
+        /// Number of records deleted.
+        /// </returns>
+        public async Task<int> DeleteProcessedTileRecordsAsync(int numberOfDays, int maxNumberOfRecords)
+        {
+            try
+            {
+                // Initialize connection to Azure table storage
+                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
+                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
+                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
+
+                // Connect to the worlmaptiles table.
+                var cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
+
+                // Query tile records
+                var tileQuery = from t in cloudTable.CreateQuery<Tile>()
+                                where t.IsRendered == true && t.Timestamp < DateTime.Now.AddDays(-numberOfDays)
+                                select t;
+
+                // Delete the tile records 
+                int counter = 0;
+                foreach (var tile in tileQuery.Take(maxNumberOfRecords))
+                {
+                    await DeleteTileRecordAsync(tile);
+                    counter++;
+                }
+
+                // Return the number of tiles deleted
+                return counter;
+            }
+            catch (StorageException ex)
+            {
+                _loggerService.LogError("Unable to delete tile records: {0}", ex.Message);
+                return -1;
+            }
+        }
+
         /// <summary>
         /// Deletes a tile record asynchronously.
         /// </summary>
