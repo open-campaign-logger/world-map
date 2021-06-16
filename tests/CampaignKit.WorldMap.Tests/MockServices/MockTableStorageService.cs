@@ -25,6 +25,11 @@ namespace CampaignKit.WorldMap.Tests.MockServices
             throw new NotImplementedException();
         }
 
+        public Task<int> DeleteProcessedTileRecordsAsync(int numberOfDays, int maxNumberOfRecords)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<bool> DeleteTileRecordAsync(Tile tile)
         {
             throw new NotImplementedException();
