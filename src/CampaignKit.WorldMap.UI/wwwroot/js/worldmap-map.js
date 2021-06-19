@@ -264,6 +264,11 @@ function popupOpen(e) {
     // Remove temporary spacer
     $(`#popup_editor_spacer_${e.target.properties.id}`).remove();
 
+    // Update popup html
+    popupContent = L.Util.template(template, e.target.properties);
+
+    // Create a popup
+    e.target.setPopupContent(popupContent);
 
     // Instantiate the popup editor
     quill = new Quill(`#popup_editor_${e.target.properties.id}`,
@@ -289,7 +294,7 @@ function popupClose(e) {
 
     // Save marker data
     saveMarkers();
-    
+
 }
 
 // **********************************************
