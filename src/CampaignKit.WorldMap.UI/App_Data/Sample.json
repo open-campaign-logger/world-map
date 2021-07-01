@@ -2,223 +2,422 @@
   {
     "options": {
       "stroke": true,
-      "color": "#f06eaa",
-      "weight": 4,
-      "opacity": 0.5,
-      "fill": true,
-      "fillColor": null,
-      "fillOpacity": 0.2,
-      "clickable": true
-    },
-    "properties": {
-      "title": "Rectangle Title",
-      "layerType": "rectangle",
-      "latlng": "(29.97, 31.12)",
-      "id": "2997_3112",
-      "content": {
-        "ops": [
-          {
-            "insert": "Rectangle Description"
-          },
-          {
-            "attributes": {
-              "header": 1
-            },
-            "insert": "\n"
-          },
-          {
-            "insert": "\n"
-          },
-          {
-            "attributes": {
-              "underline": true,
-              "italic": true,
-              "bold": true
-            },
-            "insert": "This is the description."
-          },
-          {
-            "insert": "\n"
-          }
-        ]
-      }
-    },
-    "latlngs": [
-      {
-        "lat": 29.974044591534422,
-        "lng": 31.122508049011234
-      },
-      {
-        "lat": 29.97731598122696,
-        "lng": 31.122508049011234
-      },
-      {
-        "lat": 29.97731598122696,
-        "lng": 31.127400398254398
-      },
-      {
-        "lat": 29.974044591534422,
-        "lng": 31.127400398254398
-      }
-    ]
-  },
-  {
-    "options": {
-      "stroke": true,
-      "color": "#f06eaa",
-      "weight": 4,
-      "opacity": 0.5,
-      "fill": true,
-      "fillColor": null,
-      "fillOpacity": 0.2,
-      "clickable": true
-    },
-    "properties": {
-      "title": "Polygon Title",
-      "layerType": "polygon",
-      "latlng": "(29.98, 31.13)",
-      "id": "2998_3113",
-      "content": {
-        "ops": [
-          {
-            "insert": "Polygon Description"
-          },
-          {
-            "attributes": {
-              "header": 1
-            },
-            "insert": "\n"
-          },
-          {
-            "insert": "\nThis is the description.\n"
-          }
-        ]
-      }
-    },
-    "latlngs": [
-      {
-        "lat": 29.98497358578796,
-        "lng": 31.129674911499027
-      },
-      {
-        "lat": 29.98497358578796,
-        "lng": 31.129674911499027
-      },
-      {
-        "lat": 29.981033338736204,
-        "lng": 31.13113403320313
-      },
-      {
-        "lat": 29.981033338736204,
-        "lng": 31.13113403320313
-      },
-      {
-        "lat": 29.98244589810904,
-        "lng": 31.141390800476078
-      },
-      {
-        "lat": 29.98244589810904,
-        "lng": 31.141390800476078
-      },
-      {
-        "lat": 29.989619902644307,
-        "lng": 31.14036083221436
-      },
-      {
-        "lat": 29.989619902644307,
-        "lng": 31.14036083221436
-      }
-    ]
-  },
-  {
-    "options": {
-      "stroke": true,
-      "color": "#f06eaa",
+      "color": "#3388ff",
       "weight": 4,
       "opacity": 0.5,
       "fill": true,
       "fillColor": null,
       "fillOpacity": 0.2,
       "clickable": true,
-      "radius": 373.866398252301
+      "dashArray": null,
+      "maintainColor": false,
+      "smoothFactor": 1,
+      "noClip": false,
+      "lineCap": "round",
+      "lineJoin": "round",
+      "dashOffset": null,
+      "fillRule": "evenodd",
+      "interactive": true,
+      "bubblingMouseEvents": true,
+      "pane": "overlayPane",
+      "attribution": null
     },
     "properties": {
-      "title": "Circle Title",
-      "layerType": "circle",
-      "latlng": "(29.98, 31.14)",
-      "id": "2998_3114",
+      "title": "Rectangular Area",
+      "layerType": "rectangle",
+      "latlng": "(40.714, -155.0391)",
+      "id": "40714_-1550391",
       "content": {
         "ops": [
           {
             "attributes": {
-              "link": "https://www.cbc.ca"
+              "underline": true,
+              "bold": true
             },
-            "insert": "Circle Description"
+            "insert": "Rectangular Area Description"
+          },
+          {
+            "insert": "\n\n"
           },
           {
             "attributes": {
-              "header": 1
+              "color": "#000000"
             },
-            "insert": "\n"
+            "insert": "A tool for drawing rectangle overlays on a map"
           },
           {
-            "insert": "\nThis is the description.\n"
+            "insert": "\n"
+          }
+        ]
+      }
+    },
+    "latlngs": [
+      {
+        "lat": 40.713955826286046,
+        "lng": -155.03906250000003
+      },
+      {
+        "lat": 54.97761367069628,
+        "lng": -155.03906250000003
+      },
+      {
+        "lat": 54.97761367069628,
+        "lng": -127.96875000000001
+      },
+      {
+        "lat": 40.713955826286046,
+        "lng": -127.96875000000001
+      }
+    ]
+  },
+  {
+    "options": {
+      "stroke": true,
+      "color": "#3388ff",
+      "weight": 4,
+      "opacity": 0.5,
+      "fill": true,
+      "fillColor": null,
+      "fillOpacity": 0.2,
+      "clickable": true,
+      "dashArray": null,
+      "maintainColor": false,
+      "smoothFactor": 1,
+      "noClip": false,
+      "lineCap": "round",
+      "lineJoin": "round",
+      "dashOffset": null,
+      "fillRule": "evenodd",
+      "interactive": true,
+      "bubblingMouseEvents": true,
+      "pane": "overlayPane",
+      "attribution": null
+    },
+    "properties": {
+      "title": "Polygonal Area",
+      "layerType": "polygon",
+      "latlng": "(-29.993, -83.3203)",
+      "id": "-29993_-833203",
+      "content": {
+        "ops": [
+          {
+            "attributes": {
+              "underline": true,
+              "bold": true
+            },
+            "insert": "Polygonal Area Description"
+          },
+          {
+            "insert": "\n\n"
+          },
+          {
+            "attributes": {
+              "color": "#000000"
+            },
+            "insert": "A marker for drawing polygon overlays on a map"
+          },
+          {
+            "insert": "\n"
+          }
+        ]
+      }
+    },
+    "latlngs": [
+      {
+        "lat": -29.993002284551064,
+        "lng": -83.32031250000001
+      },
+      {
+        "lat": -32.99023555965107,
+        "lng": -87.09960937500001
+      },
+      {
+        "lat": -37.92686760148135,
+        "lng": -87.18750000000001
+      },
+      {
+        "lat": -42.488301979602255,
+        "lng": -81.82617187500001
+      },
+      {
+        "lat": -42.68243539838622,
+        "lng": -79.1015625
+      },
+      {
+        "lat": -44.33956524809713,
+        "lng": -78.31054687500001
+      },
+      {
+        "lat": -45.583289756006316,
+        "lng": -75.49804687500001
+      },
+      {
+        "lat": -45.76752296214989,
+        "lng": -72.86132812500001
+      },
+      {
+        "lat": -47.15984001304432,
+        "lng": -69.34570312500001
+      },
+      {
+        "lat": -44.715513732021336,
+        "lng": -70.04882812500001
+      },
+      {
+        "lat": -43.7710938177565,
+        "lng": -60.90820312500001
+      },
+      {
+        "lat": -45.644768217751924,
+        "lng": -59.85351562500001
+      },
+      {
+        "lat": -41.244772343082076,
+        "lng": -54.22851562500001
+      },
+      {
+        "lat": -39.50404070558416,
+        "lng": -54.75585937500001
+      },
+      {
+        "lat": -39.368279149160124,
+        "lng": -51.15234375
+      },
+      {
+        "lat": -42.09822241118974,
+        "lng": -48.076171875
+      },
+      {
+        "lat": -41.04621681452063,
+        "lng": -45.3515625
+      },
+      {
+        "lat": -39.70718665682655,
+        "lng": -47.724609375
+      },
+      {
+        "lat": -37.020098201368114,
+        "lng": -45.87890625
+      },
+      {
+        "lat": -37.92686760148135,
+        "lng": -42.80273437500001
+      },
+      {
+        "lat": -37.37015718405752,
+        "lng": -40.42968750000001
+      },
+      {
+        "lat": -39.97712009843963,
+        "lng": -40.86914062500001
+      },
+      {
+        "lat": -42.35854391749706,
+        "lng": -38.935546875
+      },
+      {
+        "lat": -38.95940879245423,
+        "lng": -37.17773437500001
+      },
+      {
+        "lat": -38.47939467327644,
+        "lng": -34.80468750000001
+      },
+      {
+        "lat": -35.88905007936092,
+        "lng": -39.02343750000001
+      },
+      {
+        "lat": -36.38591277287652,
+        "lng": -41.22070312500001
+      },
+      {
+        "lat": -33.87041555094183,
+        "lng": -47.90039062500001
+      },
+      {
+        "lat": -34.016241889667015,
+        "lng": -52.99804687500001
+      },
+      {
+        "lat": -32.9164853473144,
+        "lng": -56.25000000000001
+      },
+      {
+        "lat": -31.503629305773018,
+        "lng": -57.12890625000001
+      },
+      {
+        "lat": -31.05293398570515,
+        "lng": -60.38085937500001
+      },
+      {
+        "lat": -34.016241889667015,
+        "lng": -62.66601562500001
+      },
+      {
+        "lat": -34.74161249883172,
+        "lng": -65.91796875000001
+      },
+      {
+        "lat": -33.35806161277886,
+        "lng": -71.01562500000001
+      },
+      {
+        "lat": -35.81781315869662,
+        "lng": -76.640625
+      },
+      {
+        "lat": -33.94335994657881,
+        "lng": -79.89257812500001
+      },
+      {
+        "lat": -32.99023555965107,
+        "lng": -78.39843750000001
+      }
+    ]
+  },
+  {
+    "options": {
+      "stroke": true,
+      "color": "#3388ff",
+      "weight": 4,
+      "opacity": 0.5,
+      "fill": true,
+      "fillColor": null,
+      "fillOpacity": 0.2,
+      "clickable": true,
+      "radius": 1976830.7880608134,
+      "dashArray": null,
+      "maintainColor": false,
+      "lineCap": "round",
+      "lineJoin": "round",
+      "dashOffset": null,
+      "fillRule": "evenodd",
+      "interactive": true,
+      "bubblingMouseEvents": true,
+      "pane": "overlayPane",
+      "attribution": null
+    },
+    "properties": {
+      "title": "Circlular Area",
+      "layerType": "circle",
+      "latlng": "(-2.1089, 86.4844)",
+      "id": "-21089_864844",
+      "content": {
+        "ops": [
+          {
+            "attributes": {
+              "underline": true,
+              "bold": true
+            },
+            "insert": "Circular Area Description"
+          },
+          {
+            "insert": "\n\n"
+          },
+          {
+            "attributes": {
+              "color": "#000000"
+            },
+            "insert": "A tool for drawing circle overlays on a map."
+          },
+          {
+            "insert": "\n\n\n"
           }
         ]
       }
     },
     "latlngs": {
-      "lat": 29.97545725029985,
-      "lng": 31.13555431365967
+      "lat": -2.108898659243126,
+      "lng": 86.48437500000001
+    }
+  },
+  {
+    "options": {},
+    "properties": {
+      "title": "Pin Marker",
+      "layerType": "marker",
+      "latlng": "(21.2894, -54.4922)",
+      "id": "212894_-544922",
+      "content": {
+        "ops": [
+          {
+            "attributes": {
+              "underline": true,
+              "bold": true
+            },
+            "insert": "Pin Marker Description"
+          },
+          {
+            "insert": "\n\n"
+          },
+          {
+            "attributes": {
+              "color": "#000000"
+            },
+            "insert": "A tool for creating clickable/draggable icons on the map."
+          },
+          {
+            "insert": "\n"
+          }
+        ]
+      }
+    },
+    "latlngs": {
+      "lat": 21.289374355860424,
+      "lng": -54.4921875
     }
   },
   {
     "options": {
+      "stroke": true,
+      "color": "#3388ff",
+      "weight": 4,
+      "opacity": 0.5,
+      "fill": true,
+      "fillColor": null,
+      "fillOpacity": 0.2,
+      "clickable": true,
+      "zIndexOffset": 2000,
       "icon": {
         "options": {},
         "_initHooksCalled": true
-      }
+      },
+      "repeatMode": false
     },
     "properties": {
-      "title": "Marker Title",
-      "layerType": "marker",
-      "latlng": "(29.98, 31.14)",
-      "id": "2998_3114",
+      "title": "Circular Marker",
+      "layerType": "circlemarker",
+      "latlng": "(9.4491, 13.0078)",
+      "id": "94491_130078",
       "content": {
         "ops": [
           {
-            "insert": "Marker Description"
+            "attributes": {
+              "underline": true,
+              "bold": true
+            },
+            "insert": "Circular Marker Description"
+          },
+          {
+            "insert": "\n\n"
           },
           {
             "attributes": {
-              "header": 1
+              "color": "#000000"
             },
-            "insert": "\n"
+            "insert": "A tool used to display clickable/draggable circles markers on the map"
           },
           {
-            "insert": "\nThis is the description."
-          },
-          {
-            "attributes": {
-              "list": "bullet"
-            },
-            "insert": "\n"
-          },
-          {
-            "insert": "Another line"
-          },
-          {
-            "attributes": {
-              "list": "bullet"
-            },
             "insert": "\n"
           }
         ]
       }
     },
     "latlngs": {
-      "lat": 29.97631227084605,
-      "lng": 31.143836975097656
+      "lat": 9.44906182688142,
+      "lng": 13.0078125
     }
   }
 ]
