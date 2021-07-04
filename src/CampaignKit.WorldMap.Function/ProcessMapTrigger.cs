@@ -57,7 +57,7 @@ namespace CampaignKit.WorldMap.Function
         [Function("ProcessMapTrigger")]
         public async void Run([QueueTrigger("worldmapqueue", Connection = "ConnectionStrings:AzureQueueStorage")] string myQueueItem, FunctionContext context)
         {
-            var logger = context.GetLogger("CampaignKit.WorldMap.ProcessMapTrigger");
+            var logger = context.GetLogger("CampaignKit.WorldMap.Function.ProcessMapTrigger");
             try
             {
                 var result = await _mapProcessingService.ProcessMap(myQueueItem);

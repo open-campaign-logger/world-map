@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B6C2D82C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.Core", "src\CampaignKit.WorldMap.Core\CampaignKit.WorldMap.Core.csproj", "{4D70B4FD-8D89-4C72-970D-FA1095117734}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampaignKit.WorldMap.Function", "src\CampaignKit.WorldMap.Function\CampaignKit.WorldMap.Function.csproj", "{2BAB211F-6E04-483B-B51D-A0307F06346B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.Function", "src\CampaignKit.WorldMap.Function\CampaignKit.WorldMap.Function.csproj", "{2BAB211F-6E04-483B-B51D-A0307F06346B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

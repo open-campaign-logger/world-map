@@ -6,10 +6,7 @@ Service for managing world maps and associate them with Campaign Logger log entr
 
 ## SDKs
 
-- CampaignKit.WorldMap.UI
-  - [.Net 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
-- CampaignKit.WorldMap.Core and CampaignKit.WorldMap.Functions
-  - [.Net 3.1 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
+- [.Net 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks?utm_source=getdotnetsdk&utm_medium=referral)
 
 ## Azure Tools
 - [Microsoft Azure Storage Explorer](https://azure.microsoft.com/en-us/features/storage-explorer/)
@@ -52,9 +49,8 @@ Enabling public access to blobs.
 
 ## Docker Desktop
 1. Start Docker Desktop
-2. Click "Start" to begin debugging.  This will build and run two Docker images:
-  - CampaignKit.WorldMap.UI and
-  - CampaignKit.WorldMap.Function
+2. Click "Start" to begin debugging.  This will build and run the following Docker image:
+  - CampaignKit.WorldMap.UI
 
 ![Docker Running World-Map Projects](./DockerRunningWorldMapProjects.png)
 
