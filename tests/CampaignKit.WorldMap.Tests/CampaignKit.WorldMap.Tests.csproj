@@ -46,7 +46,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CampaignKit.WorldMap.Core\CampaignKit.WorldMap.Core.csproj" />
-    <ProjectReference Include="..\..\src\CampaignKit.WorldMap.Function\CampaignKit.WorldMap.Function.csproj" />
     <ProjectReference Include="..\..\src\CampaignKit.WorldMap.UI\CampaignKit.WorldMap.UI.csproj" />
   </ItemGroup>
 
