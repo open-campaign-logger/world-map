@@ -23,6 +23,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CampaignKit.WorldMap.Function", "src\CampaignKit.WorldMap.Function\CampaignKit.WorldMap.Function.csproj", "{2BAB211F-6E04-483B-B51D-A0307F06346B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{2D4BD44B-38F1-40B9-AC4C-46A21BA141E3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{79E69D0C-7957-4E64-A094-B5A575C27C4C}"
+	ProjectSection(SolutionItems) = preProject
+		feature-Upgrade-to-dotnet-5_CampaignKitWorldMapFunction20210530183839.yml = feature-Upgrade-to-dotnet-5_CampaignKitWorldMapFunction20210530183839.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +76,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CD62D678-74FE-4B11-B4F3-BD5E72B82BD2} = {B6C2D82C-BA53-4AFA-9BAB-829ED709321F}
+		{2D4BD44B-38F1-40B9-AC4C-46A21BA141E3} = {20D912B1-46EC-4C23-AFE7-0F7FA4071179}
+		{79E69D0C-7957-4E64-A094-B5A575C27C4C} = {2D4BD44B-38F1-40B9-AC4C-46A21BA141E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4091ECC8-0A07-4ACA-BDEB-BD6DC6D8FC86}
