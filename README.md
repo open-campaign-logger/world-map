@@ -43,6 +43,7 @@ Setting up blob containers, message queues and tables.
 ![Azure Storage Emulator](./AzureStorageEmulator.png)
 
 Enabling public access to blobs.
+
 ![Azure Blob Public Access Level](AzureBlobPublicAccessLevel.png)
 
 # Running and Debugging the Application Natively
