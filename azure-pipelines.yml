@@ -39,3 +39,9 @@ steps:
       PathtoPublish: $(Build.ArtifactStagingDirectory)
       ArtifactName: drop
       publishLocation: Container
+  - task: AzureFunctionApp@1
+    inputs:
+      azureSubscription: 'cl-test-001(7630a5f0-10f7-49a8-b19f-77f20ab880f6)'
+      appType: 'functionAppLinux'
+      appName: 'CampaignKitWorldMapFunction20210530183839'
+      package: '$(System.DefaultWorkingDirectory)/**/*.zip'
