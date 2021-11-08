@@ -14,20 +14,16 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+
 using CampaignKit.WorldMap.Core.Services;
 
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-using System;
-using System.Threading.Tasks;
-
 namespace CampaignKit.WorldMap.Function
 {
-    /// <summary>
-    /// Triggers when an enter is entered in the worldmapqueue
-    /// </summary>
     public class ProcessMapTrigger
     {
         /// <summary>
@@ -41,15 +37,9 @@ namespace CampaignKit.WorldMap.Function
         private readonly IConfiguration _configuration;
 
         /// <summary>
-        /// The application logging service.
-        /// </summary>
-        private readonly ILogger<ProcessMapTrigger> _log;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ProcessMapTrigger"/> class.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        /// <param name="log">The log.</param>
         /// <param name="mapProcessingService">The map processing service.</param>
         public ProcessMapTrigger(
             IConfiguration configuration,
@@ -57,7 +47,6 @@ namespace CampaignKit.WorldMap.Function
             IMapProcessingService mapProcessingService)
         {
             this._configuration = configuration;
-            this._log = log;
             this._mapProcessingService = mapProcessingService;
         }
 
@@ -65,9 +54,10 @@ namespace CampaignKit.WorldMap.Function
         /// Executes the function for the specified queue item.
         /// </summary>
         /// <param name="myQueueItem">The queue item.</param>
-        [FunctionName("ProcessMapTrigger")]
-        public async Task Run([QueueTrigger("worldmapqueue", Connection = "ConnectionStrings:AzureQueueStorage")] string myQueueItem)
+        [Function("ProcessMapTrigger")]
+        public async void Run([QueueTrigger("worldmapqueue", Connection = "ConnectionStrings:AzureQueueStorage")] string myQueueItem, FunctionContext context)
         {
+            var logger = context.GetLogger("CampaignKit.WorldMap.Function.ProcessMapTrigger");
             try
             {
                 var result = await _mapProcessingService.ProcessMap(myQueueItem);
@@ -75,11 +65,11 @@ namespace CampaignKit.WorldMap.Function
                 {
                     throw new Exception("Failed to process map.");
                 }
-                _log.LogInformation("ProcessMapTrigger successfully processed map: {0}", myQueueItem);
+                logger.LogInformation("ProcessMapTrigger successfully processed map: {0}", myQueueItem);
             }
             catch (Exception e)
             {
-                _log.LogError("Unable to process map: {0}", e.Message);
+                logger.LogError("Unable to process map: {0}", e.Message);
             }
         }
     }

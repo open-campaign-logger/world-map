@@ -14,20 +14,16 @@
 // limitations under the License.
 // </copyright>
 
+using System;
+
 using CampaignKit.WorldMap.Core.Services;
 
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-using System;
-using System.Threading.Tasks;
-
 namespace CampaignKit.WorldMap.Function
 {
-    /// <summary>
-    /// Triggers once a day to cleanup processed tile records.
-    /// </summary>
     public class CleanupTrigger
     {
         /// The map processing service.
@@ -38,11 +34,6 @@ namespace CampaignKit.WorldMap.Function
         /// The application configuration.
         /// </summary>
         private readonly IConfiguration _configuration;
-
-        /// <summary>
-        /// The application logging service.
-        /// </summary>
-        private readonly ILogger<CleanupTrigger> _log;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CleanupTrigger"/> class.
@@ -56,17 +47,14 @@ namespace CampaignKit.WorldMap.Function
             ITableStorageService tableStorageService)
         {
             _configuration = configuration;
-            _log = log;
             _tableStorageService = tableStorageService;
         }
 
-        /// <summary>
-        /// Runs the specified my timer.
-        /// </summary>
-        /// <param name="myTimer">My timer.</param>
-        [FunctionName("CleanupTrigger")]
-        public async Task Run([TimerTrigger("0 */30 * * * * ")] TimerInfo myTimer)
+        [Function("CleanupTrigger")]
+        public async void Run([TimerTrigger("0 */30 * * * *")] MyInfo myTimer, FunctionContext context)
         {
+            var logger = context.GetLogger("CampaignKit.WorldMap.Function.CleanupTrigger");
+            logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             try
             {
                 var result = await _tableStorageService.DeleteProcessedTileRecordsAsync(1, 500);
@@ -74,13 +62,30 @@ namespace CampaignKit.WorldMap.Function
                 {
                     throw new Exception("Failed to delete procesed tiles.");
                 }
-                _log.LogInformation("Successfully delete {0} processed tiles.", result);
+                logger.LogInformation("Successfully delete {0} processed tiles.", result);
             }
             catch (Exception e)
             {
-                _log.LogError("Unable to delete processed tiles: {0}", e.Message);
+                logger.LogError("Unable to delete processed tiles: {0}", e.Message);
             }
-            _log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            logger.LogInformation($"Next timer schedule at: {myTimer.ScheduleStatus.Next}");
         }
+    }
+
+    public class MyInfo
+    {
+        public MyScheduleStatus ScheduleStatus { get; set; }
+
+        public bool IsPastDue { get; set; }
+    }
+
+    public class MyScheduleStatus
+    {
+        public DateTime Last { get; set; }
+
+        public DateTime Next { get; set; }
+
+        public DateTime LastUpdated { get; set; }
     }
 }
