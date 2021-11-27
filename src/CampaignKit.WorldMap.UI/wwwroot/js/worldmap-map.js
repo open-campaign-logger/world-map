@@ -29,7 +29,6 @@ var template = '<div id="popup_{id}" class="popup">\
 </div>\
 <div class="popup_section">\
 <label for="popup_editor_{id}" class="popup_label">Description</label></br>\
-<div id="popup_editor_spacer_{id}" class="popup_editor_spacer"></div>\
 <div id="popup_editor_{id}" class="popup_editor"><br/><br/><br/><br/><br/></div>\
 </div>';
 
