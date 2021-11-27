@@ -52,6 +52,7 @@ Enabling public access to blobs.
 1. Start Docker Desktop
 2. Click "Start" to begin debugging.  This will build and run the following Docker image:
   - CampaignKit.WorldMap.UI
+  - CampaignKit.WorldMap.Function
 
 ![Docker Running World-Map Projects](./DockerRunningWorldMapProjects.png)
 

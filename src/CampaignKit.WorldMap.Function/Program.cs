@@ -14,13 +14,16 @@
 // limitations under the License.
 // </copyright>
 
-using CampaignKit.WorldMap.Core.Services;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
 namespace CampaignKit.WorldMap.Function
 {
+    using CampaignKit.WorldMap.Core.Services;
+
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+
+    /// <summary>
+    /// Main program.
+    /// </summary>
     public class Program
     {
         public static void Main()
