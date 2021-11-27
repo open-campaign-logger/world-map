@@ -14,16 +14,17 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-
-using CampaignKit.WorldMap.Core.Services;
-
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-
 namespace CampaignKit.WorldMap.Function
 {
+    using System;
+    using System.Threading.Tasks;
+
+    using CampaignKit.WorldMap.Core.Services;
+
+    using Microsoft.Azure.Functions.Worker;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+
     public class ProcessMapTrigger
     {
         /// <summary>
@@ -55,16 +56,17 @@ namespace CampaignKit.WorldMap.Function
         /// </summary>
         /// <param name="myQueueItem">The queue item.</param>
         [Function("ProcessMapTrigger")]
-        public async void Run([QueueTrigger("worldmapqueue", Connection = "ConnectionStrings:AzureQueueStorage")] string myQueueItem, FunctionContext context)
+        public async Task Run([QueueTrigger("worldmapqueue", Connection = "ConnectionStrings:AzureQueueStorage")] string myQueueItem, FunctionContext context)
         {
             var logger = context.GetLogger("CampaignKit.WorldMap.Function.ProcessMapTrigger");
             try
             {
-                var result = await _mapProcessingService.ProcessMap(myQueueItem);
+                var result = await this._mapProcessingService.ProcessMap(myQueueItem);
                 if (!result)
                 {
                     throw new Exception("Failed to process map.");
                 }
+
                 logger.LogInformation("ProcessMapTrigger successfully processed map: {0}", myQueueItem);
             }
             catch (Exception e)

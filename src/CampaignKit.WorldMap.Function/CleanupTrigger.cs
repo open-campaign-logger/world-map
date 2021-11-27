@@ -14,18 +14,23 @@
 // limitations under the License.
 // </copyright>
 
-using System;
-
-using CampaignKit.WorldMap.Core.Services;
-
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-
 namespace CampaignKit.WorldMap.Function
 {
+    using System;
+    using System.Threading.Tasks;
+
+    using CampaignKit.WorldMap.Core.Services;
+
+    using Microsoft.Azure.Functions.Worker;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+
+    /// <summary>
+    /// Main program.
+    /// </summary>
     public class CleanupTrigger
     {
+        /// <summary>
         /// The map processing service.
         /// </summary>
         private readonly ITableStorageService _tableStorageService;
@@ -46,28 +51,38 @@ namespace CampaignKit.WorldMap.Function
             ILogger<CleanupTrigger> log,
             ITableStorageService tableStorageService)
         {
-            _configuration = configuration;
-            _tableStorageService = tableStorageService;
+            this._configuration = configuration;
+            this._tableStorageService = tableStorageService;
         }
 
+        /// <summary>
+        /// Runs the specified my timer according to the specified CRON schedule.
+        /// see: https://arminreiter.com/2017/02/azure-functions-time-trigger-cron-cheat-sheet/
+        /// </summary>
+        /// <param name="myTimer">The time to execute..</param>
+        /// <param name="context">The context that the timer will execute in.</param>
+        /// <exception cref="System.Exception">Failed to delete procesed tiles.</exception>
+        /// <returns>A <see cref="Task"/> A Task representing the asynchronous operation.</returns>
         [Function("CleanupTrigger")]
-        public async void Run([TimerTrigger("0 */30 * * * *")] MyInfo myTimer, FunctionContext context)
+        public async Task Run([TimerTrigger("0 0 0 * * *")] MyInfo myTimer, FunctionContext context)
         {
             var logger = context.GetLogger("CampaignKit.WorldMap.Function.CleanupTrigger");
             logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             try
             {
-                var result = await _tableStorageService.DeleteProcessedTileRecordsAsync(1, 500);
+                var result = await this._tableStorageService.DeleteProcessedTileRecordsAsync(1, 500);
                 if (result < 0)
                 {
                     throw new Exception("Failed to delete procesed tiles.");
                 }
+
                 logger.LogInformation("Successfully delete {0} processed tiles.", result);
             }
             catch (Exception e)
             {
                 logger.LogError("Unable to delete processed tiles: {0}", e.Message);
             }
+
             logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             logger.LogInformation($"Next timer schedule at: {myTimer.ScheduleStatus.Next}");
         }
