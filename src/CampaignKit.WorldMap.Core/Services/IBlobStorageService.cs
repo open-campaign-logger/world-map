@@ -16,6 +16,8 @@
 
 namespace CampaignKit.WorldMap.Core.Services
 {
+    using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -36,6 +38,15 @@ namespace CampaignKit.WorldMap.Core.Services
         /// <param name="folderName">Unique name of the Azure blob folder.</param>
         /// <returns>True if successful, false otherwise.</returns>
         public Task<bool> FolderExistsAsync(string folderName);
+
+        /// <summary>
+        /// Gets a listing of folder contents asynchronously.
+        /// </summary>
+        /// <param name="folderName">Unique name of the Azure blob folder.</param>
+        /// <returns>
+        /// Number of files.
+        /// </returns>
+        public Task<List<String>> ListFolderContentsAsync(string folderName);
 
         /// <summary>
         /// Checks if the blob exists.

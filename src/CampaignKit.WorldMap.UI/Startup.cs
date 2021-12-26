@@ -170,7 +170,6 @@ namespace CampaignKit.WorldMap.UI
         {
             services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
-            services.AddSingleton<IQueueStorageService, DefaultQueueStorageService>();
         }
     }
 }

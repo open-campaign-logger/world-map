@@ -1,6 +1,7 @@
 ﻿using CampaignKit.WorldMap.Core.Services;
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CampaignKit.WorldMap.Tests.MockServices
@@ -23,6 +24,11 @@ namespace CampaignKit.WorldMap.Tests.MockServices
         }
 
         public Task<bool> FolderExistsAsync(string folderName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<string>> ListFolderContentsAsync(string folderName)
         {
             throw new NotImplementedException();
         }

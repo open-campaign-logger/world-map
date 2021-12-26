@@ -120,10 +120,5 @@ namespace CampaignKit.WorldMap.Core.Entities
         /// <value>The map's thumbnail path.</value>
         public string ThumbnailPath { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the tile collection for this map.
-        /// </summary>
-        /// <value>A collection of child tile entities.</value>
-        public ICollection<Tile> Tiles { get; set; }
     }
 }

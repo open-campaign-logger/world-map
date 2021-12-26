@@ -15,6 +15,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -115,6 +116,46 @@ namespace CampaignKit.WorldMap.Core.Services
                 _loggerService.LogError("Unable to read blob: {0}/{1}.  Error message: {2}.", folderName, blobName, ex.Message);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Gets a listing of folder contents asynchronously.
+        /// </summary>
+        /// <param name="folderName">Unique name of the Azure blob folder.</param>
+        /// <returns>
+        /// Number of files.
+        /// </returns>
+        public async Task<List<String>> ListFolderContentsAsync(string folderName)
+        {
+            // Create a BlobServiceClient object which will be used to create a container client
+            var blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
+
+            // Create result set
+            var results = new List<String>();
+
+            // Create the container and return a container client object
+            try
+            {
+                var blobContainerClient = blobServiceClient.GetBlobContainerClient("world-map");
+
+                // Call the listing operation and return pages of the specified size.
+                var resultSegment = blobContainerClient.GetBlobsAsync(prefix: folderName).AsPages(default, 500);
+
+                // Enumerate the blobs returned for each page.
+                await foreach (Azure.Page<BlobItem> blobPage in resultSegment)
+                {
+                    foreach (BlobItem blobItem in blobPage.Values)
+                    {
+                        results.Add(blobItem.Name);
+                    }
+                }
+            }
+            catch (Azure.RequestFailedException ex)
+            {
+                _loggerService.LogError("Unable to get Azure folder contents: {0}.  Error message: {1}.", folderName, ex.Message);
+            }
+
+            return results;
         }
 
         /// <summary>
