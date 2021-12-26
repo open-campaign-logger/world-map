@@ -100,46 +100,6 @@ namespace CampaignKit.WorldMap.Core.Services
         }
 
         /// <summary>
-        /// Creates a map tile record asynchronously.
-        /// </summary>
-        /// <param name="tile">The map tile.</param>
-        /// <returns>
-        /// The auto-generated tileid for the new map tile record, null if the operation fails.
-        /// </returns>
-        public async Task<string> CreateTileRecordAsync(Tile tile)
-        {
-            // Setup the partition key
-            tile.PartitionKey = tile.MapId;
-
-            // Setup the row key
-            tile.RowKey = Guid.NewGuid().ToString();
-
-            try
-            {
-                // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
-                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
-                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-
-                // Connect to the worlmaptiles table.
-                var cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
-
-                // Create an insert operation
-                var operation = TableOperation.Insert(tile);
-
-                // Execute the operation
-                await cloudTable.ExecuteAsync(operation);
-
-                return tile.RowKey;
-            }
-            catch (StorageException ex)
-            {
-                _loggerService.LogError("Unable to create tile record: {0}", ex.Message);
-                return null;
-            }
-        }
-
-        /// <summary>
         /// Deletes a map record and any associated tile records asynchronously.
         /// </summary>
         /// <param name="map">The map.</param>
@@ -150,32 +110,11 @@ namespace CampaignKit.WorldMap.Core.Services
         {
             try
             {
-                // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
+                // Connect to the worlmapmaps table.
+                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageMaps");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-
-                // Connect to the worlmaptiles table.
-                var cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
-
-                // Query the tile records associated with the map.
-                var query = from tile in cloudTable.CreateQuery<Tile>()
-                            where tile.PartitionKey == map.MapId
-                            select tile;
-
-                // Delete the tile records.
-                foreach (var tile in query)
-                {
-                    // Create a delete operation
-                    var tileOperation = TableOperation.Delete(tile);
-                    var tileOperationResult = await cloudTable.ExecuteAsync(tileOperation);
-                }
-
-                // Connect to the worlmapmaps table.
-                cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageMaps");
-                cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
-                cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-                cloudTable = cloudTableClient.GetTableReference("worldmapmaps");
+                var cloudTable = cloudTableClient.GetTableReference("worldmapmaps");
 
                 // Delete the map record.
                 var mapOperation = TableOperation.Delete(map);
@@ -186,82 +125,6 @@ namespace CampaignKit.WorldMap.Core.Services
             catch (StorageException ex)
             {
                 _loggerService.LogError("Unable to delete map and tile records: {0}", ex.Message);
-                return false;
-            }
-        }
-
-
-        /// <summary>
-        /// Delete processed tile records asynchronously.
-        /// </summary>
-        /// <param name="numberOfDays">Only delete processed tile records that are this number of days old.</param>
-        /// <param name="maxNumberOfRecords">Maximum number of records to delete.</param>
-        /// <returns>
-        /// Number of records deleted.
-        /// </returns>
-        public async Task<int> DeleteProcessedTileRecordsAsync(int numberOfDays, int maxNumberOfRecords)
-        {
-            try
-            {
-                // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
-                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
-                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-
-                // Connect to the worlmaptiles table.
-                var cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
-
-                // Query tile records
-                var tileQuery = from t in cloudTable.CreateQuery<Tile>()
-                                where t.IsRendered == true && t.Timestamp < DateTime.Now.AddDays(-numberOfDays)
-                                select t;
-
-                // Delete the tile records 
-                int counter = 0;
-                foreach (var tile in tileQuery.Take(maxNumberOfRecords))
-                {
-                    await DeleteTileRecordAsync(tile);
-                    counter++;
-                }
-
-                // Return the number of tiles deleted
-                return counter;
-            }
-            catch (StorageException ex)
-            {
-                _loggerService.LogError("Unable to delete tile records: {0}", ex.Message);
-                return -1;
-            }
-        }
-
-        /// <summary>
-        /// Deletes a tile record asynchronously.
-        /// </summary>
-        /// <param name="tile">The tile.</param>
-        /// <returns>
-        /// True if the operation succeeds, false otherwise.
-        /// </returns>
-        public async Task<bool> DeleteTileRecordAsync(Tile tile)
-        {
-            try
-            {
-                // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
-                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
-                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-
-                // Connect to the worlmaptiles table.
-                var cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
-
-                // Create a delete operation
-                var tileOperation = TableOperation.Delete(tile);
-                await cloudTable.ExecuteAsync(tileOperation);
-
-                return true;
-            }
-            catch (StorageException ex)
-            {
-                _loggerService.LogError("Unable to delete tile record: {0}", ex.Message);
                 return false;
             }
         }
@@ -289,29 +152,6 @@ namespace CampaignKit.WorldMap.Core.Services
         public async Task<List<Map>> GetMapRecordsForUserAsync(string userId, bool includePublic)
         {
             return await Task.Run(() => GetMapRecordsForUser(userId, includePublic));
-        }
-
-        /// <summary>
-        /// Gets a tile record asynchronously.
-        /// </summary>
-        /// <param name="tileId">The tile's unique id.</param>
-        /// <returns>
-        /// The tile if found, null otherwise.
-        /// </returns>
-        public async Task<Tile> GetTileRecordAsync(string tileId)
-        {
-            return await Task.Run(() => GetTileRecord(tileId));
-        }
-
-        /// <summary>
-        /// Gets a list of unprocessed tiles records asynchronously.
-        /// </summary>
-        /// <returns>
-        /// List of unprocessed tiles, empty list of no tiles require processing.
-        /// </returns>
-        public async Task<List<Tile>> GetUnprocessedTileRecordsAsync()
-        {
-            return await Task.Run(() => GetUnprocessedTileRecords());
         }
 
         /// <summary>
@@ -349,40 +189,6 @@ namespace CampaignKit.WorldMap.Core.Services
         }
 
         /// <summary>
-        /// Updates a map tile record asynchronously.
-        /// </summary>
-        /// <param name="tile">The map tile.</param>
-        /// <returns>
-        /// True if the operation succeeds, false otherwise.
-        /// </returns>
-        public async Task<bool> UpdateTileRecordAsync(Tile tile)
-        {
-            try
-            {
-                // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
-                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
-                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-
-                // Connect to the worldmapmaps table.
-                var cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
-
-                // Create an insert operation
-                var insertOperation = TableOperation.Merge(tile);
-
-                // Execute the operation
-                var operationResult = await cloudTable.ExecuteAsync(insertOperation);
-
-                return true;
-            }
-            catch (StorageException ex)
-            {
-                _loggerService.LogError("Unable to update tile record: {0}", ex.Message);
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Gets a map record and any associated tile records.
         /// </summary>
         /// <param name="mapId">The map's unique id.</param>
@@ -412,16 +218,6 @@ namespace CampaignKit.WorldMap.Core.Services
                 }
 
                 var map = mapList.First();
-
-                // Query the tile records
-                cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
-                cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
-                cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-                cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
-                var tileQuery = from t in cloudTable.CreateQuery<Tile>()
-                                where t.PartitionKey == map.RowKey
-                                select t;
-                map.Tiles = tileQuery.ToList();
 
                 return map;
             }
@@ -477,79 +273,5 @@ namespace CampaignKit.WorldMap.Core.Services
             }
         }
 
-        /// <summary>
-        /// Gets a tile record asynchronously.
-        /// </summary>
-        /// <param name="rowKey">The tile's unique id.</param>
-        /// <returns>
-        /// The tile if found, null otherwise.
-        /// </returns>
-        private Tile GetTileRecord(string rowKey)
-        {
-            try
-            {
-                // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
-                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
-                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-
-                // Connect to the worlmaptiles table.
-                var cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
-
-                // Query the tile record
-                var tileQuery = from t in cloudTable.CreateQuery<Tile>()
-                               where t.RowKey == rowKey
-                               select t;
-                var tileList = tileQuery.ToList();
-                if (tileList.Count == 0)
-                {
-                    return null;
-                }
-
-                return tileList.First();
-            }
-            catch (StorageException ex)
-            {
-                _loggerService.LogError("Unable to retrieve tile records: {0}", ex.Message);
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets a list of unprocessed tiles records asynchronously.
-        /// </summary>
-        /// <returns>
-        /// List of unprocessed tiles, empty list of no tiles require processing.
-        /// </returns>
-        private List<Tile> GetUnprocessedTileRecords()
-        {
-            try
-            {
-                // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageTiles");
-                var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
-                var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
-
-                // Connect to the worlmaptiles table.
-                var cloudTable = cloudTableClient.GetTableReference("worldmaptiles");
-
-                // Query the tile record
-                var tileQuery = from t in cloudTable.CreateQuery<Tile>()
-                                where t.IsRendered == false
-                                select t;
-                var tileList = tileQuery
-                    .ToList()
-                    .OrderBy(x => x.MapId)
-                    .ThenBy(x => x.ZoomLevel)
-                    .ToList();
-
-                return tileList;
-            }
-            catch (StorageException ex)
-            {
-                _loggerService.LogError("Unable to retrieve tile records: {0}", ex.Message);
-                return null;
-            }
-        }
     }
 }

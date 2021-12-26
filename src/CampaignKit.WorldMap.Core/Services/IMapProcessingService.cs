@@ -24,17 +24,18 @@ namespace CampaignKit.WorldMap.Core.Services
     public interface IMapProcessingService
     {
         /// <summary>
-        /// Process a tile record.
+        /// Process a map zoom level image.
         /// </summary>
-        /// <param name="tileId">The id of the tile to process.</param>
+        /// <param name="mapId">The id of the map to process.</param>
+        /// <param name="zoomLevel">The zoom level to process.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public Task<bool> ProcessTile(string tileId);
+        public Task<bool> ProcessZoomLevelImage(string mapId, int zoomLevel);
 
         /// <summary>
-        /// Process a map record.
+        /// Processes a map master image.
         /// </summary>
         /// <param name="mapId">The id of the map to process.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        public Task<bool> ProcessMap(string mapId);
+        public Task<bool> ProcessMasterImage(string mapId);
     }
 }
