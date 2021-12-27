@@ -33,18 +33,8 @@ Service for managing world maps and associate them with Campaign Logger log entr
 The Azure Storage Emulator is used by the application to simulate reading/writing from Azure storage in the local environment.  See: [Running the Azure Storage Emulator](https://medium.com/oneforall-undergrad-software-engineering/setting-up-the-azure-storage-emulator-environment-on-windows-5f20d07d3a04)
 
 Ensure that the following Azure Storage items have been created:
-- **world-map** blob container
-  - public read access for blobs only
-- **worldmapqueue** message queue for maps
+- **world-map** blob container (ensure that you setup public access to the blobs)
 - **worldmapmaps** table
-- **worldmaptiles** table
- 
-Setting up blob containers, message queues and tables.
-![Azure Storage Emulator](./AzureStorageEmulator.png)
-
-Enabling public access to blobs.
-
-![Azure Blob Public Access Level](AzureBlobPublicAccessLevel.png)
 
 # Running and Debugging the Application Natively
 
@@ -65,14 +55,54 @@ Once you open your user secrets file you can provide local configuration overrid
 
 ```
 {
-  "ConnectionStrings:AzureTableStorageTiles": "TableEndpoint=https://clst03.table.core.windows.net/;SharedAccessSignature=...",
-  "ConnectionStrings:AzureTableStorageMaps": "TableEndpoint=https://clst03.table.core.windows.net/;SharedAccessSignature=...",
-  "ConnectionStrings:AzureQueueStorage": "QueueEndpoint=https://clst03.queue.core.windows.net/;SharedAccessSignature=...",
-  "ConnectionStrings:AzureBlobStorage": "BlobEndpoint=https://clst03.blob.core.windows.net/;SharedAccessSignature=...",
+  "ConnectionStrings:AzureStorage": "TableEndpoint=https://clst03.table.core.windows.net/;SharedAccessSignature=...",
   "AzureBlobBaseURL": "https://clst03.blob.core.windows.net/world-map"
 }
 ```
 
+## Simulating EventGrid Events Locally
+
+EventGrid triggers works as follows:
+1. When a map is created a master file is added to blob storage.
+2. When the master file is added to blob storage a blob creation event is sent to the ImageTrigger function.
+3. The ImageTrigger executes and creates zoom level images for the master file.  These zoom level images are added to blob storage.
+4. When zoom level images are added to blob storage blob creation events are sent to the ImageTrigger function.
+6. The ImageTrigger executes are creates tile images for each zoom level.
+
+[Postman](https://www.postman.com/) can be used to simulate steps 2 and 4 above.
+
+To do this you need to:
+1. Create a POST request to **http://localhost:3001/runtime/webhooks/EventGrid?functionName=ImageTrigger**
+2. Add a custom **aeg-event-type** header to the request with value **Notification**
+3. Set the JSON body of the call to the text below making the following substitutions to **data.url**:
+   - **FOLDERNAME** the folder created in blob storage to hold the map files.
+   - **FILENAME** either **master-file.png** for the initial EventGrid call or **0_zoom-level.png**, **1_zoom-level.png**, **2_zoom-level.png**, etc... for each zoom level EventGrid call.
+
+```
+[{
+  "topic": "/subscriptions/{subscription-id}/resourceGroups/Storage/providers/Microsoft.Storage/storageAccounts/my-storage-account",
+  "subject": "/blobServices/default/containers/test-container/blobs/new-file.txt",
+  "eventType": "Microsoft.Storage.BlobCreated",
+  "eventTime": "2017-06-26T18:41:00.9584103Z",
+  "id": "831e1650-001e-001b-66ab-eeb76e069631",
+  "data": {
+    "api": "PutBlockList",
+    "clientRequestId": "6d79dbfb-0e37-4fc4-981f-442c9ca65760",
+    "requestId": "831e1650-001e-001b-66ab-eeb76e000000",
+    "eTag": "\"0x8D4BCC2E4835CD0\"",
+    "contentType": "text/plain",
+    "contentLength": 524288,
+    "blobType": "BlockBlob",
+    "url": "http://127.0.0.1:10000/devstoreaccount1/world-map/FOLDERNAME/FILENAME",
+    "sequencer": "00000000000004420000000000028963",
+    "storageDiagnostics": {
+      "batchId": "b68529f3-68cd-4744-baa4-3c0498ec19f0"
+    }
+  },
+  "dataVersion": "",
+  "metadataVersion": "1"
+}]
+```
 
 # Reference Material
 
