@@ -22,12 +22,17 @@ namespace CampaignKit.WorldMap.Tests.MockServices
 
         public Task<Map> GetMapRecordAsync(string mapId)
         {
-            throw new NotImplementedException();
+            return Task.Run(() => this.GetSampleMap());
+
         }
 
-        public Task<List<Map>> GetMapRecordsForUserAsync(string userId, bool includePublic)
+        public async Task<List<Map>> GetMapRecordsForUserAsync(string userId, bool includePublic)
         {
-            throw new NotImplementedException();
+            var userMapList = new List<Map>()
+            {
+                this.GetSampleMap(),
+            };
+            return await Task.Run(() => userMapList);
         }
 
         public Task<bool> UpdateMapRecordAsync(Map map)

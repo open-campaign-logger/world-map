@@ -77,7 +77,7 @@ namespace CampaignKit.WorldMap.Core.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureStorage");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -111,7 +111,7 @@ namespace CampaignKit.WorldMap.Core.Services
             try
             {
                 // Connect to the worlmapmaps table.
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureStorage");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
                 var cloudTable = cloudTableClient.GetTableReference("worldmapmaps");
@@ -166,7 +166,7 @@ namespace CampaignKit.WorldMap.Core.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureStorage");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -200,7 +200,7 @@ namespace CampaignKit.WorldMap.Core.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureStorage");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 
@@ -241,7 +241,7 @@ namespace CampaignKit.WorldMap.Core.Services
             try
             {
                 // Initialize connection to Azure table storage
-                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureTableStorageMaps");
+                var cloudStorageConnectionString = _configuration.GetConnectionString("AzureStorage");
                 var cloudStorageAccount = CloudStorageAccount.Parse(cloudStorageConnectionString);
                 var cloudTableClient = cloudStorageAccount.CreateCloudTableClient(new TableClientConfiguration());
 

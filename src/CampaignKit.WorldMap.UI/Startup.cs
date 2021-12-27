@@ -114,6 +114,9 @@ namespace CampaignKit.WorldMap.UI
 
             // Add storage services
             this.ConfigureStorage(services);
+
+            // Add application insights
+            services.AddApplicationInsightsTelemetry();
         }
 
         /// <summary>
