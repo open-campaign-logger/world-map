@@ -28,9 +28,13 @@ namespace CampaignKit.WorldMap.Tests.MockServices
             throw new NotImplementedException();
         }
 
-        public Task<List<string>> ListFolderContentsAsync(string folderName)
+        public async Task<List<string>> ListFolderContentsAsync(string folderName)
         {
-            throw new NotImplementedException();
+            var results = new List<String>
+            {
+                "master-image.png",
+            };
+            return await Task.Run(() => results);
         }
 
         public Task<byte[]> ReadBlobAsync(string folderName, string blobName)

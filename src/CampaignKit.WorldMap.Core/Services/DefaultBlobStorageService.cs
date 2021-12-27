@@ -66,7 +66,7 @@ namespace CampaignKit.WorldMap.Core.Services
         public async Task<bool> CreateBlobAsync(string folderName, string blobName, byte[] blob)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureStorage"));
 
             // Create the container and return a container client object
             try
@@ -98,7 +98,7 @@ namespace CampaignKit.WorldMap.Core.Services
         public async Task<byte[]> ReadBlobAsync(string folderName, string blobName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureStorage"));
 
             // Create the container and return a container client object
             try
@@ -128,7 +128,7 @@ namespace CampaignKit.WorldMap.Core.Services
         public async Task<List<String>> ListFolderContentsAsync(string folderName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            var blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
+            var blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureStorage"));
 
             // Create result set
             var results = new List<String>();
@@ -168,7 +168,7 @@ namespace CampaignKit.WorldMap.Core.Services
         public async Task<bool> DeleteFolderAsync(string folderName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            var blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
+            var blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureStorage"));
 
             // Create the container and return a container client object
             try
@@ -206,7 +206,7 @@ namespace CampaignKit.WorldMap.Core.Services
         public async Task<bool> FolderExistsAsync(string folderName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureStorage"));
 
             // Create the container and return a container client object
             try
@@ -231,7 +231,7 @@ namespace CampaignKit.WorldMap.Core.Services
         public async Task<bool> BlobExistsAsync(string folderName, string blobName)
         {
             // Create a BlobServiceClient object which will be used to create a container client
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureBlobStorage"));
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_configuration.GetConnectionString("AzureStorage"));
 
             // Create the container and return a container client object
             try
