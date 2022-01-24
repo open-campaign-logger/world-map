@@ -38,8 +38,6 @@ namespace CampaignKit.WorldMap.Core.Data
     /// <seealso cref="IMapRepository" />
     public class DefaultMapRepository : IMapRepository
     {
-        private const int TilePixelSize = 250;
-
         /// <summary>
         /// The application configuration.
         /// </summary>
@@ -66,11 +64,6 @@ namespace CampaignKit.WorldMap.Core.Data
         private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
-        /// The queue storage service
-        /// </summary>
-        private readonly IQueueStorageService _queueStorageService;
-
-        /// <summary>
         ///     Initializes a new instance of the <see cref="DefaultMapRepository" /> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
@@ -78,21 +71,18 @@ namespace CampaignKit.WorldMap.Core.Data
         /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="userManagerService">The user manager service.</param>
         /// <param name="blobStorageService">The blob storage service.</param>
-        /// <param name="queueStorageService">The queue storage service.</param>
         public DefaultMapRepository(
             IConfiguration configuration,
             ILogger<DefaultMapRepository> loggerService,
             ITableStorageService tableStorageService,
             IUserManagerService userManagerService,
-            IBlobStorageService blobStorageService,
-            IQueueStorageService queueStorageService)
+            IBlobStorageService blobStorageService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
             _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
             _userManagerService = userManagerService ?? throw new ArgumentNullException(nameof(userManagerService));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
-            _queueStorageService = queueStorageService ?? throw new ArgumentNullException(nameof(queueStorageService));
         }
 
         /// <summary>
@@ -198,6 +188,7 @@ namespace CampaignKit.WorldMap.Core.Data
             // **********************
             //   Precondition Tests
             // **********************
+
             // Image data not provided?
             if (stream == null)
             {
@@ -212,42 +203,29 @@ namespace CampaignKit.WorldMap.Core.Data
                 return null;
             }
 
-            // ************************************
-            //  Create DB entity (Generate Map ID)
-            // ************************************
+            // *******************
+            //   DB Operations
+            // *******************
+
+            // Create the map record in the db.
             map.UserId = userid;
             await _tableStorageService.CreateMapRecordAsync(map);
 
-            // **********************
-            //   Create Map Folder
-            // **********************
-            var folderName = $"map{map.MapId}";
+            // *******************
+            //   File Operations
+            // *******************
 
-            // ****************************
-            //   Save Original Image File
-            // ****************************
-            byte[] originalImageBlob, masterImageBlob;
-            using (var ms = new MemoryStream())
-            {
-                // Save original file.
-                stream.CopyTo(ms);
-                originalImageBlob = ms.ToArray();
-                await _blobStorageService.CreateBlobAsync(folderName, $"original-file{map.FileExtension}", originalImageBlob);
-            }
+            // Load the master image from the stream.
+            var masterImage = Image.Load(stream);
 
-            // ****************************
-            //  Save PNG Master Image File
-            // ****************************
-            var masterImage = Image.Load(originalImageBlob);
+            // Resize master image if required.
             var width = masterImage.Width;
             var height = masterImage.Height;
-
             var largestSize = Math.Max(width, height);
-            var maxZoomLevel = Math.Log((double)largestSize / TilePixelSize, 2);
-
+            var tilePixelSize = this._configuration.GetValue<int>("TilePixelSize");
+            var maxZoomLevel = Math.Log((double)largestSize / tilePixelSize, 2);
             var adjustedMaxZoomLevel = (int)Math.Max(0, Math.Floor(maxZoomLevel));
-            var adjustedLargestSize = (int)Math.Round(Math.Pow(2, adjustedMaxZoomLevel) * TilePixelSize);
-
+            var adjustedLargestSize = (int)Math.Round(Math.Pow(2, adjustedMaxZoomLevel) * tilePixelSize);
             if (width != height || largestSize != adjustedLargestSize)
             {
                 masterImage = masterImage.Clone(context => context.Resize(new ResizeOptions
@@ -258,11 +236,11 @@ namespace CampaignKit.WorldMap.Core.Data
                 }));
             }
 
+            // Save the resized image
             using (var ms = new MemoryStream())
             {
                 masterImage.Save(ms, new PngEncoder());
-                masterImageBlob = ms.ToArray();
-                await _blobStorageService.CreateBlobAsync(folderName, "master-file.png", masterImageBlob);
+                await _blobStorageService.CreateBlobAsync($"map{map.MapId}", "master-file.png", ms.ToArray());
             }
 
             // ****************************
@@ -275,35 +253,6 @@ namespace CampaignKit.WorldMap.Core.Data
             map.ThumbnailPath = $"{map.WorldFolderPath}/0_zoom-level.png";
             await _tableStorageService.UpdateMapRecordAsync(map);
 
-            // ****************************************
-            //        Create Tile Entities
-            // ****************************************
-
-            // Iterate through zoom levels to create required tiles
-            for (var zoomLevel = 0; zoomLevel <= map.MaxZoomLevel; zoomLevel++)
-            {
-                // Calculate the number of tiles required for this zoom level
-                var numberOfTilesPerDimension = (int)Math.Pow(2, zoomLevel);
-
-                for (var x = 0; x < numberOfTilesPerDimension; x++)
-                {
-                    for (var y = 0; y < numberOfTilesPerDimension; y++)
-                    {
-                        var tile = new Tile
-                        {
-                            MapId = map.MapId,
-                            ZoomLevel = zoomLevel,
-                            IsRendered = false,
-                            TileSize = TilePixelSize,
-                            X = x,
-                            Y = y,
-                        };
-                        await _tableStorageService.CreateTileRecordAsync(tile);
-                    }
-                }
-            }
-
-            await _queueStorageService.QueueMapForProcessing(map);
             return map.MapId;
         }
 
@@ -442,10 +391,8 @@ namespace CampaignKit.WorldMap.Core.Data
                     ShareKey = "lNtqjEVQ",
                     MapId = "sample",
                 };
-                using (var ms = new MemoryStream(sampleImage))
-                {
-                    await Create(map, ms, _userManagerService.GetSystemUser());
-                }
+                using var ms = new MemoryStream(sampleImage);
+                await Create(map, ms, _userManagerService.GetSystemUser());
             }
 
             return true;

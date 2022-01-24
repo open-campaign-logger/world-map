@@ -14,13 +14,16 @@
 // limitations under the License.
 // </copyright>
 
-using CampaignKit.WorldMap.Core.Services;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-
 namespace CampaignKit.WorldMap.Function
 {
+    using CampaignKit.WorldMap.Core.Services;
+
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+
+    /// <summary>
+    /// Main program.
+    /// </summary>
     public class Program
     {
         public static void Main()
@@ -32,7 +35,6 @@ namespace CampaignKit.WorldMap.Function
                     // Add the DI services to the context.
                     s.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
                     s.AddSingleton<ITableStorageService, DefaultTableStorageService>();
-                    s.AddSingleton<IQueueStorageService, DefaultQueueStorageService>();
                     s.AddSingleton<IMapProcessingService, DefaultMapProcessingService>();
                 })
                 .Build();

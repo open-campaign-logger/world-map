@@ -36,6 +36,11 @@ namespace CampaignKit.WorldMap.Core.Services
         private readonly ITableStorageService _tableStorageService;
 
         /// <summary>
+        /// The BLOB storage service.
+        /// </summary>
+        private readonly IBlobStorageService _blobStorageService;
+
+        /// <summary>
         /// The application configuration.
         /// </summary>
         private readonly IConfiguration _configuration;
@@ -49,12 +54,14 @@ namespace CampaignKit.WorldMap.Core.Services
         /// Initializes a new instance of the <see cref="DefaultProgressService"/> class.
         /// </summary>
         /// <param name="configuration">The application configuration.</param>
+        /// <param name="blobStorageService">The blob storage service.</param>
         /// <param name="tableStorageService">The table storage service.</param>
         /// <param name="loggerService">The logger service.</param>
-        public DefaultProgressService(IConfiguration configuration, ITableStorageService tableStorageService, ILogger<DefaultProgressService> loggerService)
+        public DefaultProgressService(IConfiguration configuration, IBlobStorageService blobStorageService, ITableStorageService tableStorageService, ILogger<DefaultProgressService> loggerService)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _tableStorageService = tableStorageService ?? throw new ArgumentNullException(nameof(tableStorageService));
+            _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
             _loggerService = loggerService ?? throw new ArgumentNullException(nameof(loggerService));
         }
 
@@ -75,18 +82,16 @@ namespace CampaignKit.WorldMap.Core.Services
             // If map found calculate what percentage of files have been found.
             if (map != null)
             {
-                var total = map.Tiles.Count();
-                var completed = map.Tiles.Where(t => t.IsRendered == true).Count();
+                var total = 1; // master-image
+                for (int zoomLevel = 0; zoomLevel <= map.MaxZoomLevel; zoomLevel++) {
+                    total++; // zoom level image
+                    total += (int)Math.Pow(2, 2*zoomLevel);
+                }
+
+                var createdMapFileCount = await _blobStorageService.ListFolderContentsAsync($"map{map.MapId}");
 
                 // Are there tiles defined for this map?
-                if (total > 0)
-                {
-                    progress = completed / (double)total;
-                }
-                else
-                {
-                    progress = 1;
-                }
+                progress = createdMapFileCount.Count / (double) total;
             }
 
             // Return the progress value

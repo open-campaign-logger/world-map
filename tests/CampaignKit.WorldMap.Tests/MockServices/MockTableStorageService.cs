@@ -15,22 +15,7 @@ namespace CampaignKit.WorldMap.Tests.MockServices
             throw new NotImplementedException();
         }
 
-        public Task<string> CreateTileRecordAsync(Tile tile)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<bool> DeleteMapRecordAsync(Map map)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> DeleteProcessedTileRecordsAsync(int numberOfDays, int maxNumberOfRecords)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> DeleteTileRecordAsync(Tile tile)
         {
             throw new NotImplementedException();
         }
@@ -50,22 +35,7 @@ namespace CampaignKit.WorldMap.Tests.MockServices
             return await Task.Run(() => userMapList);
         }
 
-        public Task<Tile> GetTileRecordAsync(string tileId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Tile>> GetUnprocessedTileRecordsAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<bool> UpdateMapRecordAsync(Map map)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> UpdateTileRecordAsync(Tile tile)
         {
             throw new NotImplementedException();
         }
@@ -89,7 +59,6 @@ namespace CampaignKit.WorldMap.Tests.MockServices
                 MarkerData = "[{ \"options\": { }, \"properties\": { } ] ",
                 ShareKey = "lNtqjEVQ",
                 IsPublic = true,
-                Tiles = new List<Tile>(),
             };
         }
     }

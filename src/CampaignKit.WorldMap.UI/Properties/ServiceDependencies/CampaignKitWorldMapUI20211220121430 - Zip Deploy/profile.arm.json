@@ -21,7 +21,7 @@
     },
     "resourceName": {
       "type": "string",
-      "defaultValue": "CampaignKitWorldMapFunction20210530183839",
+      "defaultValue": "CampaignKitWorldMapUI20211220121430",
       "metadata": {
         "description": "Name of the main resource to be created by this template."
       }

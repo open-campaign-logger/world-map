@@ -114,6 +114,9 @@ namespace CampaignKit.WorldMap.UI
 
             // Add storage services
             this.ConfigureStorage(services);
+
+            // Add application insights
+            services.AddApplicationInsightsTelemetry();
         }
 
         /// <summary>
@@ -170,7 +173,6 @@ namespace CampaignKit.WorldMap.UI
         {
             services.AddSingleton<IBlobStorageService, DefaultBlobStorageService>();
             services.AddSingleton<ITableStorageService, DefaultTableStorageService>();
-            services.AddSingleton<IQueueStorageService, DefaultQueueStorageService>();
         }
     }
 }

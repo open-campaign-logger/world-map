@@ -35,25 +35,11 @@ namespace CampaignKit.WorldMap.Core.Services
         public Task<string> CreateMapRecordAsync(Map map);
 
         /// <summary>
-        /// Creates a map tile record asynchronously.
-        /// </summary>
-        /// <param name="tile">The map tile.</param>
-        /// <returns>The auto-generated tileid for the new map tile record.</returns>
-        public Task<string> CreateTileRecordAsync(Tile tile);
-
-        /// <summary>
         /// Updates a map record asynchronously.
         /// </summary>
         /// <param name="map">The map.</param>
         /// <returns>True if the operation succeeds, false otherwise.</returns>
         public Task<bool> UpdateMapRecordAsync(Map map);
-
-        /// <summary>
-        /// Updates a map tile record asynchronously.
-        /// </summary>
-        /// <param name="tile">The map tile.</param>
-        /// <returns>True if the operation succeeds, false otherwise.</returns>
-        public Task<bool> UpdateTileRecordAsync(Tile tile);
 
         /// <summary>
         /// Deletes a map record and any associated tile records asynchronously.
@@ -63,25 +49,11 @@ namespace CampaignKit.WorldMap.Core.Services
         public Task<bool> DeleteMapRecordAsync(Map map);
 
         /// <summary>
-        /// Deletes a tile record asynchronously.
-        /// </summary>
-        /// <param name="tile">The tile.</param>
-        /// <returns>True if the operation succeeds, false otherwise.</returns>
-        public Task<bool> DeleteTileRecordAsync(Tile tile);
-
-        /// <summary>
         /// Gets a map record and any associated tile records asynchronously.
         /// </summary>
         /// <param name="mapId">The map's unique id.</param>
         /// <returns>The map and its tiles if found, null otherwise.</returns>
         public Task<Map> GetMapRecordAsync(string mapId);
-
-        /// <summary>
-        /// Gets a tile record asynchronously.
-        /// </summary>
-        /// <param name="tileId">The tile's unique id.</param>
-        /// <returns>The tile if found, null otherwise.</returns>
-        public Task<Tile> GetTileRecordAsync(string tileId);
 
         /// <summary>
         /// Gets all map records for the specified user asynchronously.
@@ -90,19 +62,5 @@ namespace CampaignKit.WorldMap.Core.Services
         /// <param name="includePublic">whether to include public maps in the results.</param>
         /// <returns>List of maps associated with the user, empty list if no maps found.</returns>
         public Task<List<Map>> GetMapRecordsForUserAsync(string userId, bool includePublic);
-
-        /// <summary>
-        /// Gets a list of unprocessed tiles records asynchronously.
-        /// </summary>
-        /// <returns>List of unprocessed tiles, empty list of no tiles require processing.</returns>
-        public Task<List<Tile>> GetUnprocessedTileRecordsAsync();
-
-        /// <summary>
-        /// Delete processed tile records asynchronously.
-        /// </summary>
-        /// <param name="numberOfDays">Only delete processed tile records that are this number of days old.</param>
-        /// <param name="maxNumberOfRecords">Maximum number of records to delete.</param>
-        /// <returns>Number of records deleted.</returns>
-        public Task<int> DeleteProcessedTileRecordsAsync(int numberOfDays, int maxNumberOfRecords);
     }
 }
