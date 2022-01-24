@@ -327,14 +327,23 @@ function initMap(pMapId, pMapUserId, pMapShare, pWorldPath, pMaxZoomLevel, pNoWr
         $('<div id="map"></div>').appendTo('#preMap');
     }
 
-    // Create the map box
+    // Create the map box, centre it, and set its zoom level to 2.
     map = L.map('map').setView([0, 0], 2);
+
+    // Calculate map bounds
+    var bnds = null;
+    if (pNoWrap) {
+        var corner1 = L.latLng(-85, -180);
+        var corner2 = L.latLng(85, 180);
+        bnds = L.latLngBounds(corner1, corner2);
+    }
 
     L.tileLayer(pWorldPath + '/{z}_{x}_{y}.png',
         {
             attribution: 'Campaign Logger',
             maxZoom: pMaxZoomLevel,
-            noWrap: pNoWrap
+            noWrap: pNoWrap,
+            bounds: bnds
         }).addTo(map);
 
     // Add a feature group to the map to hold drawn items
