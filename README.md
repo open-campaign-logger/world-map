@@ -2,6 +2,8 @@
 
 Service for managing world maps and associate them with Campaign Logger log entries.
 
+THIS REPO IS NO LONGER ACTIVELY MAINTAINED AND THEREFORE ARCHIVED.
+
 # Development Environment
 
 ## SDKs
